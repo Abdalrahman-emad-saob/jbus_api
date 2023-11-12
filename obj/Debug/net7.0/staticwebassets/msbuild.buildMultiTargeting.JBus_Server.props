@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\jbus_server.props" />
+</Project>

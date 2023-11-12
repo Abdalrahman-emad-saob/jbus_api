@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "SKcBEO3FERm6dAnT6iTFka8vroOCizZQfQu0Bx0/aSw=",
+  "Source": "jbus_server",
+  "BasePath": "_content/jbus_server",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
