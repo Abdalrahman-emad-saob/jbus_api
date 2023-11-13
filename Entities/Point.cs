@@ -6,10 +6,13 @@ namespace API.Entities
         public string Name { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
 
         // * Link
         public int FavoritePointId { get; set; }
         public FavoritePoint FavoritePoint { get; set; }
+        
 
         // TODO
         // public int StartingPointId { get; set; }

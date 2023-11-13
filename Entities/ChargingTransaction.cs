@@ -3,8 +3,12 @@ namespace API.Entities
     public class ChargingTransaction
     {
         public int Id { get; set; }
-        // TODO
-        public enum PaymentMethod { get, set, }
+        // TODO enum
+        public enum PaymentMethod
+        {
+            MASTERCARD = 0,
+            VISA = 1
+        }
         public double Amount { get; set; }
         public DateTime TimeStamp { get; set; }
 
