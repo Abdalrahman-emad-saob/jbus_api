@@ -19,13 +19,15 @@ namespace API.Entities
         public Passenger Passenger { get; set; }
         public int BusId { get; set; }
         public Bus Bus { get; set; }
+        public int PaymentTransactionId { get; set; }
+        public PaymentTransaction PaymentTransaction { get; set; }
+        public int RouteId { get; set; }
+        public Route Route { get; set; }
 
         // * Link       
         // TODO
-        // public int RouteId { get; set; }
-        // public Route Route { get; set; }
-        // public int PaymentTransactionId { get; set; }
-        // public PaymentTransaction PaymentTransaction { get; set; }
+        
+        
 
         // public int PickUpPointId { get; set; }
         // public Point PickUpPoint { get; set; }

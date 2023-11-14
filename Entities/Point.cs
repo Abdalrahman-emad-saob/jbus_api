@@ -12,15 +12,15 @@ namespace API.Entities
         // * Link
         public int FavoritePointId { get; set; }
         public FavoritePoint FavoritePoint { get; set; }
-        
+        public int InterestPointId { get; set; }
+        public InterestPoint InterestPoint { get; set; }
 
         // TODO
         // public int StartingPointId { get; set; }
-        // public Point StartingPoint { get; set; }
+        public ICollection<Trip> StartingPoints { get; set; }
         // public int EndingPointId { get; set; }
-        // public Point EndingPoint { get; set; }
-        // public int LocationId { get; set; }
-        // public Point Location { get; set; }
+        public ICollection<Trip> EndingPoints { get; set; }
+        
 
     }
 }

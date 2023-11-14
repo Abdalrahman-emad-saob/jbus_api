@@ -10,20 +10,15 @@ namespace API.Entities
         public DateTime UpdatedAt { get; set; }
 
         // * Link
-        // TODO
         // public int FavoritePointId { get; set; }
-        // public FavoritePoint FavoritePoint { get; set; }
+        public ICollection<FavoritePoint> FavoritePoints { get; set; }
         // public int BusId { get; set; }
-        // public ICollection<Bus> Buses { get; set; }
+        public ICollection<Bus> Buses { get; set; }
         // public int TripId { get; set; }
-        // public ICollection<Trip> Trips { get; set; }
-        // [NotMapped]
-        // public int StartingPointId { get; set; }
-        // [NotMapped]
-        // public InterestPoint StartingPoint { get; set; }
-        // [NotMapped]
-        // public int EndingPointId { get; set; }
-        // [NotMapped]
-        // public InterestPoint EndingPoint { get; set; }
+        public ICollection<Trip> Trips { get; set; }
+        public int StartingPointId { get; set; }
+        public InterestPoint StartingPoint { get; set; }
+        public int EndingPointId { get; set; }
+        public InterestPoint EndingPoint { get; set; } 
     }
 }

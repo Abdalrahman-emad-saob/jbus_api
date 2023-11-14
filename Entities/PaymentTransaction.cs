@@ -8,9 +8,7 @@ namespace API.Entities
 
         // * Link
         public int PassengerId { get; set; }
-        public Passenger Passenger { get; set; }
-        // TODO
-        
+        public Passenger Passenger { get; set; }       
         public int TripId { get; set; }
         public Trip Trip { get; set; }
     }

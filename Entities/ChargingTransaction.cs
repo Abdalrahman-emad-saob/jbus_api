@@ -3,7 +3,7 @@ namespace API.Entities
     public class ChargingTransaction
     {
         public int Id { get; set; }
-        // TODO enum
+        // TODO Payment Methods
         public enum PaymentMethod
         {
             MASTERCARD = 0,

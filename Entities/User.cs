@@ -8,8 +8,6 @@ namespace API.Entities
         public string Email { get; set; }
         public string GoogleToken { get; set; }
         public string FacebookToken { get; set; }
-        
-        // TODO enum
         public enum Role
         {
             SUPER_ADMIN = 0,
@@ -17,13 +15,13 @@ namespace API.Entities
             DRIVER = 2,
             PASSENGER = 3
         }
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
-    public byte[] PasswordHash { get; set; }
-    public byte[] PasswordSalt { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public byte[] PasswordHash { get; set; }
+        public byte[] PasswordSalt { get; set; }
 
-    // * Link
-    public int PassengerId { get; set; }
-    public Passenger Passenger { get; set; }
-}
+        // * Link
+        public int PassengerId { get; set; }
+        public Passenger Passenger { get; set; }
+    }
 }
