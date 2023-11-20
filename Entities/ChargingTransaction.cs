@@ -1,5 +1,8 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace API.Entities
 {
+    [Table("ChargingTransactions")]
     public class ChargingTransaction
     {
         public int Id { get; set; }
@@ -10,7 +13,7 @@ namespace API.Entities
             VISA = 1
         }
         public double Amount { get; set; }
-        public DateTime TimeStamp { get; set; }
+        public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
 
         // * Link
         public int PassengerId { get; set; }

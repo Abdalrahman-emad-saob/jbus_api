@@ -1,4 +1,3 @@
-using jbus_api.Entities;
 
 namespace API.Entities
 {
@@ -7,6 +6,8 @@ namespace API.Entities
         public int Id { get; set; }
         public string BusNumber { get; set; }
         public int Capacity { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         // * Link
         public int RouteId { get; set; }
@@ -14,9 +15,8 @@ namespace API.Entities
         public int DriverId { get; set; }
         public Driver Driver { get; set; }
         // public int TripId { get; set; }
-        public ICollection<Trip> Trips { get; set; }        
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public List<Trip> Trips { get; set; }        
+        
         
     }
 }

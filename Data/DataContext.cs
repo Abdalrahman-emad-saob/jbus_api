@@ -1,5 +1,4 @@
 using API.Entities;
-using jbus_api.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
@@ -11,7 +10,7 @@ namespace API.Data
         public DbSet<Driver> Drivers { get; set; }
         public DbSet<FavoritePoint> FavoritePoints { get; set; }
         public DbSet<InterestPoint> InterestPoints { get; set; }
-        public DbSet<OTP> OTPs { get; set; }
+        // public DbSet<OTP> OTPs { get; set; }
         public DbSet<Passenger> Passengers { get; set; }
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         public DbSet<Point> Points { get; set; }
@@ -31,11 +30,11 @@ namespace API.Data
                         .HasForeignKey<Passenger>(u => u.UserId)
                         .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Passenger>()
-                        .HasMany(o => o.OTPs)
-                        .WithOne(u => u.Passenger)
-                        .HasForeignKey(o => o.PassengerId)
-                        .OnDelete(DeleteBehavior.NoAction);
+            // modelBuilder.Entity<Passenger>()
+            //             .HasMany(o => o.OTPs)
+            //             .WithOne(u => u.Passenger)
+            //             .HasForeignKey(o => o.PassengerId)
+            //             .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Driver>()
                         .HasOne(d => d.Bus)
@@ -43,23 +42,23 @@ namespace API.Data
                         .HasForeignKey<Bus>(b => b.DriverId)
                         .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Bus>()
-                        .HasMany(b => b.Trips)
-                        .WithOne(t => t.Bus)
-                        .HasForeignKey(t => t.BusId)
-                        .OnDelete(DeleteBehavior.NoAction);
+            // modelBuilder.Entity<Bus>()
+            //             .HasMany(b => b.Trips)
+            //             .WithOne(t => t.Bus)
+            //             .HasForeignKey(t => t.BusId)
+            //             .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Passenger>()
-                        .HasMany(p => p.ChargingTransactions)
-                        .WithOne(ct => ct.Passenger)
-                        .HasForeignKey(ct => ct.PassengerId)
-                        .OnDelete(DeleteBehavior.NoAction);
+            // modelBuilder.Entity<Passenger>()
+            //             .HasMany(p => p.ChargingTransactions)
+            //             .WithOne(ct => ct.Passenger)
+            //             .HasForeignKey(ct => ct.PassengerId)
+            //             .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Passenger>()
-                        .HasMany(p => p.FavoritePoints)
-                        .WithOne(fp => fp.Passenger)
-                        .HasForeignKey(fp => fp.PassengerId)
-                        .OnDelete(DeleteBehavior.NoAction);
+            // modelBuilder.Entity<Passenger>()
+            //             .HasMany(p => p.FavoritePoints)
+            //             .WithOne(fp => fp.Passenger)
+            //             .HasForeignKey(fp => fp.PassengerId)
+            //             .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Point>()
                         .HasOne(p => p.FavoritePoint)
@@ -67,30 +66,30 @@ namespace API.Data
                         .HasForeignKey<FavoritePoint>(fp => fp.PointId)
                         .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Passenger>()
-                        .HasMany(p => p.PaymentTransactions)
-                        .WithOne(pm => pm.Passenger)
-                        .HasForeignKey(pm => pm.PassengerId)
-                        .OnDelete(DeleteBehavior.NoAction);
+            // modelBuilder.Entity<Passenger>()
+            //             .HasMany(p => p.PaymentTransactions)
+            //             .WithOne(pm => pm.Passenger)
+            //             .HasForeignKey(pm => pm.PassengerId)
+            //             .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Passenger>()
-                        .HasMany(p => p.Trips)
-                        .WithOne(t => t.Passenger)
-                        .HasForeignKey(t => t.PassengerId)
-                        .OnDelete(DeleteBehavior.NoAction);
+            // modelBuilder.Entity<Passenger>()
+            //             .HasMany(p => p.Trips)
+            //             .WithOne(t => t.Passenger)
+            //             .HasForeignKey(t => t.PassengerId)
+            //             .OnDelete(DeleteBehavior.NoAction);
 
             // one-to-many
-            modelBuilder.Entity<Entities.Route>()
-                        .HasMany(r => r.Buses)
-                        .WithOne(b => b.Route)
-                        .HasForeignKey(b => b.RouteId)
-                        .OnDelete(DeleteBehavior.NoAction);
+            // modelBuilder.Entity<Entities.Route>()
+            //             .HasMany(r => r.Buses)
+            //             .WithOne(b => b.Route)
+            //             .HasForeignKey(b => b.RouteId)
+            //             .OnDelete(DeleteBehavior.NoAction);
             // one-to-many
-            modelBuilder.Entity<Entities.Route>()
-                        .HasMany(r => r.FavoritePoints)
-                        .WithOne(fp => fp.Route)
-                        .HasForeignKey(fp => fp.RouteId)
-                        .OnDelete(DeleteBehavior.NoAction);
+            // modelBuilder.Entity<Entities.Route>()
+            //             .HasMany(r => r.FavoritePoints)
+            //             .WithOne(fp => fp.Route)
+            //             .HasForeignKey(fp => fp.RouteId)
+            //             .OnDelete(DeleteBehavior.NoAction);
             // one-to-one
             modelBuilder.Entity<Trip>()
                         .HasOne(t => t.PaymentTransaction)
@@ -98,11 +97,11 @@ namespace API.Data
                         .HasForeignKey<PaymentTransaction>(pt => pt.TripId)
                         .OnDelete(DeleteBehavior.NoAction);
             // one-to-many
-            modelBuilder.Entity<Entities.Route>()
-                        .HasMany(r => r.Trips)
-                        .WithOne(t => t.Route)
-                        .HasForeignKey(t => t.RouteId)
-                        .OnDelete(DeleteBehavior.NoAction);
+            // modelBuilder.Entity<Entities.Route>()
+            //             .HasMany(r => r.Trips)
+            //             .WithOne(t => t.Route)
+            //             .HasForeignKey(t => t.RouteId)
+            //             .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<InterestPoint>()
                         .HasOne(ip => ip.StartingPoint)
@@ -128,13 +127,14 @@ namespace API.Data
             //             .WithMany(p => p.StartingPoints)
             //             .HasForeignKey(t => t.PickUpPointId)
             //             .OnDelete(DeleteBehavior.NoAction);
-            
+
             // modelBuilder.Entity<Trip>() 
             //             .HasOne(t => t.DropOffPoint)
             //             .WithMany(p => p.EndingPoints)
             //             .HasForeignKey(t => t.DropOffPointId)
             //             .OnDelete(DeleteBehavior.NoAction);
-
+            base.OnModelCreating(modelBuilder);
         }
     }
+
 }

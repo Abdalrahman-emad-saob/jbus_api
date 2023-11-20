@@ -4,7 +4,7 @@ namespace API.Entities
     {
         public int Id { get; set; }
         public double Amount { get; set; }
-        public DateTime TimeStamp { get; set; }
+        public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
 
         // * Link
         public int PassengerId { get; set; }
