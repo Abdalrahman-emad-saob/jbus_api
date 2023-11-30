@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace API.Entities
 {
     public class Route
@@ -8,22 +6,16 @@ namespace API.Entities
         public string Name { get; set; }
         public string WaypointsGoing { get; set; }
         public string WaypointsReturning { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         // * Link
-        public int TripId { get; set; }
-        public Trip Trip { get; set; }
-        public int FavoritePointId { get; set; }
-        public FavoritePoint FavoritePoint { get; set; }
-        public int BusId { get; set; }
-        public Bus Bus { get; set; }
-        // TODO
-        // [NotMapped]
-        // public int StartingPointId { get; set; }
-        // [NotMapped]
-        // public InterestPoint StartingPoint { get; set; }
-        // [NotMapped]
-        // public int EndingPointId { get; set; }
-        // [NotMapped]
-        // public InterestPoint EndingPoint { get; set; }
+        public List<FavoritePoint> FavoritePoints { get; set; }
+        public List<Bus> Buses { get; set; }
+        public List<Trip> Trips { get; set; }
+        public int StartingPointId { get; set; }
+        public InterestPoint StartingPoint { get; set; }
+        public int EndingPointId { get; set; }
+        public InterestPoint EndingPoint { get; set; } 
     }
 }
