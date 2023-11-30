@@ -10,11 +10,8 @@ namespace API.Entities
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         // * Link
-        // public int FavoritePointId { get; set; }
         public List<FavoritePoint> FavoritePoints { get; set; }
-        // public int BusId { get; set; }
         public List<Bus> Buses { get; set; }
-        // public int TripId { get; set; }
         public List<Trip> Trips { get; set; }
         public int StartingPointId { get; set; }
         public InterestPoint StartingPoint { get; set; }

@@ -14,7 +14,6 @@ namespace API.Entities
         public Route Route { get; set; }
         public int DriverId { get; set; }
         public Driver Driver { get; set; }
-        // public int TripId { get; set; }
         public List<Trip> Trips { get; set; }        
         
         

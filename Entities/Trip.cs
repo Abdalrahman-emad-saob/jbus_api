@@ -25,15 +25,12 @@ namespace API.Entities
         public Bus Bus { get; set; }
         public int PaymentTransactionId { get; set; }
         public PaymentTransaction PaymentTransaction { get; set; }
-        // public int RouteId { get; set; }
-        // public Route Route { get; set; }     
-        // TODO
-        
-        
-
-        // public int PickUpPointId { get; set; }
-        // public Point PickUpPoint { get; set; }
-        // public int DropOffPointId { get; set; }
-        // public Point DropOffPoint { get; set; }
+        public int RouteId { get; set; }
+        public Route Route { get; set; }     
+        // TODO     
+        public int PickUpPointId { get; set; }
+        public Point PickUpPoint { get; set; }
+        public int DropOffPointId { get; set; }
+        public Point DropOffPoint { get; set; }
     }
 }

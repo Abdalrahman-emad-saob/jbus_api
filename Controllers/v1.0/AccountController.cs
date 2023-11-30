@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.Controllers
+namespace API.Controllers.v1
 {
     [Authorize]
     public class AccountController : BaseApiController
@@ -54,7 +54,7 @@ namespace API.Controllers
         }
         [AllowAnonymous]
         [HttpPost("login")]
-        public ActionResult<PassengerDto> Login(LoginDto loginDto)
+        public ActionResult<LoginResponseDto> Login(LoginDto loginDto)
         {
             var user = _context.Users.FirstOrDefault(x => x.Email == loginDto.Email.ToLower());
             if (user == null) return Unauthorized("Not Authorized");
@@ -66,7 +66,13 @@ namespace API.Controllers
             if (passwordVerificationResult != PasswordVerificationResult.Success)
                 return Unauthorized("Not Authorized");
 
-            return _mapper.Map<PassengerDto>(_passengerRepository.GetPassengerById(user.Id));
+            var passengerDto = _mapper.Map<PassengerDto>(_passengerRepository.GetPassengerById(user.Id));
+            var token = _tokenService.CreateToken(user);
+
+            return new LoginResponseDto{
+                passengerDto = passengerDto,
+                Token = token
+            };
         }
         [HttpGet("PassengerExists")]
         public bool PassengerExists(string Email)

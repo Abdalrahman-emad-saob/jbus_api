@@ -9,8 +9,13 @@ namespace API.Helpers
         public AutoMapperProfiles()
         {
             CreateMap<Passenger, PassengerDto>();
-            // .ForMember(dest => dest.User.Age, opt => opt.MapFrom(src => src.User.GetAge()));
+            CreateMap<PassengerUpdateDto, Passenger>();
             CreateMap<User, UserDto>();
+            CreateMap<UserDto, User>();
+            CreateMap<RouteUpdateDto, Entities.Route>();
+            CreateMap<Entities.Route, RouteDto>();
+            CreateMap<InterestPoint, InterestPointDto>();
+            CreateMap<Point, PointDto>();
         }
     }
 }

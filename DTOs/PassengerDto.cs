@@ -8,6 +8,6 @@ namespace API.DTOs
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public UserDto User { get; set; }
-
+        public string Token { get; set; }
     }
 }

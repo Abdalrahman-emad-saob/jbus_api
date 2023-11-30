@@ -19,10 +19,10 @@ namespace API.Entities
         public InterestPoint InterestPoint { get; set; }
 
         // TODO
-        // public int StartingPointId { get; set; }
-        // public ICollection<Trip> StartingPoints { get; set; }
-        // public int EndingPointId { get; set; }
-        // public ICollection<Trip> EndingPoints { get; set; }
+        public int TripPickupId { get; set; }
+        public Trip TripPickup { get; set; }
+        public int TripDropoffId { get; set; }
+        public Trip TripDropoff { get; set; }
         
 
     }

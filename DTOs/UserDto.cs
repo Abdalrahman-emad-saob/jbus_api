@@ -1,5 +1,3 @@
-using System;
-using API.Entities;
 using static API.Entities.User;
 
 namespace API.DTOs
@@ -10,9 +8,8 @@ namespace API.DTOs
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public Role UserRole { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public DateTime LastActive { get; set; }
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime LastActive { get; set; } = DateTime.UtcNow;
         public Gender UserGender { get; set; }
     }
 }

@@ -97,20 +97,20 @@ namespace API.Data
                         .HasForeignKey<PaymentTransaction>(pt => pt.TripId)
                         .OnDelete(DeleteBehavior.NoAction);
             // one-to-many
-            // modelBuilder.Entity<Entities.Route>()
-            //             .HasMany(r => r.Trips)
-            //             .WithOne(t => t.Route)
-            //             .HasForeignKey(t => t.RouteId)
-            //             .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<Entities.Route>()
+                        .HasMany(r => r.Trips)
+                        .WithOne(t => t.Route)
+                        .HasForeignKey(t => t.RouteId)
+                        .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<InterestPoint>()
-                        .HasOne(ip => ip.StartingPoint)
+                        .HasOne(ip => ip.RouteStart)
                         .WithOne(r => r.StartingPoint)
                         .HasForeignKey<Entities.Route>(r => r.StartingPointId)
                         .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<InterestPoint>()
-                        .HasOne(ip => ip.EndingPoint)
+                        .HasOne(ip => ip.RouteEnd)
                         .WithOne(r => r.EndingPoint)
                         .HasForeignKey<Entities.Route>(r => r.EndingPointId)
                         .OnDelete(DeleteBehavior.NoAction);
@@ -122,18 +122,18 @@ namespace API.Data
                         .OnDelete(DeleteBehavior.NoAction);
 
             // TODO
-            // modelBuilder.Entity<Trip>()
-            //             .HasOne(t => t.PickUpPoint)
-            //             .WithMany(p => p.StartingPoints)
-            //             .HasForeignKey(t => t.PickUpPointId)
-            //             .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<Trip>()
+                        .HasOne(t => t.PickUpPoint)
+                        .WithOne(p => p.TripPickup)
+                        .HasForeignKey<Point>(t => t.TripPickupId)
+                        .OnDelete(DeleteBehavior.NoAction);
 
-            // modelBuilder.Entity<Trip>() 
-            //             .HasOne(t => t.DropOffPoint)
-            //             .WithMany(p => p.EndingPoints)
-            //             .HasForeignKey(t => t.DropOffPointId)
-            //             .OnDelete(DeleteBehavior.NoAction);
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Trip>() 
+                        .HasOne(t => t.DropOffPoint)
+                        .WithOne(p => p.TripDropoff)
+                        .HasForeignKey<Point>(t => t.TripDropoffId)
+                        .OnDelete(DeleteBehavior.NoAction);
+            // base.OnModelCreating(modelBuilder);
         }
     }
 
