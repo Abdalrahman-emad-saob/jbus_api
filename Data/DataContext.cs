@@ -10,7 +10,7 @@ namespace API.Data
         public DbSet<Driver> Drivers { get; set; }
         public DbSet<FavoritePoint> FavoritePoints { get; set; }
         public DbSet<InterestPoint> InterestPoints { get; set; }
-        // public DbSet<OTP> OTPs { get; set; }
+        public DbSet<OTP> OTPs { get; set; }
         public DbSet<Passenger> Passengers { get; set; }
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         public DbSet<Point> Points { get; set; }

@@ -74,7 +74,6 @@ namespace API.Controllers.v1
                 Token = token
             };
         }
-        [HttpGet("PassengerExists")]
         public bool PassengerExists(string Email)
         {
             return _passengerRepository.GetPassengerByEmail(Email) != null;

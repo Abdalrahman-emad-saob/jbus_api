@@ -5,6 +5,8 @@ namespace API.Entities
         public int Id { get; set; }
         public string ProfileImage { get; set; }
         public double Wallet { get; set; }
+        public string GoogleToken { get; set; }
+        public string FacebookToken { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 

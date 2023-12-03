@@ -1,28 +1,45 @@
-using API.Entities;
+using API.DTOs;
 using API.Interfaces;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 
 namespace API.Data
 {
     public class DriverRepository : IDriverRepository
     {
-        public Driver GetDriverById(int id)
+        private readonly DataContext _context;
+        private readonly IMapper _mapper;
+
+        public DriverRepository(DataContext context, IMapper mapper)
         {
-            throw new NotImplementedException();
+            _context = context;
+            _mapper = mapper;
+        }
+        public DriverDto GetDriverById(int id)
+        {
+            return _context
+            .Drivers
+            .Where(d => d.Id == id)
+            .ProjectTo<DriverDto>(_mapper.ConfigurationProvider)
+            .SingleOrDefault();
         }
 
-        public IEnumerable<Driver> GetDrivers()
+        public IEnumerable<DriverDto> GetDrivers()
         {
-            throw new NotImplementedException();
+             return _context
+            .Drivers
+            .ProjectTo<DriverDto>(_mapper.ConfigurationProvider)
+            .ToList();
         }
 
         public bool SaveChanges()
         {
-            throw new NotImplementedException();
+            return _context.SaveChanges() > 0;
         }
 
-        public void Update(Driver driver)
+        public void Update(DriverDto driver)
         {
-            throw new NotImplementedException();
+             _context.Entry(driver).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         }
     }
 }

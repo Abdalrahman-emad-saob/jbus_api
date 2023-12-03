@@ -6,8 +6,6 @@ namespace API.Entities
         public string Name { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
-        public string GoogleToken { get; set; }
-        public string FacebookToken { get; set; }
         public Role UserRole { get; set; }
         public enum Role
         {
@@ -27,7 +25,7 @@ namespace API.Entities
             MALE = 0,
             FEMALE = 1
         }
-        public DateOnly DateOfBirth { get; set; }
+        public DateTime DateOfBirth { get; set; }
 
         // * Link
         public int PassengerId { get; set; }

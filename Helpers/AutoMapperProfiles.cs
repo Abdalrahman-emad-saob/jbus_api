@@ -16,6 +16,7 @@ namespace API.Helpers
             CreateMap<Entities.Route, RouteDto>();
             CreateMap<InterestPoint, InterestPointDto>();
             CreateMap<Point, PointDto>();
+            CreateMap<ChargingTransaction, ChargingTransactionDto>();
         }
     }
 }

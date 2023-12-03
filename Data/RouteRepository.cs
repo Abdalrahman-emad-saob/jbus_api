@@ -18,7 +18,10 @@ namespace API.Data
         }
         public RouteDto GetRouteById(int id)
         {
-            return _context.Routes.Where(r => r.Id == id).ProjectTo<RouteDto>(_mapper.ConfigurationProvider).SingleOrDefault();
+            return _context.Routes
+            .Where(r => r.Id == id)
+            .ProjectTo<RouteDto>(_mapper.ConfigurationProvider)
+            .SingleOrDefault();
         }
 
         public IEnumerable<RouteDto> GetRoutes() => _context.Routes

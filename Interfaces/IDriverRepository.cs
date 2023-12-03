@@ -1,12 +1,12 @@
-using API.Entities;
+using API.DTOs;
 
 namespace API.Interfaces
 {
     public interface IDriverRepository
     {
-        void Update(Driver driver);
-        IEnumerable<Driver> GetDrivers();
-        Driver GetDriverById(int id);
+        void Update(DriverDto driver);
+        IEnumerable<DriverDto> GetDrivers();
+        DriverDto GetDriverById(int id);
         bool SaveChanges();
     }
 }

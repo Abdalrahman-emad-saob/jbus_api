@@ -18,7 +18,7 @@ namespace API.Data
             _mapper = mapper;
         }
 
-        public PassengerDto GetPassengerByEmail(string Email)
+        public PassengerDto GetPassengerDtoByEmail(string Email)
         {
             return _context.Passengers
                 .Where(p => p.User.Email == Email)
@@ -26,28 +26,22 @@ namespace API.Data
                 .SingleOrDefault();
         }
 
-        public PassengerDto GetPassengerById(int id)
+        public PassengerDto GetPassengerDtoById(int id)
         {
             return _context.Passengers
                 .Where(p => p.Id == id)
                 .ProjectTo<PassengerDto>(_mapper.ConfigurationProvider)
                 .SingleOrDefault();
         }
-        public UserDto GetUserById(int id)
-        {
-            return _context.Users
-                .Where(u => u.Id == id)
-                .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
-                .SingleOrDefault();
-        }
-        public Passenger GetPassengerOnlyById(int id)
+        
+        public Passenger GetPassengerById(int id)
         {
             return _context.Passengers
                 .Where(p => p.Id == id)
                 .SingleOrDefault();
         }
 
-        public Passenger GetPassengerOnlyByEmail(string Email)
+        public Passenger GetPassengerByEmail(string Email)
         {
             return _context.Passengers
                 .Where(p => p.User.Email == Email)

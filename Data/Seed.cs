@@ -16,16 +16,16 @@ namespace API.Data
                 Name = "Abood Saob",
                 PhoneNumber = "0785455414",
                 Email = "aboodsaob1139@gmail.com",
-                GoogleToken = "google_token_here",
-                FacebookToken = "facebook_token_here",
                 UserRole = User.Role.PASSENGER,
                 UserGender = User.Gender.MALE,
-                DateOfBirth = new DateOnly(2002, 3, 26),
+                DateOfBirth = new DateTime(2002, 3, 26),
             };
             user.PasswordHash = passwordHasher.HashPassword(user, "password");
             Passenger passenger = new()
             {
                 Wallet = 1000,
+                GoogleToken = "google_token_here",
+                FacebookToken = "facebook_token_here",
                 User = user,
             };
             user.Passenger = passenger;

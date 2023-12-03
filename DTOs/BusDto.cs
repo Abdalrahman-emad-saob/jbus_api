@@ -1,9 +1,8 @@
-
-namespace API.Entities
+namespace API.DTOs
 {
-    public class Bus
+    public class BusDto
     {
-        public int Id { get; set; }
+        // public int Id { get; set; }
         public string BusNumber { get; set; }
         public int Capacity { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -13,9 +12,7 @@ namespace API.Entities
         public int RouteId { get; set; }
         public Route Route { get; set; }
         public int DriverId { get; set; }
-        public Driver Driver { get; set; }
-        public List<Trip> Trips { get; set; }
-        
-        
+        public DriverDto Driver { get; set; }
+        public List<TripDto> Trips { get; set; }
     }
 }

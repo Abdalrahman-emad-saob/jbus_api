@@ -1,28 +1,42 @@
+using API.DTOs;
 using API.Entities;
 using API.Interfaces;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 
 namespace API.Data
 {
     public class PaymentTransactionRepository : IPaymentTransactionRepository
     {
-        public PaymentTransaction GetPaymentTransactionById(int id)
+        private readonly DataContext _context;
+        private readonly IMapper _mapper;
+
+        public PaymentTransactionRepository(DataContext context, IMapper mapper)
         {
-            throw new NotImplementedException();
+            _context = context;
+            _mapper = mapper;
+        }
+        public PaymentTransactionDto GetPaymentTransactionById(int id)
+        {
+            return _context
+            .PaymentTransactions
+            .Where(pt => pt.Id == id)
+            .ProjectTo<PaymentTransactionDto>(_mapper.ConfigurationProvider)
+            .SingleOrDefault();
         }
 
-        public IEnumerable<PaymentTransaction> GetPaymentTransactions()
+        public IEnumerable<PaymentTransactionDto> GetPaymentTransactions(int id)
         {
-            throw new NotImplementedException();
+            return _context
+            .PaymentTransactions
+            .Where(pt => pt.PassengerId == id)
+            .ProjectTo<PaymentTransactionDto>(_mapper.ConfigurationProvider)
+            .ToList();
         }
 
         public bool SaveChanges()
         {
-            throw new NotImplementedException();
-        }
-
-        public void Update(PaymentTransaction paymentTransaction)
-        {
-            throw new NotImplementedException();
+            return _context.SaveChanges() > 0;
         }
     }
 }

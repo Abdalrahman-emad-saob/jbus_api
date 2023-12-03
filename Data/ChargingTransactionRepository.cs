@@ -5,24 +5,30 @@ namespace API.Data
 {
     public class ChargingTransactionRepository : IChargingTransactionRepository
     {
+        private readonly DataContext _context;
+
+        public ChargingTransactionRepository(DataContext context)
+        {
+            _context = context;
+        }
         public ChargingTransaction GetChargingTransactionById(int id)
         {
-            throw new NotImplementedException();
+            return _context
+            .ChargingTransactions
+            .Where(ct => ct.Id == id)
+            .SingleOrDefault();
         }
 
         public IEnumerable<ChargingTransaction> GetChargingTransactions()
         {
-            throw new NotImplementedException();
+            return _context
+                .ChargingTransactions
+                .ToList();
         }
 
         public bool SaveChanges()
         {
-            throw new NotImplementedException();
-        }
-
-        public void Update(ChargingTransaction chargingTransaction)
-        {
-            throw new NotImplementedException();
+            return _context.SaveChanges() > 0;
         }
     }
 }

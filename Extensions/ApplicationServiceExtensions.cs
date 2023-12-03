@@ -1,5 +1,4 @@
 using API.Data;
-using API.Entities;
 using API.Interfaces;
 using API.Services;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +11,8 @@ namespace API.Extensions
         {
             services.AddDbContext<DataContext>(opt =>
         {
-            opt.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+            // opt.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+            opt.UseSqlServer(configuration.GetConnectionString("MSSqlServer"));
         });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddEndpointsApiExplorer();

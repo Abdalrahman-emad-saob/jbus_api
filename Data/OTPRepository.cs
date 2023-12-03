@@ -3,14 +3,16 @@ using API.Interfaces;
 
 namespace API.Data
 {
+    // TODO OTPs
     public class OTPRepository : IOTPRepository
     {
-        public OTP GetOTPById(int id)
-        {
-            throw new NotImplementedException();
-        }
+        private readonly DataContext _context;
 
-        public IEnumerable<OTP> GetOTPs()
+        public OTPRepository(DataContext context)
+        {
+            _context = context;
+        }
+        public OTP GetOTPById(int id)
         {
             throw new NotImplementedException();
         }
@@ -20,9 +22,5 @@ namespace API.Data
             throw new NotImplementedException();
         }
 
-        public void Update(OTP oTP)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
