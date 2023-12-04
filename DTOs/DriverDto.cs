@@ -8,8 +8,8 @@ namespace API.DTOs
 
         // * LINK
         public int UserId { get; set; }
-        public UserDto User { get; set; }
-        public int BusId { get; set; }
-        public BusDto Bus { get; set; }
+        public UserDto? User { get; set; }
+        // public int BusId { get; set; }
+        // public BusDto? Bus { get; set; }
     }
 }

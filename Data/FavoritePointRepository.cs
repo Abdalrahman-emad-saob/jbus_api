@@ -16,21 +16,65 @@ namespace API.Data
             _context = context;
             _mapper = mapper;
         }
-        public FavoritePointDto GetFavoritePointById(int id)
+
+        public bool DeleteFavoritePoint(int id)
         {
-             return _context
-            .FavoritePoints
-            .Where(fp => fp.Id == id)
-            .ProjectTo<FavoritePointDto>(_mapper.ConfigurationProvider)
-            .SingleOrDefault();
+            var favoritePoint = _context.FavoritePoints.Find(id);
+            if (favoritePoint != null)
+            {
+                _context.FavoritePoints.Remove(favoritePoint);
+                _context.SaveChanges();
+                return true;
+            }
+            return false;
         }
 
-        public IEnumerable<FavoritePointDto> GetFavoritePoints()
+        public FavoritePointDto GetFavoritePointById(int id)
+        {
+            return _context
+           .FavoritePoints
+           .Where(fp => fp.Id == id)
+           .ProjectTo<FavoritePointDto>(_mapper.ConfigurationProvider)
+           .SingleOrDefault()!;
+        }
+
+        public IEnumerable<FavoritePointDto> GetFavoritePoints(int id)
         {
             return _context
             .FavoritePoints
+            .Where(fp => fp.PassengerId == id)
             .ProjectTo<FavoritePointDto>(_mapper.ConfigurationProvider)
             .ToList();
+        }
+
+        public bool InsertFavoritePoint(FavoritePointCreateDto favoritePointCreateDto)
+        {
+            var point = _context.Points.Where(p => p.Latitude == favoritePointCreateDto.Lat).SingleOrDefault();
+            if (point == null)
+            {
+                Point createPoint = new()
+                {
+                    Latitude = favoritePointCreateDto.Lat,
+                    Longitude = favoritePointCreateDto.Long,
+                    Name = favoritePointCreateDto.Name
+                };
+                FavoritePoint favoritePoint = new()
+                {
+                    PassengerId = favoritePointCreateDto.PassengerId,
+                    PointId = createPoint.Id,
+                    RouteId = favoritePointCreateDto.RouteId
+                };
+                _context.SaveChanges();
+                return true;
+            }
+            FavoritePoint createfavoritePoint = new()
+                {
+                    PassengerId = favoritePointCreateDto.PassengerId,
+                    PointId = point.Id,
+                    RouteId = favoritePointCreateDto.RouteId
+                };
+                _context.SaveChanges();
+                return true;
         }
 
         public bool SaveChanges()

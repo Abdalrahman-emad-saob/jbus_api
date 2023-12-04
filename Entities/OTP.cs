@@ -12,7 +12,7 @@ namespace API.Entities
 
         // * Link
         public int PassengerId { get; set; }
-        public Passenger Passenger { get; set; }
+        public Passenger? Passenger { get; set; }
         
     }
 }

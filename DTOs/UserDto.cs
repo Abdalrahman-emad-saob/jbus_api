@@ -4,9 +4,9 @@ namespace API.DTOs
 {
     public class UserDto
     {
-        public string Name { get; set; }
-        public string PhoneNumber { get; set; }
-        public string Email { get; set; }
+        public string? Name { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? Email { get; set; }
         public Role UserRole { get; set; }
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public DateTime LastActive { get; set; } = DateTime.UtcNow;

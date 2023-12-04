@@ -18,10 +18,10 @@ namespace API.Data
         public TripDto GetTripById(int id)
         {
             return _context
-            .Trips
-            .Where(t => t.Id == id)
-            .ProjectTo<TripDto>(_mapper.ConfigurationProvider)
-            .SingleOrDefault();
+                .Trips
+                .Where(t => t.Id == id)
+                .ProjectTo<TripDto>(_mapper.ConfigurationProvider)
+                .SingleOrDefault()!;
         }
 
         public IEnumerable<TripDto> GetTrips()

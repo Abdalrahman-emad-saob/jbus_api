@@ -8,10 +8,10 @@ namespace API.DTOs
 
         // * Link
         public int PassengerId { get; set; }
-        public PassengerDto Passenger { get; set; }
+        public PassengerDto? Passenger { get; set; }
         public int PointId { get; set; }
-        public PointDto Point { get; set; }       
+        public PointDto? Point { get; set; }       
         public int RouteId { get; set; }
-        public RouteDto Route { get; set; }
+        public RouteDto? Route { get; set; }
     }
 }

@@ -21,7 +21,7 @@ namespace API.Data
             return _context.Routes
             .Where(r => r.Id == id)
             .ProjectTo<RouteDto>(_mapper.ConfigurationProvider)
-            .SingleOrDefault();
+            .SingleOrDefault()!;
         }
 
         public IEnumerable<RouteDto> GetRoutes() => _context.Routes

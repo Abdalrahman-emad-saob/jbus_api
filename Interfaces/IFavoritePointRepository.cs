@@ -5,8 +5,10 @@ namespace API.Interfaces
     public interface IFavoritePointRepository
     {
         void Update(FavoritePointDto favoritePoint);
-        IEnumerable<FavoritePointDto> GetFavoritePoints();
+        IEnumerable<FavoritePointDto> GetFavoritePoints(int id);
         FavoritePointDto GetFavoritePointById(int id);
+        bool DeleteFavoritePoint(int id);
+        bool InsertFavoritePoint(FavoritePointCreateDto favoritePointCreateDto);
         bool SaveChanges();
     }
 }

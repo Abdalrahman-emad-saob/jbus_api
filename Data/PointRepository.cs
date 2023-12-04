@@ -22,7 +22,7 @@ namespace API.Data
             .Points
             .Where(p => p.Id == id)
             .ProjectTo<PointDto>(_mapper.ConfigurationProvider)
-            .SingleOrDefault();
+            .SingleOrDefault()!;
         }
 
         public IEnumerable<PointDto> GetPoints()

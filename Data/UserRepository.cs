@@ -21,7 +21,7 @@ namespace API.Data
         {
             return _context.Users
                 .Where(u => u.Id == id)
-                .SingleOrDefault();
+                .SingleOrDefault()!;
         }
 
         public UserDto GetUserDtoById(int id)
@@ -29,7 +29,7 @@ namespace API.Data
             return _context.Users
                 .Where(u => u.Id == id)
                 .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
-                .SingleOrDefault();
+                .SingleOrDefault()!;
         }
 
         public void Update(UserDto userDto)

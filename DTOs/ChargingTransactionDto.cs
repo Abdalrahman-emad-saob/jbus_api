@@ -14,6 +14,6 @@ namespace API.DTOs
 
         // * Link
         public int PassengerId { get; set; }
-        public PassengerDto Passenger { get; set; }
+        public PassengerDto? Passenger { get; set; }
     }
 }

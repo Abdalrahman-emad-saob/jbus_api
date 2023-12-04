@@ -21,7 +21,7 @@ namespace API.Data
             .Drivers
             .Where(d => d.Id == id)
             .ProjectTo<DriverDto>(_mapper.ConfigurationProvider)
-            .SingleOrDefault();
+            .SingleOrDefault()!;
         }
 
         public IEnumerable<DriverDto> GetDrivers()

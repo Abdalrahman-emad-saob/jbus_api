@@ -28,7 +28,7 @@ namespace API.Controllers.v1
         [HttpPost("register")]
         public ActionResult<PassengerDto> Register(RegisterDto registerDto)
         {
-            if (PassengerExists(registerDto.Email))
+            if (PassengerExists(registerDto.Email!))
             {
                 return BadRequest("Passenger Exists");
             }
@@ -37,10 +37,10 @@ namespace API.Controllers.v1
             {
                 Name = registerDto.Name,
                 PhoneNumber = registerDto.PhoneNumber,
-                Email = registerDto.Email.ToLower()
+                Email = registerDto.Email?.ToLower()
             };
             var passwordHasher = new PasswordHasher<User>();
-            user.PasswordHash = passwordHasher.HashPassword(user, registerDto.Password);
+            user.PasswordHash = passwordHasher.HashPassword(user, registerDto.Password!);
             var passenger = new Passenger()
             {
                 Wallet = 0,
@@ -56,12 +56,12 @@ namespace API.Controllers.v1
         [HttpPost("login")]
         public ActionResult<LoginResponseDto> Login(LoginDto loginDto)
         {
-            var user = _context.Users.FirstOrDefault(x => x.Email == loginDto.Email.ToLower());
+            var user = _context.Users.FirstOrDefault(x => x.Email!.Equals(loginDto.Email, StringComparison.CurrentCultureIgnoreCase));
             if (user == null) return Unauthorized("Not Authorized");
 
 
             var passwordHasher = new PasswordHasher<User>();
-            var passwordVerificationResult = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginDto.Password);
+            var passwordVerificationResult = passwordHasher.VerifyHashedPassword(user, user.PasswordHash!, loginDto.Password!);
 
             if (passwordVerificationResult != PasswordVerificationResult.Success)
                 return Unauthorized("Not Authorized");
@@ -74,6 +74,7 @@ namespace API.Controllers.v1
                 Token = token
             };
         }
+        [NonAction]
         public bool PassengerExists(string Email)
         {
             return _passengerRepository.GetPassengerByEmail(Email) != null;

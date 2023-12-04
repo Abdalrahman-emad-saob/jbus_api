@@ -30,6 +30,12 @@ namespace API.Data
                         .HasForeignKey<Passenger>(u => u.UserId)
                         .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder.Entity<User>()
+                        .HasOne(d => d.Driver)
+                        .WithOne(u => u.User)
+                        .HasForeignKey<Driver>(u => u.UserId)
+                        .OnDelete(DeleteBehavior.NoAction);
+
             // modelBuilder.Entity<Passenger>()
             //             .HasMany(o => o.OTPs)
             //             .WithOne(u => u.Passenger)
@@ -60,11 +66,11 @@ namespace API.Data
             //             .HasForeignKey(fp => fp.PassengerId)
             //             .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Point>()
-                        .HasOne(p => p.FavoritePoint)
-                        .WithOne(fp => fp.Point)
-                        .HasForeignKey<FavoritePoint>(fp => fp.PointId)
-                        .OnDelete(DeleteBehavior.NoAction);
+            // modelBuilder.Entity<Point>()
+            //             .HasOne(p => p.FavoritePoint)
+            //             .WithOne(fp => fp.Point)
+            //             .HasForeignKey<FavoritePoint>(fp => fp.PointId)
+            //             .OnDelete(DeleteBehavior.NoAction);
 
             // modelBuilder.Entity<Passenger>()
             //             .HasMany(p => p.PaymentTransactions)
@@ -115,9 +121,9 @@ namespace API.Data
                         .HasForeignKey<Entities.Route>(r => r.EndingPointId)
                         .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Point>()
-                        .HasOne(p => p.InterestPoint)
-                        .WithOne(ip => ip.Location)
+            modelBuilder.Entity<InterestPoint>()
+                        .HasOne(ip => ip.Location)
+                        .WithOne(p => p.InterestPoint)
                         .HasForeignKey<InterestPoint>(ip => ip.LocationId)
                         .OnDelete(DeleteBehavior.NoAction);
 
@@ -125,13 +131,13 @@ namespace API.Data
             modelBuilder.Entity<Trip>()
                         .HasOne(t => t.PickUpPoint)
                         .WithOne(p => p.TripPickup)
-                        .HasForeignKey<Point>(t => t.TripPickupId)
+                        .HasForeignKey<Trip>(t => t.PickUpPointId)
                         .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Trip>() 
                         .HasOne(t => t.DropOffPoint)
                         .WithOne(p => p.TripDropoff)
-                        .HasForeignKey<Point>(t => t.TripDropoffId)
+                        .HasForeignKey<Trip>(t => t.DropOffPointId)
                         .OnDelete(DeleteBehavior.NoAction);
             // base.OnModelCreating(modelBuilder);
         }

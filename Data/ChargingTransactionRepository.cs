@@ -16,7 +16,7 @@ namespace API.Data
             return _context
             .ChargingTransactions
             .Where(ct => ct.Id == id)
-            .SingleOrDefault();
+            .SingleOrDefault()!;
         }
 
         public IEnumerable<ChargingTransaction> GetChargingTransactions()

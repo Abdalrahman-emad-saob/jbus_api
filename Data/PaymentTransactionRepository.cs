@@ -22,7 +22,7 @@ namespace API.Data
             .PaymentTransactions
             .Where(pt => pt.Id == id)
             .ProjectTo<PaymentTransactionDto>(_mapper.ConfigurationProvider)
-            .SingleOrDefault();
+            .SingleOrDefault()!;
         }
 
         public IEnumerable<PaymentTransactionDto> GetPaymentTransactions(int id)

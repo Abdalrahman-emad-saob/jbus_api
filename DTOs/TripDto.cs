@@ -17,17 +17,17 @@ namespace API.DTOs
 
         // * Link
         public int PassengerId { get; set; }
-        public PassengerDto Passenger { get; set; }
+        public PassengerDto? Passenger { get; set; }
         public int BusId { get; set; }
-        public BusDto Bus { get; set; }
+        public BusDto? Bus { get; set; }
         public int PaymentTransactionId { get; set; }
-        public PaymentTransactionDto PaymentTransaction { get; set; }
+        public PaymentTransactionDto? PaymentTransaction { get; set; }
         public int RouteId { get; set; }
-        public Route Route { get; set; }     
+        public Route? Route { get; set; }     
         // TODO     
         public int PickUpPointId { get; set; }
-        public PointDto PickUpPoint { get; set; }
+        public PointDto? PickUpPoint { get; set; }
         public int DropOffPointId { get; set; }
-        public PointDto DropOffPoint { get; set; }
+        public PointDto? DropOffPoint { get; set; }
     }
 }

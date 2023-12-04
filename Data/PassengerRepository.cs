@@ -21,9 +21,9 @@ namespace API.Data
         public PassengerDto GetPassengerDtoByEmail(string Email)
         {
             return _context.Passengers
-                .Where(p => p.User.Email == Email)
+                .Where(p => p.User!.Email == Email)
                 .ProjectTo<PassengerDto>(_mapper.ConfigurationProvider)
-                .SingleOrDefault();
+                .SingleOrDefault()!;
         }
 
         public PassengerDto GetPassengerDtoById(int id)
@@ -31,21 +31,21 @@ namespace API.Data
             return _context.Passengers
                 .Where(p => p.Id == id)
                 .ProjectTo<PassengerDto>(_mapper.ConfigurationProvider)
-                .SingleOrDefault();
+                .SingleOrDefault()!;
         }
         
         public Passenger GetPassengerById(int id)
         {
             return _context.Passengers
                 .Where(p => p.Id == id)
-                .SingleOrDefault();
+                .SingleOrDefault()!;
         }
 
         public Passenger GetPassengerByEmail(string Email)
         {
             return _context.Passengers
-                .Where(p => p.User.Email == Email)
-                .SingleOrDefault();
+                .Where(p => p.User!.Email == Email)
+                .SingleOrDefault()!;
         }
 
         public IEnumerable<PassengerDto> GetPassengers() => _context.Passengers
