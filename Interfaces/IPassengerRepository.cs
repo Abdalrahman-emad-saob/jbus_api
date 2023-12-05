@@ -10,7 +10,7 @@ namespace API.Interfaces
         PassengerDto GetPassengerDtoById(int id);
         PassengerDto GetPassengerDtoByEmail(string Email);
         Passenger GetPassengerById(int id);
-        Passenger GetPassengerByEmail(string Email);
+        Passenger GetPassengerByEmail(string? Email);
         bool SaveChanges();
     }
 }

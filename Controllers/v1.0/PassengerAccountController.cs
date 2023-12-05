@@ -28,7 +28,7 @@ namespace API.Controllers.v1
         [HttpPost("register")]
         public ActionResult<PassengerDto> Register(RegisterDto registerDto)
         {
-            if (PassengerExists(registerDto.Email!))
+            if (PassengerExists(registerDto.Email))
             {
                 return BadRequest("Passenger Exists");
             }
@@ -56,7 +56,7 @@ namespace API.Controllers.v1
         [HttpPost("login")]
         public ActionResult<LoginResponseDto> Login(LoginDto loginDto)
         {
-            var user = _context.Users.FirstOrDefault(x => x.Email!.Equals(loginDto.Email, StringComparison.CurrentCultureIgnoreCase));
+            var user = _context.Users.FirstOrDefault(x => x.Equals != null && x.Email!.Equals(loginDto.Email, StringComparison.CurrentCultureIgnoreCase));
             if (user == null) return Unauthorized("Not Authorized");
 
 
@@ -75,7 +75,7 @@ namespace API.Controllers.v1
             };
         }
         [NonAction]
-        public bool PassengerExists(string Email)
+        public bool PassengerExists(string? Email)
         {
             return _passengerRepository.GetPassengerByEmail(Email) != null;
         }

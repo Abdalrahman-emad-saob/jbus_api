@@ -1,4 +1,5 @@
 using API.DTOs;
+using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -15,21 +16,35 @@ namespace API.Data
             _context = context;
             _mapper = mapper;
         }
-        public DriverDto GetDriverById(int id)
+        // TODO register Driver
+        public bool CreateDrive(DriverCreateDto driverDto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Driver GetDriverById(int id)
         {
             return _context
             .Drivers
             .Where(d => d.Id == id)
-            .ProjectTo<DriverDto>(_mapper.ConfigurationProvider)
             .SingleOrDefault()!;
+        }
+
+        public DriverDto GetDriverDtoById(int id)
+        {
+            return _context
+           .Drivers
+           .Where(d => d.Id == id)
+           .ProjectTo<DriverDto>(_mapper.ConfigurationProvider)
+           .SingleOrDefault()!;
         }
 
         public IEnumerable<DriverDto> GetDrivers()
         {
-             return _context
-            .Drivers
-            .ProjectTo<DriverDto>(_mapper.ConfigurationProvider)
-            .ToList();
+            return _context
+           .Drivers
+           .ProjectTo<DriverDto>(_mapper.ConfigurationProvider)
+           .ToList();
         }
 
         public bool SaveChanges()
@@ -39,7 +54,7 @@ namespace API.Data
 
         public void Update(DriverDto driver)
         {
-             _context.Entry(driver).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            _context.Entry(driver).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         }
     }
 }

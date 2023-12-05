@@ -25,7 +25,7 @@ namespace API.Controllers.v1
         [HttpGet("{id}")]
         public ActionResult<DriverDto> GetDriverById(int id)
         {
-            return _driverRepository.GetDriverById(id);
+            return _driverRepository.GetDriverDtoById(id);
         }
         [HttpPut("{id}")]
         public ActionResult updateDriver(int id, DriverUpdateDto driverUpdateDto)

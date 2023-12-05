@@ -29,13 +29,13 @@ namespace api.Controllers.v1
         public ActionResult updateRoute(RouteUpdateDto routeUpdateDto, int id)
         {
             var route = _routeRepository.GetRouteById(id);
-            var InterestPointStart = _interestPointRepository.GetInterestPointById(routeUpdateDto.StartingPointId);
-            var InterestPointEnd = _interestPointRepository.GetInterestPointById(routeUpdateDto.EndingPointId);
+            // var InterestPointStart = _interestPointRepository.GetInterestPointById(routeUpdateDto.StartingPointId);
+            // var InterestPointEnd = _interestPointRepository.GetInterestPointById(routeUpdateDto.EndingPointId);
 
             if (route == null) return NotFound();
             _mapper.Map(routeUpdateDto, route);
-            _mapper.Map(routeUpdateDto.StartingPoint, InterestPointStart);
-            _mapper.Map(routeUpdateDto.EndingPoint, InterestPointEnd);
+            // _mapper.Map(routeUpdateDto.StartingPoint, InterestPointStart);
+            // _mapper.Map(routeUpdateDto.EndingPoint, InterestPointEnd);
             if (_routeRepository.SaveChanges()) return NoContent();
 
             return BadRequest("Failed to Update Route");

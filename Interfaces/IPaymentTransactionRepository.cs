@@ -6,6 +6,7 @@ namespace API.Interfaces
     {
         IEnumerable<PaymentTransactionDto> GetPaymentTransactions(int id);
         PaymentTransactionDto GetPaymentTransactionById(int id);
+        bool CreatePaymentTransaction(PaymentTransactionCreateDto paymentTransactionDto);
         bool SaveChanges();
     }
 }

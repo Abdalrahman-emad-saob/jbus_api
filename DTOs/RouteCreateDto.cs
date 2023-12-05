@@ -1,11 +1,12 @@
 namespace API.DTOs
 {
-    public class RouteUpdateDto
+    public class RouteCreateDto
     {
         public string? Name { get; set; }
         public string? WaypointsGoing { get; set; }
         public string? WaypointsReturning { get; set; }
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+        // * Link
         public int StartingPointId { get; set; }
         public int EndingPointId { get; set; }
     }

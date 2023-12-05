@@ -1,4 +1,3 @@
-using System.Drawing;
 using API.DTOs;
 using API.Interfaces;
 using AutoMapper;
@@ -16,6 +15,20 @@ namespace API.Data
             _context = context;
             _mapper = mapper;
         }
+
+        public bool CreatePoint(PointCreateDto pointDto)
+        {
+            Entities.Point point = new()
+            {
+                Name = pointDto.Name,
+                Latitude = pointDto.Latitude,
+                Longitude = pointDto.Longitude
+            };
+            _context.Points.Add(point);
+
+            return SaveChanges();
+        }
+
         public PointDto GetPointById(int id)
         {
             return _context

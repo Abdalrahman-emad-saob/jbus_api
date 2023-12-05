@@ -41,7 +41,7 @@ namespace API.Data
                 .SingleOrDefault()!;
         }
 
-        public Passenger GetPassengerByEmail(string Email)
+        public Passenger GetPassengerByEmail(string? Email)
         {
             return _context.Passengers
                 .Where(p => p.User!.Email == Email)

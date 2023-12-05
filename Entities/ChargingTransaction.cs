@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace API.Entities
 {
-    [Table("ChargingTransactions")]
     public class ChargingTransaction
     {
         public int Id { get; set; }
@@ -12,6 +11,7 @@ namespace API.Entities
             MASTERCARD = 0,
             VISA = 1
         }
+        public PaymentMethod paymentMethod { get; set; }
         public double Amount { get; set; }
         public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
 

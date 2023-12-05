@@ -1,3 +1,4 @@
+using API.DTOs;
 using API.Entities;
 using API.Interfaces;
 
@@ -12,6 +13,12 @@ namespace API.Data
         {
             _context = context;
         }
+
+        public bool CreateOTP(OTPCreateDto oTP)
+        {
+            throw new NotImplementedException();
+        }
+
         public OTP GetOTPById(int id)
         {
             throw new NotImplementedException();

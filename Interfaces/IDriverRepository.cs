@@ -1,4 +1,5 @@
 using API.DTOs;
+using API.Entities;
 
 namespace API.Interfaces
 {
@@ -6,7 +7,9 @@ namespace API.Interfaces
     {
         void Update(DriverDto driver);
         IEnumerable<DriverDto> GetDrivers();
-        DriverDto GetDriverById(int id);
+        DriverDto GetDriverDtoById(int id);
+        Driver GetDriverById(int id);
+        bool CreateDrive(DriverCreateDto driverDto);
         bool SaveChanges();
     }
 }

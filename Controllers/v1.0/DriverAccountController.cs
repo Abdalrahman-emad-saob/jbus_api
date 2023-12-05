@@ -1,4 +1,4 @@
-namespace jbus_api.Controllers.v1
+namespace API.Controllers.v1
 {
     public class DriverAccountController
     {

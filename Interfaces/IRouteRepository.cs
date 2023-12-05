@@ -7,6 +7,7 @@ namespace API.Interfaces
         void Update(RouteDto route);
         IEnumerable<RouteDto> GetRoutes();
         RouteDto GetRouteById(int id);
+        bool CreateRoute(RouteCreateDto routeDto);
         bool SaveChanges();
     }
 }

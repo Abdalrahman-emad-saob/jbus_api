@@ -16,6 +16,20 @@ namespace API.Data
             _context = context;
             _mapper = mapper;
         }
+
+        public bool CreatePaymentTransaction(PaymentTransactionCreateDto paymentTransactionDto)
+        {
+            PaymentTransaction paymentTransaction = new()
+            {
+                Amount = paymentTransactionDto.Amount,
+                PassengerId = paymentTransactionDto.PassengerId,
+                TripId = paymentTransactionDto.TripId
+            };
+            _context.PaymentTransactions.Add(paymentTransaction);
+
+            return SaveChanges();
+        }
+
         public PaymentTransactionDto GetPaymentTransactionById(int id)
         {
             return _context

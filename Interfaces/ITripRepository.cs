@@ -8,6 +8,7 @@ namespace API.Interfaces
         IEnumerable<TripDto> GetTrips();
         TripDto GetTripById(int id);
         IEnumerable<TripDto> GetTripsById(int id);
+        bool CreateTrip(TripCreateDto tripDto);
         bool SaveChanges();
     }
 }

@@ -1,4 +1,3 @@
-using System.Drawing;
 using API.DTOs;
 
 namespace API.Interfaces
@@ -8,6 +7,7 @@ namespace API.Interfaces
         void Update(PointDto point);
         IEnumerable<PointDto> GetPoints();
         PointDto GetPointById(int id);
+        bool CreatePoint(PointCreateDto pointDto);
         bool SaveChanges();
     }
 }

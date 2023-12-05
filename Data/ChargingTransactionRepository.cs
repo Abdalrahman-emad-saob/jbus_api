@@ -1,3 +1,4 @@
+using API.DTOs;
 using API.Entities;
 using API.Interfaces;
 
@@ -11,6 +12,24 @@ namespace API.Data
         {
             _context = context;
         }
+
+        public bool CreateChargingTransaction(ChargingTransactionCreateDto chargingTransactionDto)
+        {
+            int payMethod = 0;
+            if(chargingTransactionDto.paymentMethod?.ToLower() == "mastercard")
+                payMethod = 0;
+            else if(chargingTransactionDto.paymentMethod?.ToLower() == "visa")
+                payMethod = 1;
+            ChargingTransaction chargingTransaction = new()
+            {
+                paymentMethod = (ChargingTransaction.PaymentMethod)payMethod,
+                Amount = chargingTransactionDto.Amount,
+                PassengerId = chargingTransactionDto.PassengerId
+            };
+            _context.ChargingTransactions.Add(chargingTransaction);
+            return SaveChanges();
+        }
+
         public ChargingTransaction GetChargingTransactionById(int id)
         {
             return _context

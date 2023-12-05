@@ -16,6 +16,12 @@ namespace API.Data
             _context = context;
             _mapper = mapper;
         }
+
+        public bool CreateRoute(RouteCreateDto routeDto)
+        {
+            throw new NotImplementedException();
+        }
+
         public RouteDto GetRouteById(int id)
         {
             return _context.Routes

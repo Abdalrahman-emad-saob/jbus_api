@@ -1,4 +1,5 @@
 using API.DTOs;
+using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -15,6 +16,34 @@ namespace API.Data
             _context = context;
             _mapper = mapper;
         }
+
+        public bool CreateTrip(TripCreateDto tripDto)
+        {
+            int status = 0;
+            if(tripDto.status?.ToLower() == "pending")
+                status = 0;
+            else if(tripDto.status?.ToLower() == "ongoing")
+                status = 1;
+            else if(tripDto.status?.ToLower() == "completed")
+                status = 2;
+            else if(tripDto.status?.ToLower() == "canceled")
+                status = 3;
+            Trip trip = new()
+            {
+                Rating = tripDto.Rating,
+                status = (Trip.Status)status,
+                PassengerId = tripDto.PassengerId,
+                BusId = tripDto.BusId,
+                PaymentTransactionId = tripDto.PaymentTransactionId,
+                RouteId = tripDto.RouteId,
+                PickUpPointId = tripDto.PickUpPointId,
+                DropOffPointId = tripDto.DropOffPointId
+            };
+            _context.Trips.Add(trip);
+
+            return SaveChanges();
+        }
+
         public TripDto GetTripById(int id)
         {
             return _context

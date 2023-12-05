@@ -24,6 +24,7 @@ namespace API.Extensions
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPassengerRepository, PassengerRepository>();
+            services.AddScoped<IBusRepository, BusRepository>();
             services.AddScoped<IRouteRepository, RouteRepository>();
             services.AddScoped<IChargingTransactionRepository, ChargingTransactionRepository>();
             services.AddScoped<IDriverRepository, DriverRepository>();
