@@ -13,9 +13,9 @@ namespace API.Entities
         public List<FavoritePoint>? FavoritePoints { get; set; }
         public List<Bus>? Buses { get; set; }
         public List<Trip>? Trips { get; set; }
-        public int StartingPointId { get; set; }
+        public int? StartingPointId { get; set; }
         public InterestPoint? StartingPoint { get; set; }
-        public int EndingPointId { get; set; }
+        public int? EndingPointId { get; set; }
         public InterestPoint? EndingPoint { get; set; } 
     }
 }

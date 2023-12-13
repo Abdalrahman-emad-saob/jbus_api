@@ -11,11 +11,11 @@ namespace API.Entities
 
         // * Link
         public List<FavoritePoint>? FavoritePoint { get; set; }
-        public int InterestPointId { get; set; }
+        public int? InterestPointId { get; set; }
         public InterestPoint? InterestPoint { get; set; }
-        public int TripPickupId { get; set; }
+        public int? TripPickupId { get; set; }
         public Trip? TripPickup { get; set; }
-        public int TripDropoffId { get; set; }
+        public int? TripDropoffId { get; set; }
         public Trip? TripDropoff { get; set; }
         
 

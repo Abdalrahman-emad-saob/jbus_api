@@ -11,8 +11,7 @@ namespace API.Entities
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         // * Link
-        public int PassengerId { get; set; }
-        public Passenger? Passenger { get; set; }
+        public string? PassengerEmail { get; set; }
         
     }
 }

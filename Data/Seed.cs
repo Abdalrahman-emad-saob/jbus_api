@@ -151,7 +151,6 @@ namespace API.Data
             await context.SaveChangesAsync();
         }
 
-
         public static async Task SeedFavoritePoint(DataContext context)
         {
             if (await context.FavoritePoints.AnyAsync()) return;
@@ -169,17 +168,20 @@ namespace API.Data
 
             await context.SaveChangesAsync();
         }
+        
         public static async Task SeedOTP(DataContext context)
         {
+            if (await context.Passengers.AnyAsync()) return;
             var passenger = await context.Passengers.FindAsync(1);
-            if (passenger != null)
+            var user = await context.Users.FindAsync(passenger.UserId);
+            if (passenger != null && user != null)
             {
                 OTP otp = new()
                 {
-                    Otp = 1234
+                    Otp = 1234,
+                    PassengerEmail = user.Email 
                 };
-                // context.OTPs.Add(otp);
-                passenger.OTPs.Add(otp);
+                context.OTPs.Add(otp);
                 await context.SaveChangesAsync();
             }
         }

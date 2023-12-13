@@ -13,10 +13,9 @@ namespace API.Entities
         // * Link
         public List<ChargingTransaction> ChargingTransactions { get; set; } = [];
         public List<FavoritePoint> FavoritePoints { get; set; } = [];
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
         public User? User { get; set; }
         public List<PaymentTransaction> PaymentTransactions { get; set; } = [];
-        public List<OTP> OTPs { get; set; } = [];
         public List<Trip> Trips { get; set; } = [];
     }
 }

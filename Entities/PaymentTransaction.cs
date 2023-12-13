@@ -7,9 +7,9 @@ namespace API.Entities
         public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
 
         // * Link
-        public int PassengerId { get; set; }
+        public int? PassengerId { get; set; }
         public Passenger? Passenger { get; set; }       
-        public int TripId { get; set; }
+        public int? TripId { get; set; }
         public Trip? Trip { get; set; }
     }
 }

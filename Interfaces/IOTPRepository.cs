@@ -4,9 +4,11 @@ using API.Entities;
 namespace API.Interfaces
 {
     public interface IOTPRepository
-    {// TODO
-        OTP GetOTPById(int id);
-        bool CreateOTP(OTPCreateDto oTP);
+    {
+        // TODO
+        OTP GetOTPByEmail(string Email);
+        int CreateOTP(string Email);
         bool SaveChanges();
+        bool DeleteOTP(int id);
     }
 }

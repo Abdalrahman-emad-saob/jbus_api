@@ -19,6 +19,7 @@ namespace api.Controllers.v1
             _interestPointRepository = interestPointRepository;
             _mapper = mapper;
         }
+        // TODO Create Route
         [HttpGet("GetRoutes")]
         public ActionResult<IEnumerable<RouteDto>> GetRoutes() => Ok(_routeRepository.GetRoutes());
 

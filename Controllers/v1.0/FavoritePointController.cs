@@ -26,9 +26,15 @@ namespace API.Controllers.v1
             return Ok(_favoritePointRepository.GetFavoritePoints(id));
         }
         [HttpDelete("{id}")]
-        public ActionResult<IEnumerable<FavoritePointDto>> DeketeFavoritePoint(int id)
+        public ActionResult<IEnumerable<FavoritePointDto>> DeleteFavoritePoint(int id)
         {
             return Ok(_favoritePointRepository.DeleteFavoritePoint(id));
+        }
+        [HttpPost("AddFavoritePoint")]
+        public ActionResult CreateFavoritePoint(FavoritePointCreateDto favoritePointCreateDto)
+        {
+            _favoritePointRepository.InsertFavoritePoint(favoritePointCreateDto);
+            return Ok();
         }
     }
 }

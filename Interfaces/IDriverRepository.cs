@@ -9,6 +9,7 @@ namespace API.Interfaces
         IEnumerable<DriverDto> GetDrivers();
         DriverDto GetDriverDtoById(int id);
         Driver GetDriverById(int id);
+        Driver GetDriverByEmail(string Email);
         bool CreateDrive(DriverCreateDto driverDto);
         bool SaveChanges();
     }

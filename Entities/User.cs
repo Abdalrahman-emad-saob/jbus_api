@@ -28,9 +28,9 @@ namespace API.Entities
         public DateTime DateOfBirth { get; set; }
 
         // * Link
-        public int PassengerId { get; set; }
+        public int? PassengerId { get; set; }
         public Passenger? Passenger { get; set; }
-        public int DriverId { get; set; }
+        public int? DriverId { get; set; }
         public Driver? Driver { get; set; }
 
         // * Methods

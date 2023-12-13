@@ -19,7 +19,25 @@ namespace API.Data
         // TODO register Driver
         public bool CreateDrive(DriverCreateDto driverDto)
         {
-            throw new NotImplementedException();
+            Driver driver = new() { };
+            User user = new()
+            {
+                Name = driverDto.Name,
+                PhoneNumber = driverDto.PhoneNumber,
+                Email = driverDto.Email,
+                UserRole = User.Role.DRIVER,
+                UserGender = User.Gender.MALE
+            };
+            _context.Drivers.Add(driver);
+            _context.SaveChanges();
+            return true;
+        }
+
+        public Driver GetDriverByEmail(string Email)
+        {
+            return _context.Drivers
+                .Where(p => p.User!.Email == Email)
+                .SingleOrDefault()!;
         }
 
         public Driver GetDriverById(int id)

@@ -10,9 +10,9 @@ namespace API.Entities
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         // * Link
-        public int RouteId { get; set; }
+        public int? RouteId { get; set; }
         public Route? Route { get; set; }
-        public int DriverId { get; set; }
+        public int? DriverId { get; set; }
         public Driver? Driver { get; set; }
         public List<Trip>? Trips { get; set; }
         

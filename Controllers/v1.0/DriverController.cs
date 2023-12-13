@@ -27,11 +27,21 @@ namespace API.Controllers.v1
         {
             return _driverRepository.GetDriverDtoById(id);
         }
+        [HttpPost("AddDriver")]
+        public ActionResult<DriverDto> CreateDriver(DriverCreateDto driverDto)
+        {
+            if(DriverExists(driverDto.Email))
+            {
+                return BadRequest("Driver Exists");
+            }
+            _driverRepository.CreateDrive(driverDto);
+            return Ok();
+        }
         [HttpPut("{id}")]
         public ActionResult updateDriver(int id, DriverUpdateDto driverUpdateDto)
         {
             var driver = _driverRepository.GetDriverById(id);
-            var user = _userRepository.GetUserById(driver.UserId);
+            var user = _userRepository.GetUserById((int)driver.UserId);
 
             if (driver == null) return NotFound();
             _mapper.Map(driverUpdateDto, driver);
@@ -39,6 +49,11 @@ namespace API.Controllers.v1
             if (_driverRepository.SaveChanges()) return NoContent();
 
             return BadRequest("Failed to Update Driver");
+        }
+        [NonAction]
+        public bool DriverExists(string? Email)
+        {
+            return _driverRepository.GetDriverByEmail(Email) != null;
         }
     }
 }

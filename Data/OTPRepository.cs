@@ -14,19 +14,40 @@ namespace API.Data
             _context = context;
         }
 
-        public bool CreateOTP(OTPCreateDto oTP)
+        public int CreateOTP(string Email)
         {
-            throw new NotImplementedException();
+            Random random = new();
+            int otp = random.Next(1000, 10000);
+            OTP oTP = new()
+            {
+                Otp = otp,
+                PassengerEmail = Email
+            };
+            _context.OTPs.Add(oTP);
+            _context.SaveChanges();
+            return otp;
         }
 
-        public OTP GetOTPById(int id)
+        public bool DeleteOTP(int id)
         {
-            throw new NotImplementedException();
+            var otp = _context.OTPs.Find(id);
+            if (otp != null)
+            {
+                _context.OTPs.Remove(otp);
+                _context.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+
+        public OTP GetOTPByEmail(string Email)
+        {
+            return _context.OTPs.Where(otp => otp.PassengerEmail == Email).SingleOrDefault();
         }
 
         public bool SaveChanges()
         {
-            throw new NotImplementedException();
+            return _context.SaveChanges() > 0;
         }
 
     }

@@ -13,9 +13,11 @@ namespace API.DTOs
         [EmailAddress(ErrorMessage = "Invalid email address")]
         [Required]
         public string? Email { get; set; }
-        [ValidPassword]
+        // [ValidPassword]
         [Required]
         public string? Password { get; set; }
+        [Required]
+        public int OTP { get; set; }
 
     }
 }
