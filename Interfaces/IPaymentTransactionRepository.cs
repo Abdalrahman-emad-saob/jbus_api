@@ -1,12 +1,12 @@
-using API.Entities;
+using API.DTOs;
 
 namespace API.Interfaces
 {
     public interface IPaymentTransactionRepository
     {
-        void Update(PaymentTransaction paymentTransaction);
-        IEnumerable<PaymentTransaction> GetPaymentTransactions();
-        PaymentTransaction GetPaymentTransactionById(int id);
+        IEnumerable<PaymentTransactionDto> GetPaymentTransactions(int id);
+        PaymentTransactionDto GetPaymentTransactionById(int id);
+        bool CreatePaymentTransaction(PaymentTransactionCreateDto paymentTransactionDto);
         bool SaveChanges();
     }
 }

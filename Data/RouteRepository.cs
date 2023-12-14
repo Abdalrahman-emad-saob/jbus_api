@@ -16,9 +16,18 @@ namespace API.Data
             _context = context;
             _mapper = mapper;
         }
+
+        public bool CreateRoute(RouteCreateDto routeDto)
+        {
+            throw new NotImplementedException();
+        }
+
         public RouteDto GetRouteById(int id)
         {
-            return _context.Routes.Where(r => r.Id == id).ProjectTo<RouteDto>(_mapper.ConfigurationProvider).SingleOrDefault();
+            return _context.Routes
+            .Where(r => r.Id == id)
+            .ProjectTo<RouteDto>(_mapper.ConfigurationProvider)
+            .SingleOrDefault()!;
         }
 
         public IEnumerable<RouteDto> GetRoutes() => _context.Routes

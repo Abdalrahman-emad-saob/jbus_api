@@ -1,28 +1,78 @@
+using API.DTOs;
 using API.Entities;
 using API.Interfaces;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 
 namespace API.Data
 {
     public class DriverRepository : IDriverRepository
     {
-        public Driver GetDriverById(int id)
+        private readonly DataContext _context;
+        private readonly IMapper _mapper;
+
+        public DriverRepository(DataContext context, IMapper mapper)
         {
-            throw new NotImplementedException();
+            _context = context;
+            _mapper = mapper;
+        }
+        // TODO register Driver
+        public bool CreateDrive(DriverCreateDto driverDto)
+        {
+            Driver driver = new() { };
+            User user = new()
+            {
+                Name = driverDto.Name,
+                PhoneNumber = driverDto.PhoneNumber,
+                Email = driverDto.Email,
+                UserRole = User.Role.DRIVER,
+                UserGender = User.Gender.MALE
+            };
+            _context.Drivers.Add(driver);
+            _context.SaveChanges();
+            return true;
         }
 
-        public IEnumerable<Driver> GetDrivers()
+        public Driver GetDriverByEmail(string Email)
         {
-            throw new NotImplementedException();
+            return _context.Drivers
+                .Where(p => p.User!.Email == Email)
+                .SingleOrDefault()!;
+        }
+
+        public Driver GetDriverById(int id)
+        {
+            return _context
+            .Drivers
+            .Where(d => d.Id == id)
+            .SingleOrDefault()!;
+        }
+
+        public DriverDto GetDriverDtoById(int id)
+        {
+            return _context
+           .Drivers
+           .Where(d => d.Id == id)
+           .ProjectTo<DriverDto>(_mapper.ConfigurationProvider)
+           .SingleOrDefault()!;
+        }
+
+        public IEnumerable<DriverDto> GetDrivers()
+        {
+            return _context
+           .Drivers
+           .ProjectTo<DriverDto>(_mapper.ConfigurationProvider)
+           .ToList();
         }
 
         public bool SaveChanges()
         {
-            throw new NotImplementedException();
+            return _context.SaveChanges() > 0;
         }
 
-        public void Update(Driver driver)
+        public void Update(DriverDto driver)
         {
-            throw new NotImplementedException();
+            _context.Entry(driver).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         }
     }
 }

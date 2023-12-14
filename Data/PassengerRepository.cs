@@ -18,40 +18,34 @@ namespace API.Data
             _mapper = mapper;
         }
 
-        public PassengerDto GetPassengerByEmail(string Email)
+        public PassengerDto GetPassengerDtoByEmail(string Email)
         {
             return _context.Passengers
-                .Where(p => p.User.Email == Email)
+                .Where(p => p.User!.Email == Email)
                 .ProjectTo<PassengerDto>(_mapper.ConfigurationProvider)
-                .SingleOrDefault();
+                .SingleOrDefault()!;
         }
 
-        public PassengerDto GetPassengerById(int id)
+        public PassengerDto GetPassengerDtoById(int id)
         {
             return _context.Passengers
                 .Where(p => p.Id == id)
                 .ProjectTo<PassengerDto>(_mapper.ConfigurationProvider)
-                .SingleOrDefault();
+                .SingleOrDefault()!;
         }
-        public UserDto GetUserById(int id)
-        {
-            return _context.Users
-                .Where(u => u.Id == id)
-                .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
-                .SingleOrDefault();
-        }
-        public Passenger GetPassengerOnlyById(int id)
+        
+        public Passenger GetPassengerById(int id)
         {
             return _context.Passengers
                 .Where(p => p.Id == id)
-                .SingleOrDefault();
+                .SingleOrDefault()!;
         }
 
-        public Passenger GetPassengerOnlyByEmail(string Email)
+        public Passenger GetPassengerByEmail(string? Email)
         {
             return _context.Passengers
-                .Where(p => p.User.Email == Email)
-                .SingleOrDefault();
+                .Where(p => p.User!.Email == Email)
+                .SingleOrDefault()!;
         }
 
         public IEnumerable<PassengerDto> GetPassengers() => _context.Passengers

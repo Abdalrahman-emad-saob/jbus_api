@@ -7,6 +7,7 @@ namespace API.Interfaces
         void Update(InterestPointDto interestPoint);
         IEnumerable<InterestPointDto> GetInterestPoints();
         InterestPointDto GetInterestPointById(int id);
+        bool CreateInterestPoint(InterestPointCreateDto interestPointDto);
         bool SaveChanges();
     }
 }

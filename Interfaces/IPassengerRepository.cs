@@ -7,11 +7,10 @@ namespace API.Interfaces
     {
         void Update(PassengerDto passenger);
         IEnumerable<PassengerDto> GetPassengers();
-        PassengerDto GetPassengerById(int id);
-        PassengerDto GetPassengerByEmail(string Email);
-        UserDto GetUserById(int id);
-        Passenger GetPassengerOnlyById(int id);
-        Passenger GetPassengerOnlyByEmail(string Email);
+        PassengerDto GetPassengerDtoById(int id);
+        PassengerDto GetPassengerDtoByEmail(string Email);
+        Passenger GetPassengerById(int id);
+        Passenger GetPassengerByEmail(string? Email);
         bool SaveChanges();
     }
 }

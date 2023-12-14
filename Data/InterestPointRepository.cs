@@ -16,9 +16,18 @@ namespace API.Data
             _context = context;
             _mapper = mapper;
         }
+
+        public bool CreateInterestPoint(InterestPointCreateDto interestPointDto)
+        {
+            throw new NotImplementedException();
+        }
+
         public InterestPointDto GetInterestPointById(int id)
         {
-            return _context.InterestPoints.Where(ip => ip.Id == id).ProjectTo<InterestPointDto>(_mapper.ConfigurationProvider).SingleOrDefault();
+            return _context.InterestPoints
+                .Where(ip => ip.Id == id)
+                .ProjectTo<InterestPointDto>(_mapper.ConfigurationProvider)
+                .SingleOrDefault()!;
         }
 
         public IEnumerable<InterestPointDto> GetInterestPoints()

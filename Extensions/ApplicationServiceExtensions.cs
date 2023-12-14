@@ -1,5 +1,4 @@
 using API.Data;
-using API.Entities;
 using API.Interfaces;
 using API.Services;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +11,9 @@ namespace API.Extensions
         {
             services.AddDbContext<DataContext>(opt =>
         {
-            opt.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+            // opt.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+            opt.UseSqlServer(configuration.GetConnectionString("MSSqlServer"))
+            .LogTo(Console.WriteLine, LogLevel.Information);
         });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddEndpointsApiExplorer();
@@ -21,7 +22,9 @@ namespace API.Extensions
             services.AddCors();
 
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPassengerRepository, PassengerRepository>();
+            services.AddScoped<IBusRepository, BusRepository>();
             services.AddScoped<IRouteRepository, RouteRepository>();
             services.AddScoped<IChargingTransactionRepository, ChargingTransactionRepository>();
             services.AddScoped<IDriverRepository, DriverRepository>();
@@ -29,7 +32,7 @@ namespace API.Extensions
             services.AddScoped<IInterestPointRepository, InterestPointRepository>();
             services.AddScoped<IOTPRepository, OTPRepository>();
             services.AddScoped<IPaymentTransactionRepository, PaymentTransactionRepository>();
-            services.AddScoped<ITripRepository,TripRepository>();
+            services.AddScoped<ITripRepository, TripRepository>();
             services.AddScoped<IPointRepository, PointRepository>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

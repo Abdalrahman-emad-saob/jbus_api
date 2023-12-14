@@ -7,9 +7,9 @@ namespace API.Entities
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         // * LINK
-        public int UserId { get; set; }
-        public User User { get; set; }
-        public int BusId { get; set; }
-        public Bus Bus { get; set; }
+        public int? UserId { get; set; }
+        public User? User { get; set; }
+        public int? BusId { get; set; }
+        public Bus? Bus { get; set; }
     }
 }

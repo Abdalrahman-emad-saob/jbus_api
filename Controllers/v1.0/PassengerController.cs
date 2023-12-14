@@ -11,11 +11,13 @@ namespace API.Controllers.v1
     public class PassengerController : BaseApiController
     {
         private readonly IPassengerRepository _passengerRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
-        public PassengerController(IPassengerRepository passengerRepository, IMapper mapper)
+        public PassengerController(IPassengerRepository passengerRepository, IUserRepository userRepository, IMapper mapper)
         {
             _passengerRepository = passengerRepository;
+            _userRepository = userRepository;
             _mapper = mapper;
         }
 
@@ -23,14 +25,13 @@ namespace API.Controllers.v1
         public ActionResult<IEnumerable<PassengerDto>> GetPassengers() => Ok(_passengerRepository.GetPassengers());
 
         [HttpGet("{id}")]
-        public ActionResult<PassengerDto> GetPassengerById(int id) => _passengerRepository.GetPassengerById(id);
+        public ActionResult<PassengerDto> GetPassengerById(int id) => _passengerRepository.GetPassengerDtoById(id);
 
-        [HttpPut("updatePassenger")]
-        public ActionResult updatePassenger(PassengerUpdateDto passengerUpdateDto)
+        [HttpPut("{id}")]
+        public ActionResult updatePassenger(int id, PassengerUpdateDto passengerUpdateDto)
         {
-            var Email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var passenger = _passengerRepository.GetPassengerOnlyByEmail(Email);
-            var user = _passengerRepository.GetUserById(passenger.UserId);
+            var passenger = _passengerRepository.GetPassengerById(id);
+            var user = _userRepository.GetUserById((int)passenger.UserId);
 
             if (passenger == null) return NotFound();
             _mapper.Map(passengerUpdateDto, passenger);
@@ -39,15 +40,6 @@ namespace API.Controllers.v1
 
             return BadRequest("Failed to Update Passenger");
         }
-
-        // [HttpGet("GetOTPs")]
-        // public ActionResult<List<OTP>> GetOTPs()
-        // {
-        //     var otps = _context.Passengers.Include(p => p.OTPs).FirstOrDefault(p => p.Id == 1).OTPs;
-        //     return otps;
-        // }
-
-
 
     }
 }

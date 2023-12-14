@@ -1,12 +1,14 @@
-using API.Entities;
+using API.DTOs;
 
 namespace API.Interfaces
 {
     public interface ITripRepository
     {
-        void Update(Trip trip);
-        IEnumerable<Trip> GetTrips();
-        Trip GetTripById(int id);
+        void Update(TripDto trip);
+        IEnumerable<TripDto> GetTrips();
+        TripDto GetTripById(int id);
+        IEnumerable<TripDto> GetTripsById(int id);
+        bool CreateTrip(TripCreateDto tripDto);
         bool SaveChanges();
     }
 }

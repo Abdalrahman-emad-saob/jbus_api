@@ -1,28 +1,91 @@
+using API.DTOs;
 using API.Entities;
 using API.Interfaces;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 
 namespace API.Data
 {
     public class FavoritePointRepository : IFavoritePointRepository
     {
-        public FavoritePoint GetFavoritePointById(int id)
+        private readonly DataContext _context;
+        private readonly IMapper _mapper;
+
+        public FavoritePointRepository(DataContext context, IMapper mapper)
         {
-            throw new NotImplementedException();
+            _context = context;
+            _mapper = mapper;
         }
 
-        public IEnumerable<FavoritePoint> GetFavoritePoints()
+        public bool DeleteFavoritePoint(int id)
         {
-            throw new NotImplementedException();
+            var favoritePoint = _context.FavoritePoints.Find(id);
+            if (favoritePoint != null)
+            {
+                _context.FavoritePoints.Remove(favoritePoint);
+                _context.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+
+        public FavoritePointDto GetFavoritePointById(int id)
+        {
+            return _context
+           .FavoritePoints
+           .Where(fp => fp.Id == id)
+           .ProjectTo<FavoritePointDto>(_mapper.ConfigurationProvider)
+           .SingleOrDefault()!;
+        }
+
+        public IEnumerable<FavoritePointDto> GetFavoritePoints(int id)
+        {
+            return _context
+            .FavoritePoints
+            .Where(fp => fp.PassengerId == id)
+            .ProjectTo<FavoritePointDto>(_mapper.ConfigurationProvider)
+            .ToList();
+        }
+
+        public bool InsertFavoritePoint(FavoritePointCreateDto favoritePointCreateDto)
+        {
+            var point = _context.Points.Where(p => p.Latitude == favoritePointCreateDto.Lat).SingleOrDefault();
+            if (point == null)
+            {
+                Point createPoint = new()
+                {
+                    Latitude = favoritePointCreateDto.Lat,
+                    Longitude = favoritePointCreateDto.Long,
+                    Name = favoritePointCreateDto.Name
+                };
+                FavoritePoint favoritePoint = new()
+                {
+                    PassengerId = favoritePointCreateDto.PassengerId,
+                    PointId = createPoint.Id,
+                    RouteId = favoritePointCreateDto.RouteId
+                };
+                _context.SaveChanges();
+                return true;
+            }
+            FavoritePoint createfavoritePoint = new()
+                {
+                    PassengerId = favoritePointCreateDto.PassengerId,
+                    PointId = point.Id,
+                    RouteId = favoritePointCreateDto.RouteId
+                };
+                _context.SaveChanges();
+                return true;
         }
 
         public bool SaveChanges()
         {
-            throw new NotImplementedException();
+            return _context
+            .SaveChanges() > 0;
         }
 
-        public void Update(FavoritePoint favoritePoint)
+        public void Update(FavoritePointDto favoritePoint)
         {
-            throw new NotImplementedException();
+            _context.Entry(favoritePoint).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         }
     }
 }

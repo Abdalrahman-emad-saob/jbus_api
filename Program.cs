@@ -7,44 +7,49 @@ using Microsoft.EntityFrameworkCore;
 // {
 //     private static async void Main(string[] args)
 //     {
-        var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddControllers();
-        builder.Services.AddApplicationServices(builder.Configuration);
-        builder.Services.AddIdentityServices(builder.Configuration);
+builder.Services.AddControllers();
+builder.Services.AddApplicationServices(builder.Configuration);
+builder.Services.AddIdentityServices(builder.Configuration);
 
-        var app = builder.Build();
+var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
-        app.UseMiddleware<ExceptionMiddleware>();
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
-        app.UseHttpsRedirection();
+// Configure the HTTP request pipeline.
+app.UseMiddleware<ExceptionMiddleware>();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+app.UseHttpsRedirection();
 
-        app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200"));
-        app.UseAuthentication();
-        app.UseAuthorization();
+app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200"));
+app.UseAuthentication();
+app.UseAuthorization();
 
-        app.MapControllers();
+app.MapControllers();
 
-        using var scope = app.Services.CreateScope();
-        var services = scope.ServiceProvider;
-        try
-        {
-            var context = services.GetRequiredService<DataContext>();
-            await context.Database.MigrateAsync();
-            await Seed.SeedPassenger(context);
-            await Seed.SeedOTP(context);
-        }
-        catch(Exception ex)
-        {
-            var logger = services.GetService<ILogger<Program>>();
-            logger.LogError(ex, "An Error Ocurred During Migration");
-        }
+using var scope = app.Services.CreateScope();
+var services = scope.ServiceProvider;
+try
+{
+    var context = services.GetRequiredService<DataContext>();
+    await context.Database.MigrateAsync();
+    await Seed.SeedPassenger(context);
+    await Seed.SeedDriver(context);
+    await Seed.SeedPoint(context);
+    await Seed.SeedInterestPoints(context);
+    await Seed.SeedRoute(context);
+    await Seed.SeedFavoritePoint(context);
+    await Seed.SeedOTP(context);
+}
+catch (Exception ex)
+{
+    var logger = services?.GetService<ILogger<Program>>();
+    logger?.LogError(ex, "An Error Occurred During Migration");
+}
 
-        app.Run();
+app.Run();
 //     }
 // }

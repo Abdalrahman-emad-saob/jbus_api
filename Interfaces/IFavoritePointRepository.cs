@@ -1,12 +1,14 @@
-using API.Entities;
+using API.DTOs;
 
 namespace API.Interfaces
 {
     public interface IFavoritePointRepository
     {
-        void Update(FavoritePoint favoritePoint);
-        IEnumerable<FavoritePoint> GetFavoritePoints();
-        FavoritePoint GetFavoritePointById(int id);
+        void Update(FavoritePointDto favoritePoint);
+        IEnumerable<FavoritePointDto> GetFavoritePoints(int id);
+        FavoritePointDto GetFavoritePointById(int id);
+        bool DeleteFavoritePoint(int id);
+        bool InsertFavoritePoint(FavoritePointCreateDto favoritePointCreateDto);
         bool SaveChanges();
     }
 }
