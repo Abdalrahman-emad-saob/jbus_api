@@ -1,4 +1,5 @@
 using API.DTOs;
+using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -10,16 +11,33 @@ namespace API.Data
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
+        private readonly IPointRepository _pointRepository;
 
-        public InterestPointRepository(DataContext context, IMapper mapper)
+        public InterestPointRepository(DataContext context, IMapper mapper, IPointRepository pointRepository)
         {
             _context = context;
             _mapper = mapper;
+            _pointRepository = pointRepository;
         }
 
-        public bool CreateInterestPoint(InterestPointCreateDto interestPointDto)
+        public InterestPoint CreateInterestPoint(InterestPointCreateDto interestPointDto)
         {
-            throw new NotImplementedException();
+            PointCreateDto pointCreateDto = new()
+            {
+                Name = interestPointDto.PointName,
+                Latitude = interestPointDto.Latitude,
+                Longitude = interestPointDto.Longitude
+            };
+            var point = _pointRepository.CreatePoint(pointCreateDto);
+            InterestPoint interestPoint = new()
+            {
+                Name = interestPointDto.Name,
+                Logo = interestPointDto.Logo,
+                LocationId = point.Id
+            };
+            _context.InterestPoints.Add(interestPoint);
+
+            return interestPoint;
         }
 
         public InterestPointDto GetInterestPointById(int id)

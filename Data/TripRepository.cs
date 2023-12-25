@@ -30,12 +30,9 @@ namespace API.Data
                 status = 3;
             Trip trip = new()
             {
-                Rating = tripDto.Rating,
                 status = (Trip.Status)status,
                 PassengerId = tripDto.PassengerId,
-                BusId = tripDto.BusId,
                 PaymentTransactionId = tripDto.PaymentTransactionId,
-                RouteId = tripDto.RouteId,
                 PickUpPointId = tripDto.PickUpPointId,
                 DropOffPointId = tripDto.DropOffPointId
             };

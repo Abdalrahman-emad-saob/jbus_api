@@ -47,6 +47,15 @@ namespace API.Data
             .ToList();
         }
 
+        public IEnumerable<FavoritePointDto> GetRouteFavoritePointDtos(int PassengerId, int RouteId)
+        {
+            return _context
+                .FavoritePoints
+                .Where(fp => fp.PassengerId == PassengerId && fp.RouteId == RouteId)
+                .ProjectTo<FavoritePointDto>(_mapper.ConfigurationProvider)
+                .ToList();
+        }
+
         public bool InsertFavoritePoint(FavoritePointCreateDto favoritePointCreateDto)
         {
             var point = _context.Points.Where(p => p.Latitude == favoritePointCreateDto.Lat).SingleOrDefault();
@@ -68,13 +77,13 @@ namespace API.Data
                 return true;
             }
             FavoritePoint createfavoritePoint = new()
-                {
-                    PassengerId = favoritePointCreateDto.PassengerId,
-                    PointId = point.Id,
-                    RouteId = favoritePointCreateDto.RouteId
-                };
-                _context.SaveChanges();
-                return true;
+            {
+                PassengerId = favoritePointCreateDto.PassengerId,
+                PointId = point.Id,
+                RouteId = favoritePointCreateDto.RouteId
+            };
+            _context.SaveChanges();
+            return true;
         }
 
         public bool SaveChanges()

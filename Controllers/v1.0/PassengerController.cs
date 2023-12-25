@@ -31,7 +31,7 @@ namespace API.Controllers.v1
         public ActionResult updatePassenger(int id, PassengerUpdateDto passengerUpdateDto)
         {
             var passenger = _passengerRepository.GetPassengerById(id);
-            var user = _userRepository.GetUserById((int)passenger.UserId);
+            var user = _userRepository.GetUserById((int)passenger.UserId!);
 
             if (passenger == null) return NotFound();
             _mapper.Map(passengerUpdateDto, passenger);

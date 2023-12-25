@@ -16,8 +16,7 @@ namespace API.Data
             _context = context;
             _mapper = mapper;
         }
-        // TODO register Driver
-        public bool CreateDrive(DriverCreateDto driverDto)
+        public bool CreateDriver(DriverCreateDto driverDto)
         {
             Driver driver = new() { };
             User user = new()
@@ -26,11 +25,12 @@ namespace API.Data
                 PhoneNumber = driverDto.PhoneNumber,
                 Email = driverDto.Email,
                 UserRole = User.Role.DRIVER,
-                UserGender = User.Gender.MALE
+                UserSex = User.Sex.MALE
             };
+            driver.User = user;
             _context.Drivers.Add(driver);
-            _context.SaveChanges();
-            return true;
+            
+            return _context.SaveChanges() > 0;
         }
 
         public Driver GetDriverByEmail(string Email)

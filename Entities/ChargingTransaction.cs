@@ -6,12 +6,12 @@ namespace API.Entities
     {
         public int Id { get; set; }
         // TODO Payment Methods
-        public enum PaymentMethod
+        public enum ChargingMethod
         {
             MASTERCARD = 0,
             VISA = 1
         }
-        public PaymentMethod paymentMethod { get; set; }
+        public ChargingMethod chargingMethod { get; set; }
         public double Amount { get; set; }
         public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
 

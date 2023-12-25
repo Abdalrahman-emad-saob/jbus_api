@@ -17,7 +17,8 @@ namespace API.Entities
         public Trip? TripPickup { get; set; }
         public int? TripDropoffId { get; set; }
         public Trip? TripDropoff { get; set; }
-        
+        // public int FazaaId { get; set; }
+        // public Fazaa? Fazaa { get; set; }
 
     }
 }

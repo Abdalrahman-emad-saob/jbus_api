@@ -1,26 +1,22 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace API.DTOs
 {
     public class TripCreateDto
     {
-        // TODO TIMESTAMPS
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime FinishedAt { get; set; } = DateTime.UtcNow;
-        public int Rating { get; set; }
+        [Required]
+        public DateTime StartedAt { get; set; }
+        [Required]
+        public DateTime FinishedAt { get; set; }
+        [Required]
         public string? status { get; set; }
-        public enum Status
-        {
-            PENDING = 0,
-            ONGOING = 1,
-            COMPLETED = 2,
-            CANCELED = 3
-        }
-        
-        // * Link
+        [Required]
         public int PassengerId { get; set; }
-        public int BusId { get; set; }
+        [Required]
         public int PaymentTransactionId { get; set; }
-        public int RouteId { get; set; }
+        [Required]
         public int PickUpPointId { get; set; }
+        [Required]
         public int DropOffPointId { get; set; }
     }
 }

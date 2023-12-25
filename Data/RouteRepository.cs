@@ -10,16 +10,46 @@ namespace API.Data
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
+        private readonly IInterestPointRepository _interestPointRepository;
 
-        public RouteRepository(DataContext context, IMapper mapper)
+        public RouteRepository(DataContext context, IMapper mapper, IInterestPointRepository interestPointRepository)
         {
             _context = context;
             _mapper = mapper;
+            _interestPointRepository = interestPointRepository;
         }
 
         public bool CreateRoute(RouteCreateDto routeDto)
         {
-            throw new NotImplementedException();
+            InterestPointCreateDto interestPointCreateDto1 = new()
+            {
+                Name = routeDto.StartingPoint!.Name,
+                Logo = routeDto.StartingPoint.Logo,
+                PointName = routeDto.StartingPoint.PointName,
+                Latitude = routeDto.StartingPoint.Latitude,
+                Longitude = routeDto.StartingPoint.Longitude
+            };
+            InterestPointCreateDto interestPointCreateDto2 = new()
+            {
+                Name = routeDto.EndingPoint!.Name,
+                Logo = routeDto.EndingPoint.Logo,
+                PointName = routeDto.EndingPoint.PointName,
+                Latitude = routeDto.EndingPoint.Latitude,
+                Longitude = routeDto.EndingPoint.Longitude
+            };
+            var interestPoint1 = _interestPointRepository.CreateInterestPoint(interestPointCreateDto1);
+            var interestPoint2 = _interestPointRepository.CreateInterestPoint(interestPointCreateDto2);
+            Entities.Route route = new()
+            {
+                Name = routeDto.Name,
+                WaypointsGoing = routeDto.WaypointsGoing,
+                WaypointsReturning = routeDto.WaypointsReturning,
+                StartingPointId = interestPoint1.Id,
+                EndingPointId = interestPoint2.Id
+            };
+            _context.Routes.Add(route);
+            
+            return SaveChanges();
         }
 
         public RouteDto GetRouteById(int id)

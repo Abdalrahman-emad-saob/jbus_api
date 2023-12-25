@@ -33,8 +33,19 @@ namespace API.Controllers.v1
         [HttpPost("AddFavoritePoint")]
         public ActionResult CreateFavoritePoint(FavoritePointCreateDto favoritePointCreateDto)
         {
-            _favoritePointRepository.InsertFavoritePoint(favoritePointCreateDto);
-            return Ok();
+            if (_favoritePointRepository.InsertFavoritePoint(favoritePointCreateDto))
+            {
+                return Created();
+            }
+            return BadRequest();
+        }
+        [HttpGet("{PassengerId}/{RouteId}")]
+        public ActionResult<IEnumerable<FavoritePointDto>> GetRouteFavoritePoints(int PassengerId, int RouteId)
+        {
+            IEnumerable<FavoritePointDto> favoritePointDtos = _favoritePointRepository.GetRouteFavoritePointDtos(PassengerId, RouteId);
+            if(favoritePointDtos == null || !favoritePointDtos.Any())
+                return NotFound("No favorite points found for the specified PassengerId and RouteId");
+            return Ok(favoritePointDtos);
         }
     }
 }

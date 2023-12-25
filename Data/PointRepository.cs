@@ -1,4 +1,5 @@
 using API.DTOs;
+using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -16,9 +17,9 @@ namespace API.Data
             _mapper = mapper;
         }
 
-        public bool CreatePoint(PointCreateDto pointDto)
+        public Point CreatePoint(PointCreateDto pointDto)
         {
-            Entities.Point point = new()
+            Point point = new()
             {
                 Name = pointDto.Name,
                 Latitude = pointDto.Latitude,
@@ -26,7 +27,7 @@ namespace API.Data
             };
             _context.Points.Add(point);
 
-            return SaveChanges();
+            return point;
         }
 
         public PointDto GetPointById(int id)

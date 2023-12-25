@@ -10,7 +10,7 @@ namespace API.Interfaces
         DriverDto GetDriverDtoById(int id);
         Driver GetDriverById(int id);
         Driver GetDriverByEmail(string Email);
-        bool CreateDrive(DriverCreateDto driverDto);
+        bool CreateDriver(DriverCreateDto driverDto);
         bool SaveChanges();
     }
 }

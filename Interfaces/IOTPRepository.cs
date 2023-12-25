@@ -5,7 +5,6 @@ namespace API.Interfaces
 {
     public interface IOTPRepository
     {
-        // TODO
         OTP GetOTPByEmail(string Email);
         int CreateOTP(string Email);
         bool SaveChanges();

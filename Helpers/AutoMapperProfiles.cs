@@ -25,7 +25,6 @@ namespace API.Helpers
             CreateMap<InterestPointCreateDto, InterestPoint>();
             CreateMap<InterestPointUpdateDto, InterestPoint>();
             
-            // TODO
             CreateMap<OTP, OTPDto>();
             
             CreateMap<Passenger, PassengerDto>();
@@ -45,7 +44,10 @@ namespace API.Helpers
             CreateMap<Trip, TripDto>();
             CreateMap<TripCreateDto, Trip>();
 
-            CreateMap<User, UserDto>();
+            CreateMap<User, UserDto>()
+            .ForMember(ud => ud.UserSex, opt => opt.MapFrom(u => u.UserSex.ToString()))
+            .ForMember(ud => ud.UserRole, opt => opt.MapFrom(u => u.UserRole.ToString()));
+
             CreateMap<UserUpdateDto, User>();
             CreateMap<UserDto, User>();
         }

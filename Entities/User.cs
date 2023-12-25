@@ -18,29 +18,16 @@ namespace API.Entities
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public DateTime LastActive { get; set; } = DateTime.UtcNow;
         public string? PasswordHash { get; set; }
-        // public byte[] PasswordSalt { get; set; }
-        public Gender UserGender { get; set; }
-        public enum Gender
+        public Sex UserSex { get; set; }
+        public enum Sex
         {
             MALE = 0,
             FEMALE = 1
         }
-        public DateTime DateOfBirth { get; set; }
+        public DateOnly DateOfBirth { get; set; }
 
         // * Link
-        public int? PassengerId { get; set; }
         public Passenger? Passenger { get; set; }
-        public int? DriverId { get; set; }
         public Driver? Driver { get; set; }
-
-        // * Methods
-        // public int GetAge()
-        // {
-        //     var age = DateOnly.FromDateTime(DateTime.UtcNow).Year - DateOfBirth.Year;
-        //     if (DateOfBirth > DateOnly.FromDateTime(DateTime.UtcNow).AddYears(-age))
-        //         --age;
-                
-        //     return age;
-        // }
     }
 }

@@ -10,5 +10,6 @@ namespace API.Interfaces
         bool DeleteFavoritePoint(int id);
         bool InsertFavoritePoint(FavoritePointCreateDto favoritePointCreateDto);
         bool SaveChanges();
+        IEnumerable<FavoritePointDto> GetRouteFavoritePointDtos(int PassengerId, int RouteId);
     }
 }

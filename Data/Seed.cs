@@ -1,5 +1,4 @@
 using API.Entities;
-using Bogus;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,8 +17,8 @@ namespace API.Data
                 PhoneNumber = "0785455414",
                 Email = "aboodsaob1139@gmail.com",
                 UserRole = User.Role.PASSENGER,
-                UserGender = User.Gender.MALE,
-                DateOfBirth = new DateTime(2002, 3, 26),
+                UserSex = User.Sex.MALE,
+                DateOfBirth = new DateOnly(2002, 3, 26),
             };
             user.PasswordHash = passwordHasher.HashPassword(user, "password");
             Passenger passenger = new()
@@ -46,8 +45,8 @@ namespace API.Data
                 PhoneNumber = "0790364258",
                 Email = "khader.mallouh@gmail.com",
                 UserRole = User.Role.DRIVER,
-                UserGender = User.Gender.MALE,
-                DateOfBirth = new DateTime(2000, 6, 25),
+                UserSex = User.Sex.MALE,
+                DateOfBirth = new DateOnly(2000, 6, 25),
             };
             user.PasswordHash = passwordHasher.HashPassword(user, "password");
             Driver driver = new()
@@ -65,18 +64,26 @@ namespace API.Data
             if (await context.Points.AnyAsync()) return;
             Point point1 = new()
             {
-                Name = "Custom1",
-                Latitude = 118.06,
-                Longitude = 118.06,
+                Name = "JUST Bus Station",
+                Latitude = 32.49512209286742,
+                Longitude = 35.98597417188871,
             };
             context.Points.Add(point1);
             Point point2 = new()
             {
-                Name = "Custom2",
-                Latitude = 118.06,
-                Longitude = 118.06,
+                Name = "North Bus Station",
+                Latitude = 31.9957018434082,
+                Longitude = 35.91987132195803,
             };
+            Point point3 = new()
+            {
+                Name = "حي الجامعة الاردنية",
+                Latitude = 32.02511248566629,
+                Longitude = 35.89201395463377,
+            };
+            context.Points.Add(point1);
             context.Points.Add(point2);
+            context.Points.Add(point3);
             await context.SaveChangesAsync();
         }
         public static async Task SeedInterestPoints(DataContext context)
@@ -87,7 +94,7 @@ namespace API.Data
 
             InterestPoint startingPoint = new()
             {
-                Name = "Starting Point",
+                Name = "North Bus Station",
                 Logo = "5.png"
             };
 
@@ -96,8 +103,8 @@ namespace API.Data
                 Name = "Ending Point",
                 Logo = "5.png"
             };
-            startingPoint.LocationId = point1!.Id;
-            endingPoint.LocationId = point2!.Id;
+            startingPoint.LocationId = point2!.Id;
+            endingPoint.LocationId = point1!.Id;
             context.InterestPoints.Add(startingPoint);
             context.InterestPoints.Add(endingPoint);
 
@@ -112,9 +119,42 @@ namespace API.Data
 
             Entities.Route route = new()
             {
-                Name = "Example Route",
-                WaypointsGoing = "Waypoint1, Waypoint2, Waypoint3",
-                WaypointsReturning = "Waypoint3, Waypoint2, Waypoint1",
+                Name = "Amman-JUST",
+                WaypointsGoing = @"[
+                    {
+                        ""Location"": {
+                            ""Latitude"": 31.9957018434082,
+                            ""Longitude"": 35.91987132195803
+                        }
+                    },
+                    {
+                        ""Location"": {
+                            ""Latitude"": 32.21854548546048,
+                            ""Longitude"": 35.89057887311955
+                        }
+                    },
+                    {
+                        ""Location"": {
+                            ""Latitude"": 32.49512209286742,
+                            ""Longitude"": 35.98597417188871
+                        }
+                    }
+                ]",
+                WaypointsReturning = @"[
+                    [
+                        {""Location"": {""Latitude"": 32.49512209286742,
+                                ""Longitude"": 35.98597417188871}}
+                    ],
+                    [
+                        {""Location"": {
+                                ""Latitude"": 32.21854548546048,
+                                ""Longitude"": 35.89057887311955}}
+                                ],
+                    [
+                        {""Location"": {""Latitude"": 31.9957018434082,
+                                ""Longitude"": 35.91987132195803}}]
+                                ]",
+                Fee = 115,
                 StartingPointId = interestpoint1!.Id,
                 EndingPointId = interestpoint2!.Id
             };
@@ -127,21 +167,13 @@ namespace API.Data
         {
             if (await context.Trips.AnyAsync()) return;
 
-            // Assuming you have already seeded other entities like Bus, Route, Point, Passenger, PaymentTransaction
-
             Trip trip = new()
             {
-                CreatedAt = DateTime.UtcNow,
+                StartedAt = DateTime.UtcNow,
                 FinishedAt = DateTime.UtcNow,
-                Rating = 5,
-
                 status = Trip.Status.COMPLETED,
-
                 PassengerId = 1,
-                BusId = 1,
                 PaymentTransactionId = 1,
-                RouteId = 1,
-
                 PickUpPointId = 1,
                 DropOffPointId = 1
             };
@@ -168,18 +200,18 @@ namespace API.Data
 
             await context.SaveChangesAsync();
         }
-        
+
         public static async Task SeedOTP(DataContext context)
         {
             if (await context.Passengers.AnyAsync()) return;
             var passenger = await context.Passengers.FindAsync(1);
-            var user = await context.Users.FindAsync(passenger.UserId);
+            var user = await context.Users.FindAsync(passenger!.UserId);
             if (passenger != null && user != null)
             {
                 OTP otp = new()
                 {
                     Otp = 1234,
-                    PassengerEmail = user.Email 
+                    PassengerEmail = user.Email
                 };
                 context.OTPs.Add(otp);
                 await context.SaveChangesAsync();

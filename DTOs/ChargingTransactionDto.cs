@@ -2,9 +2,9 @@ namespace API.DTOs
 {
     public class ChargingTransactionDto
     {
-        //  public int Id { get; set; }
-        // TODO Payment Methods
-        public enum PaymentMethod
+         public int Id { get; set; }
+        // TODO Charging Methods
+        public enum ChargingMethod
         {
             MASTERCARD = 0,
             VISA = 1

@@ -4,7 +4,6 @@ using API.Interfaces;
 
 namespace API.Data
 {
-    // TODO OTPs
     public class OTPRepository : IOTPRepository
     {
         private readonly DataContext _context;
@@ -42,7 +41,7 @@ namespace API.Data
 
         public OTP GetOTPByEmail(string Email)
         {
-            return _context.OTPs.Where(otp => otp.PassengerEmail == Email).SingleOrDefault();
+            return _context.OTPs.Where(otp => otp.PassengerEmail == Email).SingleOrDefault()!;
         }
 
         public bool SaveChanges()

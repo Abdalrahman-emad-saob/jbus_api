@@ -11,9 +11,9 @@ namespace API.Extensions
         {
             services.AddDbContext<DataContext>(opt =>
         {
-            // opt.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
-            opt.UseSqlServer(configuration.GetConnectionString("MSSqlServer"))
+            opt.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
             .LogTo(Console.WriteLine, LogLevel.Information);
+            // opt.UseSqlServer(configuration.GetConnectionString("MSSqlServer"))
         });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddEndpointsApiExplorer();

@@ -8,11 +8,11 @@ namespace API.DTOs
         public string? Name { get; set; }
         [Phone]
         public string? PhoneNumber { get; set; }
-        // TODO TO REMENBER [RegularExpression(@"^[A-Za-z0-9_-]*$")]
+        // TODO TO REMEMBER [RegularExpression(@"^[A-Za-z0-9_-]*$")]
         [EmailAddress(ErrorMessage = "Invalid email address")]
         public string? Email { get; set; }
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public DateTime LastActive { get; set; } = DateTime.UtcNow;
-        public Gender UserGender { get; set; }
+        public Sex UserSex { get; set; }
     }
 }

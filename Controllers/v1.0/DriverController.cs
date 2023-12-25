@@ -34,14 +34,14 @@ namespace API.Controllers.v1
             {
                 return BadRequest("Driver Exists");
             }
-            _driverRepository.CreateDrive(driverDto);
+            _driverRepository.CreateDriver(driverDto);
             return Ok();
         }
         [HttpPut("{id}")]
         public ActionResult updateDriver(int id, DriverUpdateDto driverUpdateDto)
         {
             var driver = _driverRepository.GetDriverById(id);
-            var user = _userRepository.GetUserById((int)driver.UserId);
+            var user = _userRepository.GetUserById((int)driver.UserId!);
 
             if (driver == null) return NotFound();
             _mapper.Map(driverUpdateDto, driver);
@@ -53,7 +53,7 @@ namespace API.Controllers.v1
         [NonAction]
         public bool DriverExists(string? Email)
         {
-            return _driverRepository.GetDriverByEmail(Email) != null;
+            return _driverRepository.GetDriverByEmail(Email!) != null;
         }
     }
 }

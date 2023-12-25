@@ -1,10 +1,18 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace API.DTOs
 {
     public class InterestPointCreateDto
     {
+        [Required]
         public string? Name { get; set; }
-        public string? Logo { get; set; }        
-        // * Link
-        public int LocationId { get; set; }
+        [Required]
+        public string? Logo { get; set; }   
+        [Required]     
+        public string? PointName { get; set; }
+        [Required]
+        public double Latitude { get; set; }
+        [Required]
+        public double Longitude { get; set; }
     }
 }

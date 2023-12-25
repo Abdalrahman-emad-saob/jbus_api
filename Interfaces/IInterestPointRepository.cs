@@ -1,4 +1,5 @@
 using API.DTOs;
+using API.Entities;
 
 namespace API.Interfaces
 {
@@ -7,7 +8,7 @@ namespace API.Interfaces
         void Update(InterestPointDto interestPoint);
         IEnumerable<InterestPointDto> GetInterestPoints();
         InterestPointDto GetInterestPointById(int id);
-        bool CreateInterestPoint(InterestPointCreateDto interestPointDto);
+        InterestPoint CreateInterestPoint(InterestPointCreateDto interestPointDto);
         bool SaveChanges();
     }
 }
