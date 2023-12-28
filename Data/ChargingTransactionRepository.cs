@@ -1,16 +1,20 @@
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 
 namespace API.Data
 {
     public class ChargingTransactionRepository : IChargingTransactionRepository
     {
         private readonly DataContext _context;
+        private readonly IMapper _mapper;
 
-        public ChargingTransactionRepository(DataContext context)
+        public ChargingTransactionRepository(DataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public bool CreateChargingTransaction(ChargingTransactionCreateDto chargingTransactionDto)
@@ -30,18 +34,20 @@ namespace API.Data
             return SaveChanges();
         }
 
-        public ChargingTransaction GetChargingTransactionById(int id)
+        public ChargingTransactionDto GetChargingTransactionById(int id)
         {
             return _context
             .ChargingTransactions
             .Where(ct => ct.Id == id)
+            .ProjectTo<ChargingTransactionDto>(_mapper.ConfigurationProvider)
             .SingleOrDefault()!;
         }
 
-        public IEnumerable<ChargingTransaction> GetChargingTransactions()
+        public IEnumerable<ChargingTransactionDto> GetChargingTransactions()
         {
             return _context
                 .ChargingTransactions
+                .ProjectTo<ChargingTransactionDto>(_mapper.ConfigurationProvider)
                 .ToList();
         }
 

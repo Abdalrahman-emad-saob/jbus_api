@@ -69,7 +69,6 @@ namespace API.Data
                 };
                 FavoritePoint favoritePoint = new()
                 {
-                    PassengerId = favoritePointCreateDto.PassengerId,
                     PointId = createPoint.Id,
                     RouteId = favoritePointCreateDto.RouteId
                 };
@@ -78,7 +77,6 @@ namespace API.Data
             }
             FavoritePoint createfavoritePoint = new()
             {
-                PassengerId = favoritePointCreateDto.PassengerId,
                 PointId = point.Id,
                 RouteId = favoritePointCreateDto.RouteId
             };

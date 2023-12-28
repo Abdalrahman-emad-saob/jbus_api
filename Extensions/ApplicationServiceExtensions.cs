@@ -34,8 +34,9 @@ namespace API.Extensions
             services.AddScoped<IPaymentTransactionRepository, PaymentTransactionRepository>();
             services.AddScoped<ITripRepository, TripRepository>();
             services.AddScoped<IPointRepository, PointRepository>();
+            services.AddScoped<ITokenHandlerService, TokenHandlerService>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             return services;
         }

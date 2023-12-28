@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using static API.Entities.User;
+using API.Entities;
 
 namespace API.DTOs
 {
@@ -13,6 +13,6 @@ namespace API.DTOs
         public string? Email { get; set; }
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public DateTime LastActive { get; set; } = DateTime.UtcNow;
-        public Sex UserSex { get; set; }
+        public Sex Sex { get; set; }
     }
 }

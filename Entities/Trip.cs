@@ -5,14 +5,7 @@ namespace API.Entities
         public int Id { get; set; }
         public DateTime StartedAt { get; set; } = DateTime.UtcNow;
         public DateTime FinishedAt { get; set; } = DateTime.UtcNow;
-        public Status status { get; set; }
-        public enum Status
-        {
-            PENDING = 0,
-            ONGOING = 1,
-            COMPLETED = 2,
-            CANCELED = 3
-        }
+        public TripStatus status { get; set; }
         
 
         // * Link

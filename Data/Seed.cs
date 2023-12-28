@@ -16,8 +16,8 @@ namespace API.Data
                 Name = "Abood Saob",
                 PhoneNumber = "0785455414",
                 Email = "aboodsaob1139@gmail.com",
-                UserRole = User.Role.PASSENGER,
-                UserSex = User.Sex.MALE,
+                Role = Role.PASSENGER,
+                Sex = Sex.MALE,
                 DateOfBirth = new DateOnly(2002, 3, 26),
             };
             user.PasswordHash = passwordHasher.HashPassword(user, "password");
@@ -26,7 +26,7 @@ namespace API.Data
                 Wallet = 1000,
                 GoogleToken = "google_token_here",
                 FacebookToken = "facebook_token_here",
-                User = user,
+                User = user
             };
             user.Passenger = passenger;
             context.Users.Add(user);
@@ -44,8 +44,8 @@ namespace API.Data
                 Name = "Khader Abumallouh",
                 PhoneNumber = "0790364258",
                 Email = "khader.mallouh@gmail.com",
-                UserRole = User.Role.DRIVER,
-                UserSex = User.Sex.MALE,
+                Role = Role.DRIVER,
+                Sex = Sex.MALE,
                 DateOfBirth = new DateOnly(2000, 6, 25),
             };
             user.PasswordHash = passwordHasher.HashPassword(user, "password");
@@ -171,7 +171,7 @@ namespace API.Data
             {
                 StartedAt = DateTime.UtcNow,
                 FinishedAt = DateTime.UtcNow,
-                status = Trip.Status.COMPLETED,
+                status = TripStatus.COMPLETED,
                 PassengerId = 1,
                 PaymentTransactionId = 1,
                 PickUpPointId = 1,

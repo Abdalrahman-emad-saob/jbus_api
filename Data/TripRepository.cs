@@ -30,7 +30,7 @@ namespace API.Data
                 status = 3;
             Trip trip = new()
             {
-                status = (Trip.Status)status,
+                status = (TripStatus)status,
                 PassengerId = tripDto.PassengerId,
                 PaymentTransactionId = tripDto.PaymentTransactionId,
                 PickUpPointId = tripDto.PickUpPointId,

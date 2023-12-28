@@ -37,7 +37,7 @@ namespace API.Data
         public Passenger GetPassengerById(int id)
         {
             return _context.Passengers
-                .Where(p => p.Id == id)
+                .Where(p => p.UserId == id)
                 .SingleOrDefault()!;
         }
 

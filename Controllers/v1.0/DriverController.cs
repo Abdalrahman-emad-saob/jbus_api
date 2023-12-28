@@ -1,10 +1,12 @@
 using API.DTOs;
 using API.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers.v1
 {
+    [Authorize]
     public class DriverController : BaseApiController
     {
         private readonly IDriverRepository _driverRepository;
@@ -27,7 +29,7 @@ namespace API.Controllers.v1
         {
             return _driverRepository.GetDriverDtoById(id);
         }
-        [HttpPost("AddDriver")]
+        [HttpPost("addDriver")]
         public ActionResult<DriverDto> CreateDriver(DriverCreateDto driverDto)
         {
             if(DriverExists(driverDto.Email))

@@ -45,8 +45,8 @@ namespace API.Helpers
             CreateMap<TripCreateDto, Trip>();
 
             CreateMap<User, UserDto>()
-            .ForMember(ud => ud.UserSex, opt => opt.MapFrom(u => u.UserSex.ToString()))
-            .ForMember(ud => ud.UserRole, opt => opt.MapFrom(u => u.UserRole.ToString()));
+            .ForMember(ud => ud.Sex, opt => opt.MapFrom(u => u.Sex.ToString()))
+            .ForMember(ud => ud.Role, opt => opt.MapFrom(u => u.Role.ToString()));
 
             CreateMap<UserUpdateDto, User>();
             CreateMap<UserDto, User>();

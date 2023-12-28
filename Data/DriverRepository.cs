@@ -24,8 +24,8 @@ namespace API.Data
                 Name = driverDto.Name,
                 PhoneNumber = driverDto.PhoneNumber,
                 Email = driverDto.Email,
-                UserRole = User.Role.DRIVER,
-                UserSex = User.Sex.MALE
+                Role = Role.DRIVER,
+                Sex = Sex.MALE
             };
             driver.User = user;
             _context.Drivers.Add(driver);
