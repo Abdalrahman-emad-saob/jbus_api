@@ -26,13 +26,13 @@ namespace api.Controllers.v1
             _tokenHandlerService = tokenHandlerService;
             _favoritePointRepository = favoritePointRepository;
         }
-        [HttpPost("addRoute")]
+        [HttpPost("addroute")]
         public ActionResult CreateRoute(RouteCreateDto routeCreateDto)
         {
             _routeRepository.CreateRoute(routeCreateDto);
             return Created();
         }
-        [HttpGet("getRoutes")]
+        [HttpGet("getroutes")]
         public ActionResult<IEnumerable<RouteDto>> GetRoutes() => Ok(_routeRepository.GetRoutes());
 
         [HttpGet("{id}")]
@@ -50,7 +50,7 @@ namespace api.Controllers.v1
 
             return BadRequest("Failed to Update Route");
         }
-        [HttpGet("{id}/favoritePoints")]
+        [HttpGet("{id}/favoritepoints")]
         public ActionResult<IEnumerable<FavoritePointDto>> GetRouteFavoritePoints(int id)
         {
             int PassengerId = _tokenHandlerService.TokenHandler();

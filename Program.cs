@@ -52,5 +52,5 @@ catch (Exception ex)
     logger?.LogError(ex, "An Error Occurred During Migration");
 }
 
-// app.Run("http://localhost:5002");
-app.Run("http://localhost:5000");
+app.Run("http://localhost:5002");
+// app.Run("http://localhost:5000");

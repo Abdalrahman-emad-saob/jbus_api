@@ -7,42 +7,47 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class PredefinedStopsRepository : IPredefinedStopsRepository
+    public class FazaaRepository : IFazaaRepository
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
 
-        public PredefinedStopsRepository(DataContext context, IMapper mapper)
+        public FazaaRepository(DataContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        public bool CreatePredefinedStop(PredefinedStopsCreateDto predefinedStopsCreateDto)
+        public bool CreateFazaa(FazaaCreateDto fazaaCreateDto)
         {
             throw new NotImplementedException();
         }
 
-        public PredefinedStopsDto GetPredefinedStopById(int id)
+        public FazaaDto GetFazaaById(int id)
         {
             return _context
-           .PredefinedStops
+           .Fazaas
            .Where(dt => dt.Id == id)
-           .ProjectTo<PredefinedStopsDto>(_mapper.ConfigurationProvider)
+           .ProjectTo<FazaaDto>(_mapper.ConfigurationProvider)
            .SingleOrDefault()!;
         }
 
-        public IEnumerable<PredefinedStopsDto> GetPredefinedStops()
+        public IEnumerable<FazaaDto> GetFazaas()
         {
             return _context
-           .PredefinedStops
-           .ProjectTo<PredefinedStopsDto>(_mapper.ConfigurationProvider)
+           .Fazaas
+           .ProjectTo<FazaaDto>(_mapper.ConfigurationProvider)
            .ToList();
         }
 
         public bool SaveChanges()
         {
             return _context.SaveChanges() > 0;
+        }
+
+        public void Update(FazaaDto fazaa)
+        {
+             _context.Entry(fazaa).State = EntityState.Modified;
         }
     }
 }

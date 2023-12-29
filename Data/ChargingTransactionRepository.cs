@@ -26,7 +26,7 @@ namespace API.Data
                 chargeMethod = 1;
             ChargingTransaction chargingTransaction = new()
             {
-                chargingMethod = (ChargingTransaction.ChargingMethod)chargeMethod,
+                ChargingMethod = (ChargingMethod)chargeMethod,
                 Amount = chargingTransactionDto.Amount,
                 PassengerId = chargingTransactionDto.PassengerId
             };

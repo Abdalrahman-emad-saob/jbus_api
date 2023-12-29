@@ -28,7 +28,7 @@ namespace API.Controllers.v1
             _tokenHandlerService = tokenHandlerService;
         }
 
-        [HttpGet("getPassengers")]
+        [HttpGet("getpassengers")]
         public ActionResult<IEnumerable<PassengerDto>> GetPassengers() => Ok(_passengerRepository.GetPassengers());
 
         [HttpGet]

@@ -3,40 +3,39 @@ using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class PredefinedStopsRepository : IPredefinedStopsRepository
+    public class DriverTripRepository : IDriverTripRepository
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
 
-        public PredefinedStopsRepository(DataContext context, IMapper mapper)
+        public DriverTripRepository(DataContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        public bool CreatePredefinedStop(PredefinedStopsCreateDto predefinedStopsCreateDto)
+        public bool CreateDriverTrip(DriverTripCreateDto driverTripCreateDto)
         {
             throw new NotImplementedException();
         }
 
-        public PredefinedStopsDto GetPredefinedStopById(int id)
+        public DriverTripDto GetDriverTripById(int id)
         {
             return _context
-           .PredefinedStops
+           .DriverTrips
            .Where(dt => dt.Id == id)
-           .ProjectTo<PredefinedStopsDto>(_mapper.ConfigurationProvider)
+           .ProjectTo<DriverTripDto>(_mapper.ConfigurationProvider)
            .SingleOrDefault()!;
         }
 
-        public IEnumerable<PredefinedStopsDto> GetPredefinedStops()
+        public IEnumerable<DriverTripDto> GetDriverTrips()
         {
             return _context
-           .PredefinedStops
-           .ProjectTo<PredefinedStopsDto>(_mapper.ConfigurationProvider)
+           .DriverTrips
+           .ProjectTo<DriverTripDto>(_mapper.ConfigurationProvider)
            .ToList();
         }
 

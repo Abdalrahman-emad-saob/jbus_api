@@ -3,6 +3,7 @@ using System;
 using API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231229121009_AddedFriendsTableAndEnumsInSeperatedFile")]
+    partial class AddedFriendsTableAndEnumsInSeperatedFile
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -229,10 +232,10 @@ namespace API.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("FriendId")
+                    b.Property<int>("FriendId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("PassengerId")
+                    b.Property<int>("PassengerId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -323,6 +326,9 @@ namespace API.Migrations
                     b.Property<string>("FacebookToken")
                         .HasColumnType("text");
 
+                    b.Property<int>("FriendId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("GoogleToken")
                         .HasColumnType("text");
 
@@ -342,6 +348,8 @@ namespace API.Migrations
                         .HasColumnType("double precision");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FriendId");
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -682,11 +690,15 @@ namespace API.Migrations
                 {
                     b.HasOne("API.Entities.Passenger", "Friend")
                         .WithMany()
-                        .HasForeignKey("FriendId");
+                        .HasForeignKey("FriendId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("API.Entities.Passenger", "Passenger")
                         .WithMany()
-                        .HasForeignKey("PassengerId");
+                        .HasForeignKey("PassengerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Friend");
 
@@ -705,10 +717,18 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Entities.Passenger", b =>
                 {
+                    b.HasOne("API.Entities.Passenger", "Friend")
+                        .WithMany()
+                        .HasForeignKey("FriendId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("API.Entities.User", "User")
                         .WithOne("Passenger")
                         .HasForeignKey("API.Entities.Passenger", "UserId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Friend");
 
                     b.Navigation("User");
                 });

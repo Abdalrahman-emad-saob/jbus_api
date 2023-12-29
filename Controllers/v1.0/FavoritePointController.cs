@@ -27,7 +27,7 @@ namespace API.Controllers.v1
         {
             return Ok(_favoritePointRepository.GetFavoritePointById(id));
         }
-        [HttpGet("favoritePoints")]
+        [HttpGet("favoritepoints")]
         public ActionResult<IEnumerable<FavoritePointDto>> GetPassengerFavoritePoints()
         {
             int Id = _tokenHandlerService.TokenHandler();
@@ -40,7 +40,7 @@ namespace API.Controllers.v1
         {
             return Ok(_favoritePointRepository.DeleteFavoritePoint(id));
         }
-        [HttpPost("addFavoritePoint")]
+        [HttpPost("addfavoritepoint")]
         public ActionResult CreateFavoritePoint(FavoritePointCreateDto favoritePointCreateDto)
         {
             int Id = _tokenHandlerService.TokenHandler();

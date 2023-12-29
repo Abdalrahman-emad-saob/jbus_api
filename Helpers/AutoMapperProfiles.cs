@@ -19,7 +19,19 @@ namespace API.Helpers
             CreateMap<DriverCreateDto, Driver>();
             CreateMap<DriverUpdateDto, Driver>();
 
+            CreateMap<DriverTrip, DriverTripDto>()
+            .ForMember(dtd => dtd.status, opt => opt.MapFrom(dt => dt.status.ToString()));
+            CreateMap<DriverTripCreateDto, DriverTrip>()
+            .ForMember(dtc => dtc.status, opt => opt.MapFrom(dt => Enum.Parse<TripStatus>(dt.status!)));
+
             CreateMap<FavoritePoint, FavoritePointDto>();
+
+            CreateMap<Fazaa, FazaaDto>();
+            CreateMap<FazaaCreateDto, Fazaa>();
+            CreateMap<FazaaUpdateDto, Fazaa>();
+
+            CreateMap<Friends, FriendsDto>();
+            CreateMap<FriendsCreateDto, Friends>();
 
             CreateMap<InterestPoint, InterestPointDto>();
             CreateMap<InterestPointCreateDto, InterestPoint>();
@@ -36,6 +48,9 @@ namespace API.Helpers
             CreateMap<Point, PointDto>();
             CreateMap<PointCreateDto, Point>();
             CreateMap<PointUpdateDto, Point>();
+
+            CreateMap<PredefinedStops, PredefinedStopsDto>();
+            CreateMap<PredefinedStopsCreateDto, PredefinedStops>();
 
             CreateMap<Entities.Route, RouteDto>();
             CreateMap<RouteCreateDto, Entities.Route>();

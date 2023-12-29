@@ -5,13 +5,7 @@ namespace API.Entities
     public class ChargingTransaction
     {
         public int Id { get; set; }
-        // TODO Payment Methods
-        public enum ChargingMethod
-        {
-            MASTERCARD = 0,
-            VISA = 1
-        }
-        public ChargingMethod chargingMethod { get; set; }
+        public ChargingMethod ChargingMethod { get; set; }
         public double Amount { get; set; }
         public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
 

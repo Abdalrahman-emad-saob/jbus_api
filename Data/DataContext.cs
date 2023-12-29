@@ -20,6 +20,7 @@ namespace API.Data
         public DbSet<DriverTrip> DriverTrips { get; set; }
         public DbSet<Fazaa> Fazaas { get; set; }
         public DbSet<PredefinedStops> PredefinedStops { get; set; }
+        public DbSet<Friends> Friends { get; set; }
 
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
@@ -106,7 +107,7 @@ namespace API.Data
                         .WithOne(ps => ps.Route)
                         .HasForeignKey<PredefinedStops>(ps => ps.RouteId)
                         .OnDelete(DeleteBehavior.Cascade);
-            
+
         }
     }
 
