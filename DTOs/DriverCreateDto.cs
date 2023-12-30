@@ -13,10 +13,6 @@ namespace API.DTOs
         [Required]
         public string? Email { get; set; }
         [Required]
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-        [Required]
-        public DateTime LastActive { get; set; } = DateTime.UtcNow;
-        [Required]
         public string? UserSex { get; set; }
     }
 }

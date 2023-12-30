@@ -23,8 +23,7 @@ namespace API.Data
             if (favoritePoint != null)
             {
                 _context.FavoritePoints.Remove(favoritePoint);
-                _context.SaveChanges();
-                return true;
+                return SaveChanges();
             }
             return false;
         }
@@ -80,8 +79,7 @@ namespace API.Data
                 PointId = point.Id,
                 RouteId = favoritePointCreateDto.RouteId
             };
-            _context.SaveChanges();
-            return true;
+            return SaveChanges();
         }
 
         public bool SaveChanges()

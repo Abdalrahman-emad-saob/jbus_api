@@ -17,16 +17,34 @@ namespace API.Data
             _mapper = mapper;
         }
 
-        public bool CreateFriend(FriendsCreateDto friendCreateDto)
+        public bool SendFriendRequest(FriendsCreateDto friendCreateDto, int PassengerId)
         {
-            throw new NotImplementedException();
+            Friends friends = new()
+            {
+                Confirmed = false,
+                FriendId = friendCreateDto.FriendId,
+                PassengerId = PassengerId
+            };
+            _context.Friends.Add(friends);
+
+            return SaveChanges();
+        }
+
+        public bool ConfirmFriendRequest(int FriendId, int PassengerId)
+        {
+            var friend = _context
+                        .Friends
+                        .Where(f => f.FriendId == FriendId && f.PassengerId == PassengerId)
+                        .SingleOrDefault();
+            friend!.Confirmed = true;
+            return SaveChanges();
         }
 
         public FriendsDto GetFriendById(int id)
         {
             return _context
            .Friends
-           .Where(f => f.Id == id)
+           .Where(f => f.Id == id && f.Confirmed == true)
            .ProjectTo<FriendsDto>(_mapper.ConfigurationProvider)
            .SingleOrDefault()!;
         }
@@ -35,7 +53,7 @@ namespace API.Data
         {
             return _context
            .Friends
-           .Where(f => f.Id == id)
+           .Where(f => f.Id == id && f.Confirmed == true)
            .ProjectTo<FriendsDto>(_mapper.ConfigurationProvider)
            .ToList();
         }
@@ -48,6 +66,20 @@ namespace API.Data
         public void Update(FriendsDto friend)
         {
             _context.Entry(friend).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+        }
+
+        public bool DeleteFriend(int FriendId, int PassengerId)
+        {
+            var friendToDelete = _context
+                                .Friends
+                                .Where(f => f.FriendId == FriendId && f.PassengerId == PassengerId)
+                                .SingleOrDefault();
+
+            if (friendToDelete == null)
+                return false;
+
+            _context.Friends.Remove(friendToDelete!);
+            return SaveChanges();
         }
     }
 }

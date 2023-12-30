@@ -21,7 +21,11 @@ app.UseMiddleware<ExceptionMiddleware>();
 // if (app.Environment.IsDevelopment())
 // {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+    options.RoutePrefix = "jbus_endpoints";
+});
 // }
 app.UseHttpsRedirection();
 
@@ -52,5 +56,5 @@ catch (Exception ex)
     logger?.LogError(ex, "An Error Occurred During Migration");
 }
 
-app.Run("http://localhost:5002");
+app.Run();
 // app.Run("http://localhost:5000");

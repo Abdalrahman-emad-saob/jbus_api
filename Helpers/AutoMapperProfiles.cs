@@ -12,7 +12,8 @@ namespace API.Helpers
             CreateMap<BusCreateDto, Bus>();
             CreateMap<BusUpdateDto, Bus>();
 
-            CreateMap<ChargingTransaction, ChargingTransactionDto>();
+            CreateMap<ChargingTransaction, ChargingTransactionDto>()
+            .ForMember(ctd => ctd.chargingMethod, opt => opt.MapFrom(ct => ct.ChargingMethod.ToString()));
             CreateMap<ChargingTransactionCreateDto, ChargingTransaction>();
 
             CreateMap<Driver, DriverDto>();

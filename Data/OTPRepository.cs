@@ -33,8 +33,7 @@ namespace API.Data
             if (otp != null)
             {
                 _context.OTPs.Remove(otp);
-                _context.SaveChanges();
-                return true;
+                return SaveChanges();
             }
             return false;
         }

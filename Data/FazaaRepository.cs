@@ -18,9 +18,20 @@ namespace API.Data
             _mapper = mapper;
         }
 
-        public bool CreateFazaa(FazaaCreateDto fazaaCreateDto)
+        public bool CreateFazaas(IEnumerable<FazaaCreateDto> fazaaCreateDto, int InDebtId)
         {
-            throw new NotImplementedException();
+            foreach (var fazaa in fazaaCreateDto)
+            {
+                Fazaa newFazaa = new()
+                {
+                    CreatedAt = DateTime.UtcNow,
+                    Paid = false,
+                    Amount = fazaa.Amount,
+                    CreditorId = fazaa.CreditorId
+                };
+                _context.Fazaas.Add(newFazaa);
+            }
+            return SaveChanges();
         }
 
         public FazaaDto GetFazaaById(int id)
@@ -32,10 +43,11 @@ namespace API.Data
            .SingleOrDefault()!;
         }
 
-        public IEnumerable<FazaaDto> GetFazaas()
+        public IEnumerable<FazaaDto> GetFazaas(int InDebtId)
         {
             return _context
            .Fazaas
+           .Where(dt => dt.InDebtId == InDebtId)
            .ProjectTo<FazaaDto>(_mapper.ConfigurationProvider)
            .ToList();
         }
@@ -47,7 +59,7 @@ namespace API.Data
 
         public void Update(FazaaDto fazaa)
         {
-             _context.Entry(fazaa).State = EntityState.Modified;
+            _context.Entry(fazaa).State = EntityState.Modified;
         }
     }
 }

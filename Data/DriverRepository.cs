@@ -25,12 +25,15 @@ namespace API.Data
                 PhoneNumber = driverDto.PhoneNumber,
                 Email = driverDto.Email,
                 Role = Role.DRIVER,
-                Sex = Sex.MALE
+                Sex = Sex.MALE,
+                UpdatedAt = DateTime.UtcNow,
+                LastActive = DateTime.UtcNow
             };
             driver.User = user;
+            _context.Users.Add(user);
             _context.Drivers.Add(driver);
-            
-            return _context.SaveChanges() > 0;
+
+            return SaveChanges();
         }
 
         public Driver GetDriverByEmail(string Email)

@@ -1,12 +1,12 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace API.DTOs
 {
     public class FazaaCreateDto
     {
-        public DateTime CreatedAt { get; set; }
+        [Required]
         public double Amount { get; set; }
-        public bool Paid { get; set; } = false;
-        public int InDebtId { get; set; }
+        [Required]
         public int CreditorId { get; set; }
-
     }
 }
