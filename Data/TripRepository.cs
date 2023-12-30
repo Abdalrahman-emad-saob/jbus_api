@@ -17,7 +17,7 @@ namespace API.Data
             _mapper = mapper;
         }
 
-        public bool CreateTrip(TripCreateDto tripDto)
+        public bool CreateTrip(TripCreateDto tripDto, int PassengerId)
         {
             int status = 0;
             if(tripDto.status?.ToLower() == "pending")
@@ -31,7 +31,7 @@ namespace API.Data
             Trip trip = new()
             {
                 status = (TripStatus)status,
-                PassengerId = tripDto.PassengerId,
+                PassengerId = PassengerId,
                 PaymentTransactionId = tripDto.PaymentTransactionId,
                 PickUpPointId = tripDto.PickUpPointId,
                 DropOffPointId = tripDto.DropOffPointId
@@ -50,10 +50,11 @@ namespace API.Data
                 .SingleOrDefault()!;
         }
 
-        public IEnumerable<TripDto> GetTrips()
+        public IEnumerable<TripDto> GetTrips(int PassengerId)
         {
             return _context
             .Trips
+            .Where(t => t.PassengerId == PassengerId)
             .ProjectTo<TripDto>(_mapper.ConfigurationProvider)
             .ToList();
         }

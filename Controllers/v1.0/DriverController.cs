@@ -29,7 +29,7 @@ namespace API.Controllers.v1
         {
             return _driverRepository.GetDriverDtoById(id);
         }
-        [HttpPost("adddriver")]
+        [HttpPost("addDriver")]
         public ActionResult<DriverDto> CreateDriver(DriverCreateDto driverDto)
         {
             if(DriverExists(driverDto.Email))

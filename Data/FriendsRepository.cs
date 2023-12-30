@@ -49,7 +49,7 @@ namespace API.Data
            .SingleOrDefault()!;
         }
 
-        public IEnumerable<FriendsDto> GetFriendsById(int id)
+        public IEnumerable<FriendsDto> GetFriends(int id)
         {
             return _context
            .Friends
@@ -80,6 +80,16 @@ namespace API.Data
 
             _context.Friends.Remove(friendToDelete!);
             return SaveChanges();
+        }
+
+        public IEnumerable<FriendsDto> GetFriendRequests(int PassengerId)
+        {
+            var friendsRequests = _context
+                            .Friends
+                            .Where(f => f.PassengerId == PassengerId && f.Confirmed == false)
+                            .ProjectTo<FriendsDto>(_mapper.ConfigurationProvider)
+                            .ToList();
+            return friendsRequests;
         }
     }
 }

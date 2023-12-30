@@ -10,8 +10,8 @@ namespace API.DTOs
         public DateTime FinishedAt { get; set; }
         [Required]
         public string? status { get; set; }
-        [Required]
-        public int PassengerId { get; set; }
+        // [Required]
+        // public int PassengerId { get; set; }
         [Required]
         public int PaymentTransactionId { get; set; }
         [Required]

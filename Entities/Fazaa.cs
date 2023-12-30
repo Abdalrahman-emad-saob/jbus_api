@@ -1,10 +1,12 @@
 
+using API.DTOs;
+
 namespace API.Entities
 {
     public class Fazaa
     {
         public int Id { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
         public DateTime ReturnedAt { get; set; }
         public double Amount { get; set; }
         public bool Paid { get; set; }
@@ -13,6 +15,5 @@ namespace API.Entities
         public Passenger? InDebt { get; set; }
         public int CreditorId { get; set; }
         public Passenger? Creditor { get; set; }
-        
     }
 }

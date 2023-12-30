@@ -6,7 +6,7 @@ namespace API.Interfaces
     {
         IEnumerable<FazaaDto> GetFazaas(int InDebtId);
         FazaaDto GetFazaaById(int id);
-        bool CreateFazaas(IEnumerable<FazaaCreateDto> fazaaCreateDto, int InDebtId);
+        bool StoreFazaas(IEnumerable<FazaaCreateDto> fazaaCreateDto, int InDebtId);
         void Update(FazaaDto fazaa);
         bool SaveChanges();
     }

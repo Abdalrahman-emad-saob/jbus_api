@@ -57,8 +57,10 @@ namespace API.Helpers
             CreateMap<RouteCreateDto, Entities.Route>();
             CreateMap<RouteUpdateDto, Entities.Route>();
 
-            CreateMap<Trip, TripDto>();
-            CreateMap<TripCreateDto, Trip>();
+            CreateMap<Trip, TripDto>()
+            .ForMember(td => td.Status, opt => opt.MapFrom(t => t.status.ToString()));
+            CreateMap<TripCreateDto, Trip>()
+            .ForMember(t => t.status, opt => opt.MapFrom(tcd => tcd.status!.ToString()));
 
             CreateMap<User, UserDto>()
             .ForMember(ud => ud.Sex, opt => opt.MapFrom(u => u.Sex.ToString()))

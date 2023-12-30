@@ -18,7 +18,7 @@ namespace API.Data
             _mapper = mapper;
         }
 
-        public bool CreateFazaas(IEnumerable<FazaaCreateDto> fazaaCreateDto, int InDebtId)
+        public bool StoreFazaas(IEnumerable<FazaaCreateDto> fazaaCreateDto, int InDebtId)
         {
             foreach (var fazaa in fazaaCreateDto)
             {

@@ -11,95 +11,33 @@ namespace API.Controllers
     public class FazaaController : BaseApiController
     {
         private readonly IFazaaRepository _fazaaRepository;
-        private readonly IFriendsRepository _friendsRepository;
         private readonly IMapper _mapper;
         private readonly ITokenHandlerService _tokenHandlerService;
 
         public FazaaController(
             IFazaaRepository fazaaRepository,
-            IFriendsRepository friendsRepository,
             IMapper mapper,
             ITokenHandlerService tokenHandlerService)
         {
             _fazaaRepository = fazaaRepository;
-            _friendsRepository = friendsRepository;
             _mapper = mapper;
             _tokenHandlerService = tokenHandlerService;
         }
 
-        [HttpPost("sendFriendRequest")]
-        public ActionResult sendFriendRequest(FriendsCreateDto friendsCreateDto)
-        {
-            int Id = _tokenHandlerService.TokenHandler();
-            if (Id == -1)
-                return Unauthorized("Not authorized");
-
-            _friendsRepository.SendFriendRequest(friendsCreateDto, Id);
-            return Created();
-        }
-
-        [HttpPut("confirmFriendRequest")]
-        public ActionResult confirmFriendRequest(int friendId)
-        {
-            int Id = _tokenHandlerService.TokenHandler();
-            if (Id == -1)
-                return Unauthorized("Not authorized");
-
-            _friendsRepository.ConfirmFriendRequest(friendId, Id);
-            return NoContent();
-        }
-
-        [HttpGet("getFriendById")]
-        public ActionResult<FriendsDto> getFriendById(int FriendId)
-        {
-            var friend = _friendsRepository.GetFriendById(FriendId);
-            if (friend == null)
-                return NotFound("Friend Not Found");
-            return Ok(friend);
-        }
-
-        [HttpGet("getFriendsById")]
-        public ActionResult<IEnumerable<FriendsDto>> getFriendsById()
-        {
-            int Id = _tokenHandlerService.TokenHandler();
-            if (Id == -1)
-                return Unauthorized("Not authorized");
-
-            var friends = _friendsRepository.GetFriendsById(Id);
-            if (friends == null)
-                return NotFound("No Friends, forever alone!");
-
-            return Ok(friends);
-        }
-
-        [HttpDelete("DeleteFriend")]
-        public ActionResult deleteFriend(int friendId)
-        {
-            int Id = _tokenHandlerService.TokenHandler();
-            if (Id == -1)
-                return Unauthorized("Not authorized");
-
-            bool result = _friendsRepository.DeleteFriend(friendId, Id);
-            if (!result)
-                return NotFound("Friend Not Found");
-
-            return NoContent();
-        }
-
-        [HttpPost("createFazaas")]
+        [HttpPost("storeFazaas")]
         public ActionResult CreateFazaas(IEnumerable<FazaaCreateDto> fazaaCreateDtos)
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
                 return Unauthorized("Not authorized");
 
-            bool result = _fazaaRepository.CreateFazaas(fazaaCreateDtos, Id);
+            bool result = _fazaaRepository.StoreFazaas(fazaaCreateDtos, Id);
             if (!result)
                 return StatusCode(500, "Internal Server Error");
 
             return NoContent();
         }
-
+        [NonAction]
         [HttpGet("getFazaas")]
         public ActionResult<IEnumerable<FazaaDto>> getFazaas()
         {
@@ -113,7 +51,7 @@ namespace API.Controllers
 
             return Ok(fazaas);
         }
-
+        [NonAction]
         [HttpGet("getFazaaById")]
         public ActionResult<FazaaDto> getFazaaById(int Id)
         {

@@ -7,8 +7,6 @@ namespace API.DTOs
         public int Capacity { get; set; }
         public DateTime CreatedAt { get; set; } 
         public DateTime UpdatedAt { get; set; }
-
-        // * Link
         public int RouteId { get; set; }
         public RouteDto? Route { get; set; }
         public int DriverId { get; set; }

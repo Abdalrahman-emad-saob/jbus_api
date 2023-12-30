@@ -9,7 +9,7 @@ namespace API.DTOs
         [Required]
         public DateTime FinishedAt { get; set; }
         // TODO Function For Rating
-        public int Rating { get; set; }
+        public int? Rating { get; set; }
         [Required]
         public string? status { get; set; }
         [Required]
