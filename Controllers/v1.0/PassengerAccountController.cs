@@ -3,7 +3,6 @@ using API.DTOs;
 using API.Entities;
 using API.Interfaces;
 using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,62 +12,40 @@ namespace API.Controllers.v1
     {
         private readonly IPassengerRepository _passengerRepository;
         private readonly IOTPRepository _oTPRepository;
-        private readonly DataContext _context;
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
 
         public PassengerAccountController(
             IPassengerRepository passengerRepository,
             IOTPRepository oTPRepository,
-            DataContext context,
             ITokenService tokenService,
             IMapper mapper)
         {
             _passengerRepository = passengerRepository;
             _oTPRepository = oTPRepository;
-            _context = context;
             _tokenService = tokenService;
             _mapper = mapper;
         }
         [HttpPost("register")]
-        public ActionResult<LoginResponseDto> Register(RegisterDto registerDto)
+        public ActionResult<LoginResponseDto> Register(RegisterDto registerDto, int OTP)
         {
             OTP otp = _oTPRepository.GetOTPByEmail(registerDto.Email!);
-            if (otp.Otp == registerDto.OTP)
+            if (otp.Otp == OTP)
                 return BadRequest("Invalid OTP");
             _oTPRepository.DeleteOTP(otp.Id);
-            var user = new User
-            {
-                Role = Role.PASSENGER,
-                Name = registerDto.Name,
-                PhoneNumber = registerDto.PhoneNumber,
-                Email = registerDto.Email?.ToLower()
-            };
-            var passwordHasher = new PasswordHasher<User>();
-            user.PasswordHash = passwordHasher.HashPassword(user, registerDto.Password!);
-            var passenger = new Passenger()
-            {
-                Wallet = 0,
-                User = user
-            };
-            var token = _tokenService.CreateToken(user, passenger.Id);
+            _passengerRepository.CreatePassenger(registerDto);
 
-            _context.Users.Add(user);
-            _context.Passengers.Add(passenger);
-            _passengerRepository.SaveChanges();
-            return new LoginResponseDto
-            {
-                passengerDto = _mapper.Map<PassengerDto>(passenger),
-                Token = token
-            };
+            return Ok(_passengerRepository.CreatePassenger(registerDto));
         }
         [HttpPost("login")]
         public ActionResult<LoginResponseDto> Login(LoginDto loginDto)
         {
             try
             {
-                var user = _context.Users.AsEnumerable()
-                    .FirstOrDefault(x => x.Email != null && x.Email.Equals(loginDto.Email, StringComparison.CurrentCultureIgnoreCase));
+                if(loginDto.Email == null)
+                    return BadRequest("Emai is Empty");
+
+                var user = _passengerRepository.GetUserByEmail(loginDto.Email);
 
                 if (user == null)
                     return Unauthorized("Not Authorized");

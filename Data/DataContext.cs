@@ -5,6 +5,7 @@ namespace API.Data
 {
     public class DataContext : DbContext
     {
+        public DbSet<Admin> Admins { get; set; }
         public DbSet<Bus> Buses { get; set; }
         public DbSet<ChargingTransaction> ChargingTransactions { get; set; }
         public DbSet<Driver> Drivers { get; set; }

@@ -1,20 +1,16 @@
 using System.ComponentModel.DataAnnotations;
-using API.Validations;
 
 namespace API.DTOs
 {
-    public class RegisterDto
+    public class UserCreateDto
     {
         [Required]
         public string? Name { get; set; }
-        [Phone]
         [Required]
         public string? PhoneNumber { get; set; }
         [EmailAddress(ErrorMessage = "Invalid email address")]
         [Required]
         public string? Email { get; set; }
-        // [ValidPassword]
-        [Required]
-        public string? Password { get; set; }
+        public string? Sex { get; set; }
     }
 }

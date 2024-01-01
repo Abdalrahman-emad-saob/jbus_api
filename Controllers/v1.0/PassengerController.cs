@@ -5,6 +5,8 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
+using API.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace API.Controllers.v1
 {
@@ -14,17 +16,20 @@ namespace API.Controllers.v1
         private readonly IPassengerRepository _passengerRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly ITokenService _tokenService;
         private readonly ITokenHandlerService _tokenHandlerService;
 
         public PassengerController(
             IPassengerRepository passengerRepository,
             IUserRepository userRepository,
             IMapper mapper,
+            ITokenService tokenService,
             ITokenHandlerService tokenHandlerService)
         {
             _passengerRepository = passengerRepository;
             _userRepository = userRepository;
             _mapper = mapper;
+            _tokenService = tokenService;
             _tokenHandlerService = tokenHandlerService;
         }
 
@@ -32,7 +37,7 @@ namespace API.Controllers.v1
         public ActionResult<IEnumerable<PassengerDto>> GetPassengers() => Ok(_passengerRepository.GetPassengers());
 
         [HttpGet]
-        public ActionResult<PassengerDto> GetPassengerById()
+        public ActionResult<PassengerDto> GetPassenger()
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
@@ -56,6 +61,21 @@ namespace API.Controllers.v1
 
             if (_passengerRepository.SaveChanges()) return NoContent();
             return BadRequest("Failed to Update Passenger");
+        }
+        [HttpGet("{id}")]
+        public ActionResult<PassengerDto> GetPassengerById(int id)
+        {
+            string role = _tokenHandlerService.ExtractUserRole();
+            if (role == "Not" || role.ToUpper() != "SUPER_ADMIN" || role.ToUpper() != "ADMIN")
+                return Unauthorized("Not authorized");
+
+            return _passengerRepository.GetPassengerDtoById(id);
+        }
+        [HttpPost("AddPassenger")]
+        public ActionResult AddPassenger(RegisterDto registerDto)
+        {
+            _passengerRepository.CreatePassenger(registerDto);
+            return Created();
         }
     }
 }

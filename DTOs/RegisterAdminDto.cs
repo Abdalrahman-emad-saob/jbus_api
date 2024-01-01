@@ -3,7 +3,7 @@ using API.Validations;
 
 namespace API.DTOs
 {
-    public class RegisterDto
+    public class RegisterAdminDto
     {
         [Required]
         public string? Name { get; set; }

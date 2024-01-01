@@ -22,6 +22,25 @@ namespace API.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("API.Entities.Admin", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Admins");
+                });
+
             modelBuilder.Entity("API.Entities.Bus", b =>
                 {
                     b.Property<int>("Id")
@@ -579,6 +598,17 @@ namespace API.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("API.Entities.Admin", b =>
+                {
+                    b.HasOne("API.Entities.User", "User")
+                        .WithOne("Admin")
+                        .HasForeignKey("API.Entities.Admin", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("API.Entities.Bus", b =>
                 {
                     b.HasOne("API.Entities.Driver", "Driver")
@@ -862,6 +892,8 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Entities.User", b =>
                 {
+                    b.Navigation("Admin");
+
                     b.Navigation("Driver");
 
                     b.Navigation("Passenger");

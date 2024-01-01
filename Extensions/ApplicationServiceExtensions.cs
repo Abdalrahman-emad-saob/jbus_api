@@ -35,6 +35,11 @@ namespace API.Extensions
             services.AddScoped<ITripRepository, TripRepository>();
             services.AddScoped<IPointRepository, PointRepository>();
             services.AddScoped<ITokenHandlerService, TokenHandlerService>();
+            services.AddScoped<IDriverTripRepository, DriverTripRepository>();
+            services.AddScoped<IFazaaRepository, FazaaRepository>();
+            services.AddScoped<IPredefinedStopsRepository, PredefinedStopsRepository>();
+            services.AddScoped<IFriendsRepository, FriendsRepository>();
+            // services.AddScoped<IFriendsRepository, FriendsRepository>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 

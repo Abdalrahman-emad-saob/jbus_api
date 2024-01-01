@@ -36,5 +36,31 @@ namespace API.Services
             }
             return -1;
         }
+
+        public string ExtractUserRole()
+        {
+            var authorizationHeader = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].FirstOrDefault();
+
+            if (authorizationHeader != null && authorizationHeader.StartsWith("Bearer "))
+            {
+                var token = authorizationHeader.Substring("Bearer ".Length).Trim();
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jsonToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
+
+                if (jsonToken == null)
+                {
+                    return "Not";
+                }
+
+                var roleClaim = jsonToken.Claims.FirstOrDefault(claim => claim.Type == "Role");
+
+                if (roleClaim == null)
+                {
+                    return "Not";
+                }
+                return roleClaim.Value;
+            }
+            return "Not";
+        }
     }
 }
