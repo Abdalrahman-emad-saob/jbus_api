@@ -3,6 +3,7 @@ using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Identity;
 
 namespace API.Data
 {
@@ -16,25 +17,32 @@ namespace API.Data
             _context = context;
             _mapper = mapper;
         }
-        public bool CreateAdmin(AdminCreateDto adminCreateDto)
+        public AdminDto CreateAdmin(RegisterAdminDto registerAdminDto)
         {
-            Admin admin = new() { };
-            User user = new()
+            var user = new User
             {
-                Name = adminCreateDto.Name,
-                PhoneNumber = adminCreateDto.PhoneNumber,
-                Email = adminCreateDto.Email,
-                Role = Role.ADMIN,
-                Sex = Sex.MALE,
-                UpdatedAt = DateTime.UtcNow,
-                LastActive = DateTime.UtcNow
+                Role = Role.SUPER_ADMIN,
+                Name = registerAdminDto.Name,
+                PhoneNumber = registerAdminDto.PhoneNumber,
+                Email = registerAdminDto.Email?.ToLower()
             };
-            admin.User = user;
+            var passwordHasher = new PasswordHasher<User>();
+            user.PasswordHash = passwordHasher.HashPassword(user, registerAdminDto.Password!);
+            var admin = new Admin() { };
 
             _context.Users.Add(user);
             _context.Admins.Add(admin);
+            SaveChanges();
 
-            return SaveChanges();
+            var adminDto = _mapper.Map<AdminDto>(admin);
+            return adminDto;
+        }
+
+        public Admin GetAdminByEmail(string Email)
+        {
+            return _context.Admins
+                .Where(a => a.User!.Email == Email && a.User.Email.ToLower() == Email.ToLower())
+                .SingleOrDefault()!;
         }
 
         public Admin GetAdminById(int id)

@@ -1,4 +1,5 @@
 using API.DTOs;
+using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -25,6 +26,11 @@ namespace API.Controllers.v1
         [HttpGet("{id}")]
         public ActionResult<FavoritePointDto> GetFavoritePointById(int id)
         {
+            string role = _tokenHandlerService.ExtractUserRole();
+            if (role == "Not" 
+            || role.ToUpper() != Role.PASSENGER.ToString())
+                return Unauthorized("Not authorized");
+                
             return Ok(_favoritePointRepository.GetFavoritePointById(id));
         }
         [HttpGet("favoritepoints")]
@@ -33,11 +39,26 @@ namespace API.Controllers.v1
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
                 return Unauthorized();
+
+            string role = _tokenHandlerService.ExtractUserRole();
+            if (role == "Not" 
+            || role.ToUpper() != Role.PASSENGER.ToString())
+                return Unauthorized("Not authorized");
+
             return Ok(_favoritePointRepository.GetFavoritePoints(Id));
         }
         [HttpDelete("{id}")]
         public ActionResult<IEnumerable<FavoritePointDto>> DeleteFavoritePoint(int id)
         {
+            int Id = _tokenHandlerService.TokenHandler();
+            if (Id == -1)
+                return Unauthorized();
+            
+            string role = _tokenHandlerService.ExtractUserRole();
+            if (role == "Not" 
+            || role.ToUpper() != Role.PASSENGER.ToString())
+                return Unauthorized("Not authorized");
+
             return Ok(_favoritePointRepository.DeleteFavoritePoint(id));
         }
         [HttpPost("addfavoritepoint")]
@@ -46,6 +67,12 @@ namespace API.Controllers.v1
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
                 return Unauthorized();
+
+            string role = _tokenHandlerService.ExtractUserRole();
+            if (role == "Not" 
+            || role.ToUpper() != Role.PASSENGER.ToString())
+                return Unauthorized("Not authorized");
+            
             if (_favoritePointRepository.InsertFavoritePoint(favoritePointCreateDto))
             {
                 return Created();

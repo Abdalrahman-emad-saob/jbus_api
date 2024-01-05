@@ -14,6 +14,9 @@ namespace API.Data
             User user = new()
             {
                 Name = "Abood Saob",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                LastActive = DateTime.UtcNow,
                 PhoneNumber = "0785455414",
                 Email = "aboodsaob1139@gmail.com",
                 Role = Role.PASSENGER,
@@ -34,6 +37,34 @@ namespace API.Data
             await context.SaveChangesAsync();
         }
 
+        public static async Task SeedAdmin(DataContext context)
+        {
+            if (await context.Admins.AnyAsync()) return;
+            var passwordHasher = new PasswordHasher<User>();
+
+            User user = new()
+            {
+                Name = "Fadl Al masri",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                LastActive = DateTime.UtcNow,
+                PhoneNumber = "0791012625",
+                Email = "fdlmasri@gmail.com",
+                Role = Role.SUPER_ADMIN,
+                Sex = Sex.MALE,
+                DateOfBirth = new DateOnly(2002, 6, 25),
+            };
+            user.PasswordHash = passwordHasher.HashPassword(user, "password");
+            Admin admin = new()
+            {
+                User = user,
+            };
+            user.Admin = admin;
+            context.Users.Add(user);
+            context.Admins.Add(admin);
+            await context.SaveChangesAsync();
+        }
+
         public static async Task SeedDriver(DataContext context)
         {
             if (await context.Drivers.AnyAsync()) return;
@@ -42,6 +73,9 @@ namespace API.Data
             User user = new()
             {
                 Name = "Khader Abumallouh",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                LastActive = DateTime.UtcNow,
                 PhoneNumber = "0790364258",
                 Email = "khader.mallouh@gmail.com",
                 Role = Role.DRIVER,

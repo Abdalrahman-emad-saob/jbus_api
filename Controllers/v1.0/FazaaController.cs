@@ -1,5 +1,6 @@
 using API.Controllers.v1;
 using API.DTOs;
+using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -31,6 +32,11 @@ namespace API.Controllers
             if (Id == -1)
                 return Unauthorized("Not authorized");
 
+            string role = _tokenHandlerService.ExtractUserRole();
+            if (role == "Not" 
+            || role.ToUpper() != Role.PASSENGER.ToString())
+                return Unauthorized("Not authorized");
+
             bool result = _fazaaRepository.StoreFazaas(fazaaCreateDtos, Id);
             if (!result)
                 return StatusCode(500, "Internal Server Error");
@@ -45,6 +51,11 @@ namespace API.Controllers
             if (Id == -1)
                 return Unauthorized("Not authorized");
 
+            string role = _tokenHandlerService.ExtractUserRole();
+            if (role == "Not" 
+            || role.ToUpper() != Role.PASSENGER.ToString())
+                return Unauthorized("Not authorized");
+
             var fazaas = _fazaaRepository.GetFazaas(Id);
             if (fazaas == null)
                 return NotFound("No Fazaa Found");
@@ -55,6 +66,11 @@ namespace API.Controllers
         [HttpGet("getFazaaById")]
         public ActionResult<FazaaDto> getFazaaById(int Id)
         {
+            string role = _tokenHandlerService.ExtractUserRole();
+            if (role == "Not" 
+            || role.ToUpper() != Role.PASSENGER.ToString())
+                return Unauthorized("Not authorized");
+
             var fazaa = _fazaaRepository.GetFazaaById(Id);
             if (fazaa == null)
                 return NotFound("Fazaa Not Found");

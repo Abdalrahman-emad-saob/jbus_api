@@ -36,5 +36,11 @@ namespace API.Data
         {
             _context.Entry(userDto).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         }
+
+        public User GetUserByEmail(string Email)
+        {
+            return _context.Users.AsEnumerable()
+                    .FirstOrDefault(x => x.Email != null && x.Email.Equals(Email, StringComparison.CurrentCultureIgnoreCase))!;
+        }
     }
 }

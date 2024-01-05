@@ -1,5 +1,6 @@
 using API.Controllers.v1;
 using API.DTOs;
+using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -29,18 +30,46 @@ namespace api.Controllers.v1
         [HttpPost("addroute")]
         public ActionResult CreateRoute(RouteCreateDto routeCreateDto)
         {
+            string role = _tokenHandlerService.ExtractUserRole();
+            if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
+                return Unauthorized("Not authorized");
+                
             _routeRepository.CreateRoute(routeCreateDto);
             return Created();
         }
         [HttpGet("getroutes")]
-        public ActionResult<IEnumerable<RouteDto>> GetRoutes() => Ok(_routeRepository.GetRoutes());
+        public ActionResult<IEnumerable<RouteDto>> GetRoutes()
+        {
+            string role = _tokenHandlerService.ExtractUserRole();
+            if (role == "Not" 
+            || (role.ToUpper() != Role.SUPER_ADMIN.ToString()
+            && role.ToUpper() != Role.ADMIN.ToString() 
+            && role.ToUpper() != Role.PASSENGER.ToString()))
+                return Unauthorized("Not authorized");
+            return Ok(_routeRepository.GetRoutes());
+        }
 
         [HttpGet("{id}")]
-        public ActionResult<RouteDto> GetRouteById(int id) => _routeRepository.GetRouteById(id);
+        public ActionResult<RouteDto> GetRouteById(int id)
+        {
+            string role = _tokenHandlerService.ExtractUserRole();
+            if (role == "Not" 
+            || (role.ToUpper() != Role.SUPER_ADMIN.ToString()
+            && role.ToUpper() != Role.ADMIN.ToString()))
+                return Unauthorized("Not authorized");
+
+            return _routeRepository.GetRouteById(id);
+        }
 
         [HttpPut("{id}")]
         public ActionResult updateRoute(RouteUpdateDto routeUpdateDto, int id)
         {
+            string role = _tokenHandlerService.ExtractUserRole();
+            if (role == "Not" 
+            || (role.ToUpper() != Role.SUPER_ADMIN.ToString()
+            && role.ToUpper() != Role.ADMIN.ToString()))
+                return Unauthorized("Not authorized");
+
             var route = _routeRepository.GetRouteById(id);
 
             if (route == null) return NotFound();
@@ -56,6 +85,11 @@ namespace api.Controllers.v1
             int PassengerId = _tokenHandlerService.TokenHandler();
             if (PassengerId == -1)
                 return Unauthorized("Not authorized");
+            string role = _tokenHandlerService.ExtractUserRole();
+            if (role == "Not" 
+            || role.ToUpper() != Role.PASSENGER.ToString())
+                return Unauthorized("Not authorized");
+
             IEnumerable<FavoritePointDto> favoritePointDtos = _favoritePointRepository.GetRouteFavoritePointDtos(PassengerId, id);
             if(favoritePointDtos == null || !favoritePointDtos.Any())
                 return NotFound("No favorite points found for the specified PassengerId and RouteId");

@@ -38,7 +38,7 @@ namespace API.Data
                 .ProjectTo<PassengerDto>(_mapper.ConfigurationProvider)
                 .SingleOrDefault()!;
         }
-        
+
         public Passenger GetPassengerById(int id)
         {
             return _context.Passengers
@@ -49,7 +49,7 @@ namespace API.Data
         public Passenger GetPassengerByEmail(string? Email)
         {
             return _context.Passengers
-                .Where(p => p.User!.Email == Email && p.User.Email!.Equals(Email, StringComparison.CurrentCultureIgnoreCase))
+                .Where(p => p.User!.Email == Email && p.User.Email!.ToLower() == Email!.ToLower())
                 .SingleOrDefault()!;
         }
 
@@ -61,7 +61,7 @@ namespace API.Data
 
         public void Update(PassengerDto passenger) => _context.Entry(passenger).State = EntityState.Modified;
 
-        public LoginResponseDto CreatePassenger(RegisterDto registerDto)
+        public RegisterResponseDto CreatePassenger(RegisterDto registerDto)
         {
             var user = new User
             {
@@ -77,22 +77,18 @@ namespace API.Data
                 Wallet = 0,
                 User = user
             };
-            var token = _tokenService.CreateToken(user, passenger.Id);
 
             _context.Users.Add(user);
             _context.Passengers.Add(passenger);
             SaveChanges();
 
-            return new LoginResponseDto
+            var passengerDto = _mapper.Map<PassengerDto>(passenger);
+            return new RegisterResponseDto
             {
-                passengerDto = _mapper.Map<PassengerDto>(passenger),
-                Token = token
+                user = user,
+                passengerDto = passengerDto
             };
         }
-        public User GetUserByEmail(string Email)
-        {
-            return _context.Users.AsEnumerable()
-                    .FirstOrDefault(x => x.Email != null && x.Email.Equals(Email, StringComparison.CurrentCultureIgnoreCase))!;
-        }
+
     }
 }

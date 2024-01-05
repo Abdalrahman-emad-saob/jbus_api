@@ -7,6 +7,7 @@ namespace API.Interfaces
     {
         void Update(UserDto userDto);
         UserDto GetUserDtoById(int id);
+        User GetUserByEmail(string Email);
         User GetUserById(int id);
     }
 }

@@ -49,6 +49,7 @@ try
     await Seed.SeedRoute(context);
     await Seed.SeedFavoritePoint(context);
     await Seed.SeedOTP(context);
+    await Seed.SeedAdmin(context);
 }
 catch (Exception ex)
 {

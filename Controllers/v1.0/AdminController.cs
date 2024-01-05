@@ -1,10 +1,8 @@
-using System.Security.Claims;
 using API.DTOs;
 using API.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Controllers.v1
 {
@@ -39,12 +37,25 @@ namespace API.Controllers.v1
                 return Unauthorized("Not authorized");
 
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" || role.ToUpper() != "SUPER_ADMIN" || role.ToUpper() != "ADMIN")
+            if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
                 return Unauthorized("Not authorized");
-    
+
             return _adminRepository.GetAdminDtoById(Id);
         }
+        [Authorize]
+        [HttpPost("addAdmin")]
+        public ActionResult<AdminDto> addAdmin(RegisterAdminDto registerAdminDto)
+        {
+            if (UserExists(registerAdminDto.Email))
+            {
+                return BadRequest("Admin Exists");
+            }
+            string role = _tokenHandlerService.ExtractUserRole();
+            if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
+                return Unauthorized("Not authorized");
 
+            return _adminRepository.CreateAdmin(registerAdminDto);
+        }
         [HttpPut]
         public ActionResult updateAdmin(AdminUpdateDto adminUpdateDto)
         {
@@ -53,7 +64,7 @@ namespace API.Controllers.v1
                 return Unauthorized("Not authorized");
 
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" || role.ToUpper() != "SUPER_ADMIN" || role.ToUpper() != "ADMIN")
+            if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
                 return Unauthorized("Not authorized");
 
             var admin = _adminRepository.GetAdminById(Id);
@@ -65,6 +76,11 @@ namespace API.Controllers.v1
 
             if (_adminRepository.SaveChanges()) return NoContent();
             return BadRequest("Failed to Update Passenger");
+        }
+        [NonAction]
+        public bool UserExists(string? Email)
+        {
+            return _userRepository.GetUserByEmail(Email!) != null;
         }
     }
 }

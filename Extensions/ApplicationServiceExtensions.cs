@@ -39,7 +39,7 @@ namespace API.Extensions
             services.AddScoped<IFazaaRepository, FazaaRepository>();
             services.AddScoped<IPredefinedStopsRepository, PredefinedStopsRepository>();
             services.AddScoped<IFriendsRepository, FriendsRepository>();
-            // services.AddScoped<IFriendsRepository, FriendsRepository>();
+            services.AddScoped<IAdminRepository, AdminRepository>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 

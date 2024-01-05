@@ -3,6 +3,7 @@ using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Identity;
 
 namespace API.Data
 {
@@ -16,24 +17,25 @@ namespace API.Data
             _context = context;
             _mapper = mapper;
         }
-        public bool CreateDriver(DriverCreateDto driverDto)
+        public DriverDto CreateDriver(RegisterDriverDto registerDriverDto)
         {
-            Driver driver = new() { };
-            User user = new()
+            var user = new User
             {
-                Name = driverDto.Name,
-                PhoneNumber = driverDto.PhoneNumber,
-                Email = driverDto.Email,
-                Role = Role.DRIVER,
-                Sex = Sex.MALE,
-                UpdatedAt = DateTime.UtcNow,
-                LastActive = DateTime.UtcNow
+                Role = Role.SUPER_ADMIN,
+                Name = registerDriverDto.Name,
+                PhoneNumber = registerDriverDto.PhoneNumber,
+                Email = registerDriverDto.Email?.ToLower()
             };
+            var passwordHasher = new PasswordHasher<User>();
+            user.PasswordHash = passwordHasher.HashPassword(user, registerDriverDto.Password!);
+            var driver = new Driver() { };
+
             driver.User = user;
             _context.Users.Add(user);
             _context.Drivers.Add(driver);
-
-            return SaveChanges();
+            SaveChanges();
+            var driverDto = _mapper.Map<DriverDto>(driver);
+            return driverDto;
         }
 
         public Driver GetDriverByEmail(string Email)

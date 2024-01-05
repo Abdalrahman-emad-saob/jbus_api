@@ -8,8 +8,9 @@ namespace API.Interfaces
         void Update(AdminDto AdminDto);
         IEnumerable<AdminDto> GetAdmins();
         AdminDto GetAdminDtoById(int id);
-        bool CreateAdmin(AdminCreateDto AdminCreateDto);
+        AdminDto CreateAdmin(RegisterAdminDto registerAdminDto);
         Admin GetAdminById(int id);
+        Admin GetAdminByEmail(string Email);
         bool SaveChanges();
     }
 }

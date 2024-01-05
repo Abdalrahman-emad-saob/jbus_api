@@ -7,8 +7,8 @@ namespace API.Entities
         public double Wallet { get; set; }
         public string? GoogleToken { get; set; }
         public string? FacebookToken { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
 
         // * Link
         public List<ChargingTransaction> ChargingTransactions { get; set; } = [];

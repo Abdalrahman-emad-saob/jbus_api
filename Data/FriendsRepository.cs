@@ -40,11 +40,11 @@ namespace API.Data
             return SaveChanges();
         }
 
-        public FriendsDto GetFriendById(int id)
+        public FriendsDto GetFriendById(int id, int PassengerId)
         {
             return _context
            .Friends
-           .Where(f => f.Id == id && f.Confirmed == true)
+           .Where(f => f.Id == id && f.Confirmed == true && f.PassengerId == PassengerId)
            .ProjectTo<FriendsDto>(_mapper.ConfigurationProvider)
            .SingleOrDefault()!;
         }

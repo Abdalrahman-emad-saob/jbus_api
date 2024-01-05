@@ -28,41 +28,41 @@ namespace API.Controllers.v1
         public ActionResult<IEnumerable<DriverDto>> GetDrivers()
         {
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" || role.ToUpper() != "SUPER_ADMIN" || role.ToUpper() != "ADMIN")
+            if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
                 return Unauthorized("Not authorized");
-    
+
             return Ok(_driverRepository.GetDrivers());
         }
         [HttpGet("{id}")]
         public ActionResult<DriverDto> GetDriverById(int id)
         {
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" || role.ToUpper() != "SUPER_ADMIN" || role.ToUpper() != "ADMIN")
+            if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
                 return Unauthorized("Not authorized");
-    
+
             return _driverRepository.GetDriverDtoById(id);
         }
         [HttpPost("addDriver")]
-        public ActionResult<DriverDto> CreateDriver(DriverCreateDto driverDto)
+        public ActionResult<DriverDto> CreateDriver(RegisterDriverDto registerDriverDto)
         {
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" || role.ToUpper() != "SUPER_ADMIN" || role.ToUpper() != "ADMIN")
+            if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
                 return Unauthorized("Not authorized");
-    
-            if(DriverExists(driverDto.Email))
+
+            if (UserExists(registerDriverDto.Email))
             {
                 return BadRequest("Driver Exists");
             }
-            _driverRepository.CreateDriver(driverDto);
+            _driverRepository.CreateDriver(registerDriverDto);
             return Ok();
         }
         [HttpPut("{id}")]
         public ActionResult updateDriver(int id, DriverUpdateDto driverUpdateDto)
         {
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" || role.ToUpper() != "SUPER_ADMIN" || role.ToUpper() != "ADMIN")
+            if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
                 return Unauthorized("Not authorized");
-    
+
             var driver = _driverRepository.GetDriverById(id);
             var user = _userRepository.GetUserById((int)driver.UserId!);
 
@@ -74,9 +74,9 @@ namespace API.Controllers.v1
             return BadRequest("Failed to Update Driver");
         }
         [NonAction]
-        public bool DriverExists(string? Email)
+        public bool UserExists(string? Email)
         {
-            return _driverRepository.GetDriverByEmail(Email!) != null;
+            return _userRepository.GetUserByEmail(Email!) != null;
         }
     }
 }

@@ -1,12 +1,9 @@
-using System.Security.Claims;
 using API.DTOs;
 using API.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
 using API.Entities;
-using Microsoft.AspNetCore.Identity;
 
 namespace API.Controllers.v1
 {
@@ -42,6 +39,12 @@ namespace API.Controllers.v1
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
                 return Unauthorized("Not authorized");
+
+            string role = _tokenHandlerService.ExtractUserRole();
+            if (role == "Not" 
+            || role.ToUpper() != Role.PASSENGER.ToString())
+                return Unauthorized("Not authorized");
+
             return _passengerRepository.GetPassengerDtoById(Id);
         }
 
@@ -50,6 +53,13 @@ namespace API.Controllers.v1
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
+                return Unauthorized("Not authorized");
+
+            string role = _tokenHandlerService.ExtractUserRole();
+            if (role == "Not" 
+            || (role.ToUpper() != Role.SUPER_ADMIN.ToString()
+            && role.ToUpper() != Role.ADMIN.ToString()
+            && role.ToUpper() != Role.PASSENGER.ToString()))
                 return Unauthorized("Not authorized");
 
             var passenger = _passengerRepository.GetPassengerById(Id);
@@ -66,7 +76,9 @@ namespace API.Controllers.v1
         public ActionResult<PassengerDto> GetPassengerById(int id)
         {
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" || role.ToUpper() != "SUPER_ADMIN" || role.ToUpper() != "ADMIN")
+            if (role == "Not" 
+            || (role.ToUpper() != Role.SUPER_ADMIN.ToString()
+            && role.ToUpper() != Role.ADMIN.ToString()))
                 return Unauthorized("Not authorized");
 
             return _passengerRepository.GetPassengerDtoById(id);
@@ -74,8 +86,24 @@ namespace API.Controllers.v1
         [HttpPost("AddPassenger")]
         public ActionResult AddPassenger(RegisterDto registerDto)
         {
+            if (PassengerExists(registerDto.Email))
+            {
+                return BadRequest("Passenger Exists");
+            }
+
+            string role = _tokenHandlerService.ExtractUserRole();
+            if (role == "Not" 
+            || (role.ToUpper() != Role.SUPER_ADMIN.ToString()
+            && role.ToUpper() != Role.ADMIN.ToString()))
+                return Unauthorized("Not authorized");
+                
             _passengerRepository.CreatePassenger(registerDto);
             return Created();
+        }
+        [NonAction]
+        public bool PassengerExists(string? Email)
+        {
+            return _passengerRepository.GetPassengerByEmail(Email) != null;
         }
     }
 }

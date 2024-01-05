@@ -8,6 +8,10 @@ namespace API.Helpers
     {
         public AutoMapperProfiles()
         {
+            CreateMap<Admin, AdminDto>();
+            CreateMap<AdminCreateDto, Admin>();
+            CreateMap<AdminUpdateDto, Admin>();
+
             CreateMap<Bus, BusDto>();
             CreateMap<BusCreateDto, Bus>();
             CreateMap<BusUpdateDto, Bus>();
@@ -37,15 +41,15 @@ namespace API.Helpers
             CreateMap<InterestPoint, InterestPointDto>();
             CreateMap<InterestPointCreateDto, InterestPoint>();
             CreateMap<InterestPointUpdateDto, InterestPoint>();
-            
+
             CreateMap<OTP, OTPDto>();
-            
+
             CreateMap<Passenger, PassengerDto>();
             CreateMap<PassengerUpdateDto, Passenger>();
 
             CreateMap<PaymentTransaction, PaymentTransactionDto>();
             CreateMap<PaymentTransactionCreateDto, PaymentTransaction>();
-            
+
             CreateMap<Point, PointDto>();
             CreateMap<PointCreateDto, Point>();
             CreateMap<PointUpdateDto, Point>();
@@ -65,8 +69,8 @@ namespace API.Helpers
             CreateMap<User, UserDto>()
             .ForMember(ud => ud.Sex, opt => opt.MapFrom(u => u.Sex.ToString()))
             .ForMember(ud => ud.Role, opt => opt.MapFrom(u => u.Role.ToString()));
-
-            CreateMap<UserUpdateDto, User>();
+            CreateMap<UserUpdateDto, User>()
+            .ForMember(u => u.Sex, opt => opt.MapFrom(uud => Enum.Parse<Sex>(uud.Sex!)));
             CreateMap<UserDto, User>();
         }
     }
