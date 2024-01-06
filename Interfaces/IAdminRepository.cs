@@ -5,7 +5,7 @@ namespace API.Interfaces
 {
     public interface IAdminRepository
     {
-        void Update(AdminDto AdminDto);
+        void Update(int id);
         IEnumerable<AdminDto> GetAdmins();
         AdminDto GetAdminDtoById(int id);
         AdminDto CreateAdmin(RegisterAdminDto registerAdminDto);

@@ -24,13 +24,17 @@ namespace API.Data
                 Role = Role.SUPER_ADMIN,
                 Name = registerDriverDto.Name,
                 PhoneNumber = registerDriverDto.PhoneNumber,
-                Email = registerDriverDto.Email?.ToLower()
+                Email = registerDriverDto.Email?.ToLower(),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                LastActive = DateTime.UtcNow
             };
             var passwordHasher = new PasswordHasher<User>();
             user.PasswordHash = passwordHasher.HashPassword(user, registerDriverDto.Password!);
-            var driver = new Driver() { };
-
-            driver.User = user;
+            var driver = new Driver
+            {
+                User = user
+            };
             _context.Users.Add(user);
             _context.Drivers.Add(driver);
             SaveChanges();

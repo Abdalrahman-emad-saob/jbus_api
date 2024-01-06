@@ -29,22 +29,17 @@ namespace API.Controllers.v1
         [HttpGet("getAdmins")]
         public ActionResult<IEnumerable<AdminDto>> GetAdmins() => Ok(_adminRepository.GetAdmins());
 
-        [HttpGet]
-        public ActionResult<AdminDto> GetAdminById()
+        [HttpGet("{id}")]
+        public ActionResult<AdminDto> GetAdminById(int Id)
         {
-            int Id = _tokenHandlerService.TokenHandler();
-            if (Id == -1)
-                return Unauthorized("Not authorized");
-
             string role = _tokenHandlerService.ExtractUserRole();
             if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
                 return Unauthorized("Not authorized");
 
             return _adminRepository.GetAdminDtoById(Id);
         }
-        [Authorize]
         [HttpPost("addAdmin")]
-        public ActionResult<AdminDto> addAdmin(RegisterAdminDto registerAdminDto)
+        public ActionResult addAdmin(RegisterAdminDto registerAdminDto)
         {
             if (UserExists(registerAdminDto.Email))
             {
@@ -53,30 +48,31 @@ namespace API.Controllers.v1
             string role = _tokenHandlerService.ExtractUserRole();
             if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
                 return Unauthorized("Not authorized");
-
-            return _adminRepository.CreateAdmin(registerAdminDto);
+            _adminRepository.CreateAdmin(registerAdminDto);
+            return Created();
         }
-        [HttpPut]
-        public ActionResult updateAdmin(AdminUpdateDto adminUpdateDto)
+        [HttpPut("{id}")]
+        public ActionResult updateAdmin(AdminUpdateDto adminUpdateDto, int Id)
         {
-            int Id = _tokenHandlerService.TokenHandler();
-            if (Id == -1)
-                return Unauthorized("Not authorized");
-
             string role = _tokenHandlerService.ExtractUserRole();
             if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
                 return Unauthorized("Not authorized");
 
             var admin = _adminRepository.GetAdminById(Id);
-            var user = _userRepository.GetUserById((int)admin.UserId!);
+            var user = _userRepository.GetUserById(admin.UserId!);
 
-            if (admin == null || user == null) return NotFound();
+            if (admin == null || user == null)
+                return NotFound();
+
             _mapper.Map(adminUpdateDto, admin);
             _mapper.Map(adminUpdateDto.User, user);
+            _adminRepository.Update(Id);
+            if (_adminRepository.SaveChanges())
+                return NoContent();
 
-            if (_adminRepository.SaveChanges()) return NoContent();
             return BadRequest("Failed to Update Passenger");
         }
+
         [NonAction]
         public bool UserExists(string? Email)
         {

@@ -24,12 +24,17 @@ namespace API.Data
                 Role = Role.SUPER_ADMIN,
                 Name = registerAdminDto.Name,
                 PhoneNumber = registerAdminDto.PhoneNumber,
-                Email = registerAdminDto.Email?.ToLower()
+                Email = registerAdminDto.Email?.ToLower(),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                LastActive = DateTime.UtcNow
             };
             var passwordHasher = new PasswordHasher<User>();
             user.PasswordHash = passwordHasher.HashPassword(user, registerAdminDto.Password!);
-            var admin = new Admin() { };
-
+            var admin = new Admin
+            {
+                User = user
+            };
             _context.Users.Add(user);
             _context.Admins.Add(admin);
             SaveChanges();
@@ -74,9 +79,16 @@ namespace API.Data
             return _context.SaveChanges() > 0;
         }
 
-        public void Update(AdminDto adminDto)
+        public void Update(int id)
         {
-            _context.Entry(adminDto).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            var admin = _context.Admins.Find(id);
+            if(admin != null)
+                if(admin.User != null)
+                {
+                    admin.User.UpdatedAt = DateTime.UtcNow;
+                    admin.User.LastActive = DateTime.UtcNow;
+                    _context.Entry(admin).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                }
         }
     }
 }

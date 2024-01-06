@@ -27,7 +27,7 @@ namespace api.Controllers.v1
             _tokenHandlerService = tokenHandlerService;
             _favoritePointRepository = favoritePointRepository;
         }
-        [HttpPost("addroute")]
+        [HttpPost("addRoute")]
         public ActionResult CreateRoute(RouteCreateDto routeCreateDto)
         {
             string role = _tokenHandlerService.ExtractUserRole();
@@ -37,7 +37,7 @@ namespace api.Controllers.v1
             _routeRepository.CreateRoute(routeCreateDto);
             return Created();
         }
-        [HttpGet("getroutes")]
+        [HttpGet("getRoutes")]
         public ActionResult<IEnumerable<RouteDto>> GetRoutes()
         {
             string role = _tokenHandlerService.ExtractUserRole();

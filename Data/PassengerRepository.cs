@@ -68,7 +68,10 @@ namespace API.Data
                 Role = Role.PASSENGER,
                 Name = registerDto.Name,
                 PhoneNumber = registerDto.PhoneNumber,
-                Email = registerDto.Email?.ToLower()
+                Email = registerDto.Email?.ToLower(),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                LastActive = DateTime.UtcNow
             };
             var passwordHasher = new PasswordHasher<User>();
             user.PasswordHash = passwordHasher.HashPassword(user, registerDto.Password!);
