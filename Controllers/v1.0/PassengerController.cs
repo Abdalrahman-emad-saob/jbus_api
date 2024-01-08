@@ -30,7 +30,7 @@ namespace API.Controllers.v1
             _tokenHandlerService = tokenHandlerService;
         }
 
-        [HttpGet("getpassengers")]
+        [HttpGet("getPassengers")]
         public ActionResult<IEnumerable<PassengerDto>> GetPassengers() => Ok(_passengerRepository.GetPassengers());
 
         [HttpGet]
@@ -41,7 +41,7 @@ namespace API.Controllers.v1
                 return Unauthorized("Not authorized");
 
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" 
+            if (role == "Not"
             || role.ToUpper() != Role.PASSENGER.ToString())
                 return Unauthorized("Not authorized");
 
@@ -62,64 +62,79 @@ namespace API.Controllers.v1
             var passenger = _passengerRepository.GetPassengerById(Id);
             var user = _userRepository.GetUserById((int)passenger.UserId!);
 
-            if (passenger == null || user == null) return NotFound();
+            if (passenger == null || user == null)
+                return NotFound();
             _mapper.Map(passengerUpdateDto, passenger);
             _mapper.Map(passengerUpdateDto.User, user);
 
-            if (_passengerRepository.SaveChanges()) return NoContent();
+            if (_passengerRepository.SaveChanges())
+                return NoContent();
             return BadRequest("Failed to Update Passenger");
         }
         [HttpPut("{id}")]
         public ActionResult updatePassenger(PassengerUpdateDto passengerUpdateDto, int Id)
         {
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" 
+            if (role == "Not"
             || (role.ToUpper() != Role.SUPER_ADMIN.ToString()
             && role.ToUpper() != Role.ADMIN.ToString()))
                 return Unauthorized("Not authorized");
 
             var passenger = _passengerRepository.GetPassengerById(Id);
             var user = _userRepository.GetUserById((int)passenger.UserId!);
-
-            if (passenger == null || user == null) return NotFound();
+            if (passenger == null || user == null || passengerUpdateDto.User == null)
+                return NotFound();
+            if(passengerUpdateDto.User.Sex != null)
+                passengerUpdateDto.User.Sex = passengerUpdateDto.User.Sex.ToUpper();
+            if (user.Email != passengerUpdateDto.User.Email)
+                if (UserExists(passengerUpdateDto.User.Email))
+                {
+                    return BadRequest("Email Duplicated");
+                }
             _mapper.Map(passengerUpdateDto, passenger);
             _mapper.Map(passengerUpdateDto.User, user);
 
-            if (_passengerRepository.SaveChanges()) return NoContent();
+            if (_passengerRepository.SaveChanges())
+                return NoContent();
             return BadRequest("Failed to Update Passenger");
         }
         [HttpGet("{id}")]
         public ActionResult<PassengerDto> GetPassengerById(int id)
         {
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" 
+            if (role == "Not"
             || (role.ToUpper() != Role.SUPER_ADMIN.ToString()
             && role.ToUpper() != Role.ADMIN.ToString()))
                 return Unauthorized("Not authorized");
 
-            return _passengerRepository.GetPassengerDtoById(id);
+            var passenger = _passengerRepository.GetPassengerDtoById(id);
+            if (passenger == null)
+                return NotFound("Passenger Does not Exist");
+
+            return Ok(passenger);
         }
         [HttpPost("AddPassenger")]
         public ActionResult AddPassenger(RegisterDto registerDto)
         {
-            if (PassengerExists(registerDto.Email))
+            if (UserExists(registerDto.Email))
             {
                 return BadRequest("Passenger Exists");
             }
 
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" 
+            if (role == "Not"
             || (role.ToUpper() != Role.SUPER_ADMIN.ToString()
             && role.ToUpper() != Role.ADMIN.ToString()))
                 return Unauthorized("Not authorized");
-                
+
             _passengerRepository.CreatePassenger(registerDto);
-            return Created();
+            
+            return StatusCode(201);
         }
         [NonAction]
-        public bool PassengerExists(string? Email)
+        public bool UserExists(string? Email)
         {
-            return _passengerRepository.GetPassengerByEmail(Email) != null;
+            return _userRepository.GetUserByEmail(Email!) != null;
         }
     }
 }

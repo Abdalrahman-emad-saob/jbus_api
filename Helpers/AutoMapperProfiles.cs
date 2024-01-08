@@ -10,7 +10,9 @@ namespace API.Helpers
         {
             CreateMap<Admin, AdminDto>();
             CreateMap<AdminCreateDto, Admin>();
-            CreateMap<AdminUpdateDto, Admin>();
+            CreateMap<AdminUpdateDto, Admin>()
+            .ForMember(p => p.UserId, opt => opt.Ignore())
+            .ForMember(p => p.User, opt => opt.Ignore());
 
             CreateMap<Bus, BusDto>();
             CreateMap<BusCreateDto, Bus>();
@@ -22,7 +24,9 @@ namespace API.Helpers
 
             CreateMap<Driver, DriverDto>();
             CreateMap<DriverCreateDto, Driver>();
-            CreateMap<DriverUpdateDto, Driver>();
+            CreateMap<DriverUpdateDto, Driver>()
+            .ForMember(p => p.UserId, opt => opt.Ignore())
+            .ForMember(p => p.User, opt => opt.Ignore());
 
             CreateMap<DriverTrip, DriverTripDto>()
             .ForMember(dtd => dtd.status, opt => opt.MapFrom(dt => dt.status.ToString()));
@@ -45,7 +49,13 @@ namespace API.Helpers
             CreateMap<OTP, OTPDto>();
 
             CreateMap<Passenger, PassengerDto>();
-            CreateMap<PassengerUpdateDto, Passenger>();
+            CreateMap<PassengerUpdateDto, Passenger>()
+            .ForMember(p => p.UserId, opt => opt.Ignore())
+            .ForMember(p => p.User, opt => opt.Ignore())
+            .ForMember(p => p.CreditorId, opt => opt.Ignore())
+            .ForMember(p => p.Creditor, opt => opt.Ignore())
+            .ForMember(p => p.InDebtId, opt => opt.Ignore())
+            .ForMember(p => p.InDebt, opt => opt.Ignore());
 
             CreateMap<PaymentTransaction, PaymentTransactionDto>();
             CreateMap<PaymentTransactionCreateDto, PaymentTransaction>();

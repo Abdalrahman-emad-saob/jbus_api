@@ -40,7 +40,10 @@ namespace API.Controllers.v1
             if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
                 return Unauthorized("Not authorized");
 
-            return _driverRepository.GetDriverDtoById(id);
+            var driverDto = _driverRepository.GetDriverDtoById(id);
+            if(driverDto == null)
+                return NotFound("Driver Not Found");
+            return driverDto;
         }
         [HttpPost("addDriver")]
         public ActionResult<DriverDto> CreateDriver(RegisterDriverDto registerDriverDto)
@@ -64,12 +67,27 @@ namespace API.Controllers.v1
                 return Unauthorized("Not authorized");
 
             var driver = _driverRepository.GetDriverById(id);
-            var user = _userRepository.GetUserById((int)driver.UserId!);
 
-            if (driver == null) return NotFound();
+            if (driver == null || driverUpdateDto.User == null)
+                return NotFound();
+
+            var user = _userRepository.GetUserById(driver.UserId!);
+
+            if (user == null)
+                return NotFound();
+
+            if (driverUpdateDto.User.Sex != null)
+                driverUpdateDto.User.Sex = driverUpdateDto.User.Sex.ToUpper();
+
+            if (user.Email != driverUpdateDto.User.Email)
+                if (UserExists(driverUpdateDto.User.Email))
+                    return BadRequest("Email Duplicated");
+
             _mapper.Map(driverUpdateDto, driver);
             _mapper.Map(driverUpdateDto.User, user);
-            if (_driverRepository.SaveChanges()) return NoContent();
+
+            if (_driverRepository.SaveChanges()) 
+                return NoContent();
 
             return BadRequest("Failed to Update Driver");
         }

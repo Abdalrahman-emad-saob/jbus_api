@@ -3,6 +3,7 @@ using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 
 namespace API.Data
@@ -33,7 +34,8 @@ namespace API.Data
             user.PasswordHash = passwordHasher.HashPassword(user, registerAdminDto.Password!);
             var admin = new Admin
             {
-                User = user
+                User = user,
+                UserId = user.Id
             };
             _context.Users.Add(user);
             _context.Admins.Add(admin);
@@ -52,8 +54,9 @@ namespace API.Data
 
         public Admin GetAdminById(int id)
         {
-            return _context.Admins
-                .Where(a => a.UserId == id)
+            return _context
+                .Admins
+                .Where(a => a.Id == id)
                 .SingleOrDefault()!;
         }
 
@@ -82,8 +85,8 @@ namespace API.Data
         public void Update(int id)
         {
             var admin = _context.Admins.Find(id);
-            if(admin != null)
-                if(admin.User != null)
+            if (admin != null)
+                if (admin.User != null)
                 {
                     admin.User.UpdatedAt = DateTime.UtcNow;
                     admin.User.LastActive = DateTime.UtcNow;

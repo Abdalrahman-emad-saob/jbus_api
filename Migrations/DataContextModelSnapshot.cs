@@ -115,7 +115,7 @@ namespace API.Migrations
                     b.Property<int?>("BusId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -639,7 +639,8 @@ namespace API.Migrations
                     b.HasOne("API.Entities.User", "User")
                         .WithOne("Driver")
                         .HasForeignKey("API.Entities.Driver", "UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });

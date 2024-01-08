@@ -36,20 +36,26 @@ namespace API.Controllers.v1
             if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
                 return Unauthorized("Not authorized");
 
-            return _adminRepository.GetAdminDtoById(Id);
+            var admin = _adminRepository.GetAdminDtoById(Id);
+
+            if (admin == null)
+                return NotFound("Admin Not Found");
+
+            return admin;
         }
         [HttpPost("addAdmin")]
         public ActionResult addAdmin(RegisterAdminDto registerAdminDto)
         {
             if (UserExists(registerAdminDto.Email))
-            {
                 return BadRequest("Admin Exists");
-            }
+
             string role = _tokenHandlerService.ExtractUserRole();
             if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
                 return Unauthorized("Not authorized");
+
             _adminRepository.CreateAdmin(registerAdminDto);
-            return Created();
+
+            return StatusCode(201);
         }
         [HttpPut("{id}")]
         public ActionResult updateAdmin(AdminUpdateDto adminUpdateDto, int Id)
@@ -59,14 +65,26 @@ namespace API.Controllers.v1
                 return Unauthorized("Not authorized");
 
             var admin = _adminRepository.GetAdminById(Id);
-            var user = _userRepository.GetUserById(admin.UserId!);
 
-            if (admin == null || user == null)
+
+            if (admin == null || adminUpdateDto.User == null)
                 return NotFound();
+
+            var user = _userRepository.GetUserById(admin.UserId);
+            if (user == null)
+                return NotFound();
+                
+            if (adminUpdateDto.User.Sex != null)
+                adminUpdateDto.User.Sex = adminUpdateDto.User.Sex.ToUpper();
+
+            if (user.Email != adminUpdateDto.User.Email)
+                if (UserExists(adminUpdateDto.User.Email))
+                    return BadRequest("Email Duplicated");
 
             _mapper.Map(adminUpdateDto, admin);
             _mapper.Map(adminUpdateDto.User, user);
             _adminRepository.Update(Id);
+
             if (_adminRepository.SaveChanges())
                 return NoContent();
 

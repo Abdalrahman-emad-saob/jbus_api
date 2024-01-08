@@ -8,5 +8,6 @@ namespace API.DTOs
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public int StartingPointId { get; set; }
         public int EndingPointId { get; set; }
+        
     }
 }
