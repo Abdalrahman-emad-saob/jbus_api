@@ -41,6 +41,22 @@ namespace API.Migrations
                     b.ToTable("Admins");
                 });
 
+            modelBuilder.Entity("API.Entities.BlacklistedToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Token")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BlacklistedTokens");
+                });
+
             modelBuilder.Entity("API.Entities.Bus", b =>
                 {
                     b.Property<int>("Id")
@@ -245,6 +261,12 @@ namespace API.Migrations
                     b.Property<bool>("Confirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTime>("ConfirmedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int?>("FriendId")
                         .HasColumnType("integer");
 
@@ -314,9 +336,6 @@ namespace API.Migrations
                     b.Property<string>("PassengerEmail")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.HasKey("Id");
 
                     b.ToTable("OTPs");
@@ -330,13 +349,13 @@ namespace API.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int>("CreditorId")
                         .HasColumnType("integer");
 
                     b.Property<string>("FacebookToken")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FcmToken")
                         .HasColumnType("text");
 
                     b.Property<string>("GoogleToken")
@@ -347,9 +366,6 @@ namespace API.Migrations
 
                     b.Property<string>("ProfileImage")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("UserId")
                         .HasColumnType("integer");
@@ -426,9 +442,6 @@ namespace API.Migrations
 
                     b.Property<int?>("TripPickupId")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 

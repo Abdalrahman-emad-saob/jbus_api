@@ -10,9 +10,15 @@ namespace API.Services
     public class TokenService : ITokenService
     {
         private readonly SymmetricSecurityKey _key;
-        public TokenService(IConfiguration config)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public TokenService(
+            IConfiguration config,
+            IHttpContextAccessor httpContextAccessor
+            )
         {
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"]!));
+            _httpContextAccessor = httpContextAccessor;
         }
         public string CreateToken(User user, int passengerId)
         {
@@ -37,6 +43,24 @@ namespace API.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(token);
+        }
+
+        public string GetToken()
+        {
+            var authorizationHeader = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].FirstOrDefault();
+            var token = "";
+            if (authorizationHeader != null && authorizationHeader.StartsWith("Bearer "))
+            {
+                token = authorizationHeader.Substring("Bearer ".Length).Trim();
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jsonToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
+
+                if (jsonToken == null)
+                {
+                    return "";
+                }
+            }
+            return token;
         }
     }
 }

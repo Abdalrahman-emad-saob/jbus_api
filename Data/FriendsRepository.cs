@@ -43,10 +43,18 @@ namespace API.Data
         public FriendsDto GetFriendById(int id, int PassengerId)
         {
             return _context
-           .Friends
-           .Where(f => f.Id == id && f.Confirmed == true && f.PassengerId == PassengerId)
-           .ProjectTo<FriendsDto>(_mapper.ConfigurationProvider)
-           .SingleOrDefault()!;
+                    .Friends
+                    .Where(f => f.Id == id && f.PassengerId == PassengerId)
+                    .ProjectTo<FriendsDto>(_mapper.ConfigurationProvider)
+                    .SingleOrDefault()!;
+        }
+
+        public bool FriendRequestExists(int FriendId, int PassengerId)
+        {
+            bool friendExists = _context.Friends
+                                .Any(f => f.FriendId == FriendId && f.PassengerId == PassengerId);
+
+            return friendExists;
         }
 
         public IEnumerable<FriendsDto> GetFriends(int id)

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace API.DTOs
 {
@@ -10,5 +11,7 @@ namespace API.DTOs
         public int PassengerId { get; set; }
         [Required]
         public int TripId { get; set; }
+        [JsonIgnore]
+        public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
     }
 }

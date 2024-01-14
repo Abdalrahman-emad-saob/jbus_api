@@ -5,9 +5,9 @@ namespace API.DTOs
     public class DriverTripCreateDto
     {
         [Required]
-        public DateTime StartedAt { get; set; }
+        public DateTime StartedAt { get; set; } = DateTime.UtcNow;
         [Required]
-        public DateTime FinishedAt { get; set; }
+        public DateTime FinishedAt { get; set; } = DateTime.UtcNow;
         // TODO Function For Rating
         public int? Rating { get; set; }
         [Required]

@@ -10,5 +10,6 @@ namespace API.DTOs
         public double Amount { get; set; }
         [Required]
         public int PassengerId { get; set; }
+        public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
     }
 }

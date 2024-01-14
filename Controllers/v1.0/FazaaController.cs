@@ -30,31 +30,43 @@ namespace API.Controllers
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized("Not authorized");
+                return Unauthorized("Not authorized1");
 
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" 
-            || role.ToUpper() != Role.PASSENGER.ToString())
-                return Unauthorized("Not authorized");
-
-            bool result = _fazaaRepository.StoreFazaas(fazaaCreateDtos, Id);
+            if (
+            role == "Not" ||
+            (
+            role.ToUpper() != Role.PASSENGER.ToString()
+            ))
+                return Unauthorized("Not authorized2");
+            bool result;
+            try
+            {
+                result = _fazaaRepository.StoreFazaas(fazaaCreateDtos, Id);
+            }
+            catch (Exception)
+            {
+                return BadRequest("Duplicated Record");
+            }
             if (!result)
                 return StatusCode(500, "Internal Server Error");
 
-            return NoContent();
+            return StatusCode(201);
         }
-        [NonAction]
         [HttpGet("getFazaas")]
         public ActionResult<IEnumerable<FazaaDto>> getFazaas()
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized("Not authorized");
+                return Unauthorized("Not authorized1");
 
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" 
-            || role.ToUpper() != Role.PASSENGER.ToString())
-                return Unauthorized("Not authorized");
+            if (
+            role == "Not" || 
+            (
+            role.ToUpper() != Role.PASSENGER.ToString()
+            ))
+                return Unauthorized("Not authorized2");
 
             var fazaas = _fazaaRepository.GetFazaas(Id);
             if (fazaas == null)
@@ -62,16 +74,18 @@ namespace API.Controllers
 
             return Ok(fazaas);
         }
-        [NonAction]
-        [HttpGet("getFazaaById")]
-        public ActionResult<FazaaDto> getFazaaById(int Id)
+        [HttpGet("getFazaaById/{id}")]
+        public ActionResult<FazaaDto> getFazaaById(int id)
         {
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" 
-            || role.ToUpper() != Role.PASSENGER.ToString())
+            if (
+            role == "Not" || 
+            (
+            role.ToUpper() != Role.PASSENGER.ToString()
+            ))
                 return Unauthorized("Not authorized");
 
-            var fazaa = _fazaaRepository.GetFazaaById(Id);
+            var fazaa = _fazaaRepository.GetFazaaById(id);
             if (fazaa == null)
                 return NotFound("Fazaa Not Found");
 

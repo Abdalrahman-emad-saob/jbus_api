@@ -40,8 +40,11 @@ namespace API.Extensions
             services.AddScoped<IPredefinedStopsRepository, PredefinedStopsRepository>();
             services.AddScoped<IFriendsRepository, FriendsRepository>();
             services.AddScoped<IAdminRepository, AdminRepository>();
+            services.AddScoped<INotisTokenRepository, NotisTokenRepository>();
+            services.AddScoped<IBlacklistedTokenRepository, BlacklistedTokenRepository>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<NotificationService>();
 
             return services;
         }

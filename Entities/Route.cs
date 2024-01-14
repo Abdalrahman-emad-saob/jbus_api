@@ -7,8 +7,8 @@ namespace API.Entities
         public string? WaypointsGoing { get; set; }
         public string? WaypointsReturning { get; set; }
         public double Fee { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
 
         // * Link
         public List<FavoritePoint>? FavoritePoints { get; set; }

@@ -22,6 +22,7 @@ namespace API.Data
         public DbSet<Fazaa> Fazaas { get; set; }
         public DbSet<PredefinedStops> PredefinedStops { get; set; }
         public DbSet<Friends> Friends { get; set; }
+        public DbSet<BlacklistedToken> BlacklistedTokens { get; set; }
 
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)

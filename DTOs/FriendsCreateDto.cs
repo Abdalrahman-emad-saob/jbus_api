@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace API.DTOs
 {
@@ -6,5 +7,7 @@ namespace API.DTOs
     {
         [Required]
         public int FriendId { get; set; }
+        [JsonIgnore]
+        public DateTime CreatedAt { get; set; }
     }
 }

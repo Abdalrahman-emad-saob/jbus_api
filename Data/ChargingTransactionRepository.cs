@@ -19,14 +19,14 @@ namespace API.Data
 
         public bool CreateChargingTransaction(ChargingTransactionCreateDto chargingTransactionDto)
         {
-            int chargeMethod = 0;
-            if(chargingTransactionDto.paymentMethod?.ToLower() == "mastercard")
-                chargeMethod = 0;
-            else if(chargingTransactionDto.paymentMethod?.ToLower() == "visa")
-                chargeMethod = 1;
+            var chargeMethod = ChargingMethod.MASTERCARD;
+            if(chargingTransactionDto.paymentMethod?.ToLower() == ChargingMethod.MASTERCARD.ToString())
+                chargeMethod = ChargingMethod.MASTERCARD;
+            else if(chargingTransactionDto.paymentMethod?.ToLower() == ChargingMethod.VISA.ToString())
+                chargeMethod = ChargingMethod.VISA;
             ChargingTransaction chargingTransaction = new()
             {
-                ChargingMethod = (ChargingMethod)chargeMethod,
+                ChargingMethod = chargeMethod,
                 Amount = chargingTransactionDto.Amount,
                 PassengerId = chargingTransactionDto.PassengerId
             };

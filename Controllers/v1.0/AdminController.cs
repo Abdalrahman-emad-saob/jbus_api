@@ -92,7 +92,7 @@ namespace API.Controllers.v1
         }
 
         [NonAction]
-        public bool UserExists(string? Email)
+        private bool UserExists(string? Email)
         {
             return _userRepository.GetUserByEmail(Email!) != null;
         }

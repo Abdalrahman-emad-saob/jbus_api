@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace API.DTOs
 {
@@ -12,5 +13,9 @@ namespace API.DTOs
         [Required]
         public string? Email { get; set; }
         public string? Sex { get; set; }
+        [JsonIgnore]
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        [JsonIgnore]
+        public DateTime LastActive { get; set; } = DateTime.UtcNow;
     }
 }

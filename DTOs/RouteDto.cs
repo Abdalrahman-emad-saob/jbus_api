@@ -12,6 +12,6 @@ namespace API.DTOs
         public InterestPointDto? StartingPoint { get; set; }
         public int EndingPointId { get; set; }
         public InterestPointDto? EndingPoint { get; set; }
-        public List<PredefinedStopsDto>? PredefinedStops { get; set; }
+        // public List<PredefinedStopsDto>? PredefinedStops { get; set; }
     }
 }

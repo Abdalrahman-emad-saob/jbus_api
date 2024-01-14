@@ -10,7 +10,7 @@ namespace API.DTOs
         public string? Email { get; set; }
         public string? Role { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public DateTime LastActive { get; set; } = DateTime.UtcNow;
+        public DateTime LastActive { get; set; }
         public string? Sex { get; set; }
     }
 }

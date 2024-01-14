@@ -73,6 +73,8 @@ namespace API.Helpers
 
             CreateMap<Trip, TripDto>()
             .ForMember(td => td.Status, opt => opt.MapFrom(t => t.status.ToString()));
+            CreateMap<TripUpdateDto, Trip>()
+            .ForMember(tud => tud.status, opt => opt.MapFrom(t => t.Status!.ToString()));
             CreateMap<TripCreateDto, Trip>()
             .ForMember(t => t.status, opt => opt.MapFrom(tcd => tcd.status!.ToString()));
 

@@ -8,5 +8,7 @@ namespace API.Entities
         public Passenger? Friend { get; set; }
         public int? PassengerId { get; set; }
         public Passenger? Passenger { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime ConfirmedAt { get; set; }
     }
 }

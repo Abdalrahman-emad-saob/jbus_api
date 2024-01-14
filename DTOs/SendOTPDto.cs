@@ -1,8 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace API.DTOs {
-    public class LoginDto {
+namespace API.DTOs
+{
+    public class sendOTPDto
+    {
+        [Required]
         public string? Email { get; set; }
-        public string? Password { get; set; }
     }
 }

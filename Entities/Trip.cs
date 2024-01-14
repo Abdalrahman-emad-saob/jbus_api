@@ -3,8 +3,8 @@ namespace API.Entities
     public class Trip
     {
         public int Id { get; set; }
-        public DateTime StartedAt { get; set; } = DateTime.UtcNow;
-        public DateTime FinishedAt { get; set; } = DateTime.UtcNow;
+        public DateTime StartedAt { get; set; }
+        public DateTime FinishedAt { get; set; }
         public TripStatus status { get; set; }
         
 

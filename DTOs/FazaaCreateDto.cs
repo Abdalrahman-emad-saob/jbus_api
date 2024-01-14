@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace API.DTOs
 {
@@ -8,5 +9,7 @@ namespace API.DTOs
         public double Amount { get; set; }
         [Required]
         public int CreditorId { get; set; }
+        [JsonIgnore]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

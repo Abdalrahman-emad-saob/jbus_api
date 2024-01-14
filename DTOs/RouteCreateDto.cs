@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace API.DTOs
 {
@@ -14,7 +15,12 @@ namespace API.DTOs
         public InterestPointCreateDto? StartingPoint { get; set; }
         [Required]
         public InterestPointCreateDto? EndingPoint { get; set; }
-        public List<PredefinedStopsDto>? PredefinedStops { get; set; }
+        // public List<PredefinedStopsDto>? PredefinedStops { get; set; }
+        [JsonIgnore]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        [JsonIgnore]
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
 
     }
 }

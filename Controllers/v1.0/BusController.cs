@@ -28,21 +28,27 @@ namespace api.Controllers.v1
         public ActionResult CreateBus(BusCreateDto busCreateDto)
         {
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
+            if (role == "Not" ||
+            (
+            role.ToUpper() != Role.SUPER_ADMIN.ToString() &&
+            role.ToUpper() != Role.ADMIN.ToString()))
                 return Unauthorized("Not authorized");
-                
+
             _busRepository.CreateBus(busCreateDto);
-            return Created();
+            return StatusCode(201);
         }
         [HttpGet("getBuses")]
         public ActionResult<IEnumerable<BusDto>> GetBuses()
         {
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" 
-            || (role.ToUpper() != Role.SUPER_ADMIN.ToString()
-            && role.ToUpper() != Role.ADMIN.ToString() 
-            && role.ToUpper() != Role.PASSENGER.ToString()))
+            if (role == "Not" ||
+            (
+            role.ToUpper() != Role.SUPER_ADMIN.ToString() &&
+            role.ToUpper() != Role.ADMIN.ToString() &&
+            role.ToUpper() != Role.PASSENGER.ToString()
+            ))
                 return Unauthorized("Not authorized");
+
             return Ok(_busRepository.GetBuses());
         }
 
@@ -50,10 +56,13 @@ namespace api.Controllers.v1
         public ActionResult<BusDto> GetBusById(int id)
         {
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not"
-            || (role.ToUpper() != Role.SUPER_ADMIN.ToString()
-            && role.ToUpper() != Role.ADMIN.ToString()
-            && role.ToUpper() != Role.PASSENGER.ToString()))
+            if (
+            role == "Not" ||
+            (
+            role.ToUpper() != Role.SUPER_ADMIN.ToString() &&
+            role.ToUpper() != Role.ADMIN.ToString() &&
+            role.ToUpper() != Role.PASSENGER.ToString()
+            ))
                 return Unauthorized("Not authorized");
 
             return _busRepository.GetBusById(id);
@@ -63,14 +72,17 @@ namespace api.Controllers.v1
         public ActionResult updateBus(BusUpdateDto busUpdateDto, int id)
         {
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" 
-            || (role.ToUpper() != Role.SUPER_ADMIN.ToString()
-            && role.ToUpper() != Role.ADMIN.ToString()))
+            if (
+            role == "Not" || 
+            (
+            role.ToUpper() != Role.SUPER_ADMIN.ToString() && 
+            role.ToUpper() != Role.ADMIN.ToString()
+            ))
                 return Unauthorized("Not authorized");
 
             var route = _busRepository.GetBusById(id);
 
-            if (route == null) 
+            if (route == null)
                 return NotFound();
 
             _mapper.Map(busUpdateDto, route);

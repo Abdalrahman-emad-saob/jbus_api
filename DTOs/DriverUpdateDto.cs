@@ -1,10 +1,13 @@
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+
 namespace API.DTOs
 {
     public class DriverUpdateDto
     {
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime LastActive { get; set; } = DateTime.UtcNow;
+        [Required]
         public UserUpdateDto? User { get; set; }
+        [Required]
         public int BusId { get; set; }
     }
 }

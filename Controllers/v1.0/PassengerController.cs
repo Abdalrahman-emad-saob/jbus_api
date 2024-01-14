@@ -41,8 +41,11 @@ namespace API.Controllers.v1
                 return Unauthorized("Not authorized");
 
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not"
-            || role.ToUpper() != Role.PASSENGER.ToString())
+            if (
+            role == "Not" || 
+            (
+            role.ToUpper() != Role.PASSENGER.ToString()
+            ))
                 return Unauthorized("Not authorized");
 
             return _passengerRepository.GetPassengerDtoById(Id);
@@ -56,7 +59,11 @@ namespace API.Controllers.v1
                 return Unauthorized("Not authorized");
 
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" || role.ToUpper() != Role.PASSENGER.ToString())
+            if (
+            role == "Not" || 
+            (
+            role.ToUpper() != Role.PASSENGER.ToString()
+            ))
                 return Unauthorized("Not authorized");
 
             var passenger = _passengerRepository.GetPassengerById(Id);
@@ -75,9 +82,11 @@ namespace API.Controllers.v1
         public ActionResult updatePassenger(PassengerUpdateDto passengerUpdateDto, int Id)
         {
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not"
-            || (role.ToUpper() != Role.SUPER_ADMIN.ToString()
-            && role.ToUpper() != Role.ADMIN.ToString()))
+            if (role == "Not" || 
+            (
+            role.ToUpper() != Role.SUPER_ADMIN.ToString() && 
+            role.ToUpper() != Role.ADMIN.ToString()
+            ))
                 return Unauthorized("Not authorized");
 
             var passenger = _passengerRepository.GetPassengerById(Id);
@@ -96,15 +105,18 @@ namespace API.Controllers.v1
 
             if (_passengerRepository.SaveChanges())
                 return NoContent();
+                
             return BadRequest("Failed to Update Passenger");
         }
         [HttpGet("{id}")]
         public ActionResult<PassengerDto> GetPassengerById(int id)
         {
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not"
-            || (role.ToUpper() != Role.SUPER_ADMIN.ToString()
-            && role.ToUpper() != Role.ADMIN.ToString()))
+            if (role == "Not" || 
+            (
+            role.ToUpper() != Role.SUPER_ADMIN.ToString() && 
+            role.ToUpper() != Role.ADMIN.ToString()
+            ))
                 return Unauthorized("Not authorized");
 
             var passenger = _passengerRepository.GetPassengerDtoById(id);
@@ -122,9 +134,11 @@ namespace API.Controllers.v1
             }
 
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not"
-            || (role.ToUpper() != Role.SUPER_ADMIN.ToString()
-            && role.ToUpper() != Role.ADMIN.ToString()))
+            if (role == "Not" || 
+            (
+            role.ToUpper() != Role.SUPER_ADMIN.ToString() && 
+            role.ToUpper() != Role.ADMIN.ToString()
+            ))
                 return Unauthorized("Not authorized");
 
             _passengerRepository.CreatePassenger(registerDto);
@@ -132,7 +146,7 @@ namespace API.Controllers.v1
             return StatusCode(201);
         }
         [NonAction]
-        public bool UserExists(string? Email)
+        private bool UserExists(string? Email)
         {
             return _userRepository.GetUserByEmail(Email!) != null;
         }

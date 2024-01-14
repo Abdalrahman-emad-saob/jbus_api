@@ -2,6 +2,8 @@ using API.Data;
 using API.Extensions;
 using API.Middleware;
 using Microsoft.EntityFrameworkCore;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,17 +13,26 @@ var builder = WebApplication.CreateBuilder(args);
 //     .AddEnvironmentVariables();
 
 builder.Services.AddControllers();
+// var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "google-services.json");
+// FirebaseApp.Create(new AppOptions
+// {
+//     Credential = GoogleCredential.FromFile(path),
+// });
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
+
+
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionMiddleware>();
+// TODO
+// app.UseMiddleware<TokenBlacklistMiddleware>();
 // if (app.Environment.IsDevelopment())
 // {
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
+app.UseSwagger();
+app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
     options.RoutePrefix = "jbus_endpoints";

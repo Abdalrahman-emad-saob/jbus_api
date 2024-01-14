@@ -1,4 +1,5 @@
 using API.DTOs;
+using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -14,10 +15,12 @@ namespace API.Controllers.v1
         private readonly ITokenHandlerService _tokenHandlerService;
         private readonly IMapper _mapper;
 
-        public DriverController(IDriverRepository driverRepository,
+        public DriverController(
+                                IDriverRepository driverRepository,
                                 IUserRepository userRepository,
                                 ITokenHandlerService tokenHandlerService,
-                                IMapper mapper)
+                                IMapper mapper
+                                )
         {
             _driverRepository = driverRepository;
             _userRepository = userRepository;
@@ -28,7 +31,12 @@ namespace API.Controllers.v1
         public ActionResult<IEnumerable<DriverDto>> GetDrivers()
         {
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
+            if (
+            role == "Not" ||
+            (
+            role.ToUpper() != Role.SUPER_ADMIN.ToString() &&
+            role.ToUpper() != Role.ADMIN.ToString()
+            ))
                 return Unauthorized("Not authorized");
 
             return Ok(_driverRepository.GetDrivers());
@@ -37,11 +45,16 @@ namespace API.Controllers.v1
         public ActionResult<DriverDto> GetDriverById(int id)
         {
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
+            if (
+            role == "Not" ||
+            (
+            role.ToUpper() != Role.SUPER_ADMIN.ToString() &&
+            role.ToUpper() != Role.ADMIN.ToString()
+            ))
                 return Unauthorized("Not authorized");
 
             var driverDto = _driverRepository.GetDriverDtoById(id);
-            if(driverDto == null)
+            if (driverDto == null)
                 return NotFound("Driver Not Found");
             return driverDto;
         }
@@ -49,7 +62,12 @@ namespace API.Controllers.v1
         public ActionResult<DriverDto> CreateDriver(RegisterDriverDto registerDriverDto)
         {
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
+            if (
+            role == "Not" ||
+            (
+            role.ToUpper() != Role.SUPER_ADMIN.ToString() &&
+            role.ToUpper() != Role.ADMIN.ToString()
+            ))
                 return Unauthorized("Not authorized");
 
             if (UserExists(registerDriverDto.Email))
@@ -63,7 +81,12 @@ namespace API.Controllers.v1
         public ActionResult updateDriver(int id, DriverUpdateDto driverUpdateDto)
         {
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
+            if (
+            role == "Not" ||
+            (
+            role.ToUpper() != Role.SUPER_ADMIN.ToString() &&
+            role.ToUpper() != Role.ADMIN.ToString()
+            ))
                 return Unauthorized("Not authorized");
 
             var driver = _driverRepository.GetDriverById(id);
@@ -86,13 +109,13 @@ namespace API.Controllers.v1
             _mapper.Map(driverUpdateDto, driver);
             _mapper.Map(driverUpdateDto.User, user);
 
-            if (_driverRepository.SaveChanges()) 
+            if (_driverRepository.SaveChanges())
                 return NoContent();
 
             return BadRequest("Failed to Update Driver");
         }
         [NonAction]
-        public bool UserExists(string? Email)
+        private bool UserExists(string? Email)
         {
             return _userRepository.GetUserByEmail(Email!) != null;
         }

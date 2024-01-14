@@ -22,12 +22,14 @@ namespace API.Data
         {
             foreach (var fazaa in fazaaCreateDto)
             {
+                // var passenger =_context.Passengers.Find(fazaa.CreditorId);
                 Fazaa newFazaa = new()
                 {
                     CreatedAt = DateTime.UtcNow,
                     Paid = false,
                     Amount = fazaa.Amount,
-                    CreditorId = fazaa.CreditorId
+                    CreditorId = fazaa.CreditorId,
+                    InDebtId = InDebtId
                 };
                 _context.Fazaas.Add(newFazaa);
             }

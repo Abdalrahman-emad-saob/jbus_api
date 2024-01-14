@@ -2,20 +2,16 @@ using System.ComponentModel.DataAnnotations;
 
 namespace API.DTOs
 {
-    public class TripCreateDto
+    public class TripUpdateDto
     {
-        [Required]
-        public DateTime StartedAt { get; set; }
         public DateTime FinishedAt { get; set; }
         [Required]
-        public string? status { get; set; }
+        public string? Status { get; set; }
         [Required]
         public int PassengerId { get; set; }
-        [Required]
         public int PaymentTransactionId { get; set; }
         [Required]
-        public int PickUpPointId { get; set; }
-        [Required]
-        public int DropOffPointId { get; set; }
+        public PointDto? PickUpPoint { get; set; }
+        public PointDto? DropOffPoint { get; set; }
     }
 }

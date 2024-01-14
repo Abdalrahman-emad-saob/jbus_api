@@ -27,8 +27,12 @@ namespace API.Controllers.v1
         public ActionResult<FavoritePointDto> GetFavoritePointById(int id)
         {
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" 
-            || role.ToUpper() != Role.PASSENGER.ToString())
+            if (
+            role == "Not" || 
+            (
+            role.ToUpper() != Role.PASSENGER.ToString()
+            )
+            )
                 return Unauthorized("Not authorized");
                 
             return Ok(_favoritePointRepository.GetFavoritePointById(id));
@@ -41,8 +45,11 @@ namespace API.Controllers.v1
                 return Unauthorized();
 
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" 
-            || role.ToUpper() != Role.PASSENGER.ToString())
+            if (
+            role == "Not" || 
+            (
+            role.ToUpper() != Role.PASSENGER.ToString()
+            ))
                 return Unauthorized("Not authorized");
 
             return Ok(_favoritePointRepository.GetFavoritePoints(Id));
@@ -52,12 +59,15 @@ namespace API.Controllers.v1
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized();
+                return Unauthorized("Not authorized1");
             
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" 
-            || role.ToUpper() != Role.PASSENGER.ToString())
-                return Unauthorized("Not authorized");
+            if (
+            role == "Not" || 
+            (
+            role.ToUpper() != Role.PASSENGER.ToString()
+            ))
+                return Unauthorized("Not authorized2");
 
             return Ok(_favoritePointRepository.DeleteFavoritePoint(id));
         }
@@ -66,16 +76,19 @@ namespace API.Controllers.v1
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized();
+                return Unauthorized("Not authorized1");
 
             string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" 
-            || role.ToUpper() != Role.PASSENGER.ToString())
-                return Unauthorized("Not authorized");
+            if (
+            role == "Not" || 
+            (
+            role.ToUpper() != Role.PASSENGER.ToString()
+            ))
+                return Unauthorized("Not authorized2");
             
             if (_favoritePointRepository.InsertFavoritePoint(favoritePointCreateDto))
             {
-                return Created();
+                return StatusCode(201);
             }
             return BadRequest();
         }

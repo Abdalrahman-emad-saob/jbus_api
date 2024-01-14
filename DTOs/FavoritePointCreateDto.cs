@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace API.DTOs
 {
@@ -12,5 +13,7 @@ namespace API.DTOs
         public double Long { get; set; }
         [Required]
         public int RouteId { get; set; }
+        [JsonIgnore]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }
