@@ -22,7 +22,8 @@ namespace API.Data
             {
                 BusNumber = busCreateDto.BusNumber,
                 RouteId = busCreateDto.RouteId,
-                DriverId = busCreateDto.DriverId
+                DriverId = busCreateDto.DriverId,
+                CreatedAt = DateTime.UtcNow
             };
             _context.Buses.Add(bus);
 

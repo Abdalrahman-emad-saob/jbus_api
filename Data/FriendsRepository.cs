@@ -22,29 +22,34 @@ namespace API.Data
             Friends friends = new()
             {
                 Confirmed = false,
+                CreatedAt = DateTime.UtcNow,
                 FriendId = friendCreateDto.FriendId,
-                PassengerId = PassengerId
+                PassengerId = PassengerId,
+                Friend = _context.Passengers.Find(friendCreateDto.FriendId),
+                Passenger = _context.Passengers.Find(PassengerId)
             };
+            
             _context.Friends.Add(friends);
 
-            return SaveChanges();
+            return true;
         }
 
-        public bool ConfirmFriendRequest(int FriendId, int PassengerId)
+        public bool ConfirmFriendRequest(int Id, int PassengerId)
         {
             var friend = _context
                         .Friends
-                        .Where(f => f.FriendId == FriendId && f.PassengerId == PassengerId)
+                        .Where(f => f.Id == Id && f.FriendId == PassengerId)
                         .SingleOrDefault();
             friend!.Confirmed = true;
-            return SaveChanges();
+
+            return true;
         }
 
-        public FriendsDto GetFriendById(int id, int PassengerId)
+        public FriendsDto GetFriendById(int Id, int PassengerId)
         {
             return _context
                     .Friends
-                    .Where(f => f.Id == id && f.PassengerId == PassengerId)
+                    .Where(f => f.Confirmed == true && f.Id == Id && (f.PassengerId == PassengerId || f.FriendId == PassengerId))
                     .ProjectTo<FriendsDto>(_mapper.ConfigurationProvider)
                     .SingleOrDefault()!;
         }
@@ -61,7 +66,7 @@ namespace API.Data
         {
             return _context
            .Friends
-           .Where(f => f.Id == id && f.Confirmed == true)
+           .Where(f => (f.PassengerId == id || f.FriendId == id) && f.Confirmed == true)
            .ProjectTo<FriendsDto>(_mapper.ConfigurationProvider)
            .ToList();
         }
@@ -76,25 +81,22 @@ namespace API.Data
             _context.Entry(friend).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         }
 
-        public bool DeleteFriend(int FriendId, int PassengerId)
+        public bool DeleteFriend(int Id, int PassengerId)
         {
             var friendToDelete = _context
                                 .Friends
-                                .Where(f => f.FriendId == FriendId && f.PassengerId == PassengerId)
+                                .Where(f => f.Id == Id && (f.PassengerId == PassengerId || f.FriendId == PassengerId))
                                 .SingleOrDefault();
 
-            if (friendToDelete == null)
-                return false;
-
             _context.Friends.Remove(friendToDelete!);
-            return SaveChanges();
+            return true;
         }
 
         public IEnumerable<FriendsDto> GetFriendRequests(int PassengerId)
         {
             var friendsRequests = _context
                             .Friends
-                            .Where(f => f.PassengerId == PassengerId && f.Confirmed == false)
+                            .Where(f => f.FriendId == PassengerId && f.Confirmed == false)
                             .ProjectTo<FriendsDto>(_mapper.ConfigurationProvider)
                             .ToList();
             return friendsRequests;

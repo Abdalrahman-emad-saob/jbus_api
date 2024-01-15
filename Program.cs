@@ -13,11 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 //     .AddEnvironmentVariables();
 
 builder.Services.AddControllers();
-// var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "google-services.json");
-// FirebaseApp.Create(new AppOptions
-// {
-//     Credential = GoogleCredential.FromFile(path),
-// });
+FirebaseApp.Create(new AppOptions
+{
+    Credential = GoogleCredential.FromFile("jbus-8f9bf-firebase-adminsdk-ai17o-fc475217c3.json"),
+});
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
 
@@ -27,8 +26,7 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionMiddleware>();
-// TODO
-// app.UseMiddleware<TokenBlacklistMiddleware>();
+app.UseMiddleware<TokenBlacklistMiddleware>();
 // if (app.Environment.IsDevelopment())
 // {
 app.UseSwagger();
@@ -61,6 +59,7 @@ try
     await Seed.SeedFavoritePoint(context);
     await Seed.SeedOTP(context);
     await Seed.SeedAdmin(context);
+    await Seed.SeedCreditCards(context);
 }
 catch (Exception ex)
 {
@@ -68,5 +67,5 @@ catch (Exception ex)
     logger?.LogError(ex, "An Error Occurred During Migration");
 }
 
-app.Run();
-// app.Run("http://localhost:5000");
+// app.Run();
+app.Run("http://localhost:5000");

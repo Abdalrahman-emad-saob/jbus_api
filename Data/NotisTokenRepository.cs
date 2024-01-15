@@ -13,7 +13,7 @@ namespace API.Data
             _context = context;
         }
 
-        public string? GetDevieToken(int? passengerId)
+        public string? GetDeviceToken(int? passengerId)
         {
             var passenger = _context.Passengers.Find(passengerId);
             if(passenger == null)

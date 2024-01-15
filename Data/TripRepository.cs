@@ -17,35 +17,35 @@ namespace API.Data
             _mapper = mapper;
         }
 
-        public bool CreateTrip(TripCreateDto tripDto, int PassengerId)
+        public TripDto CreateTrip(TripCreateDto tripDto, int PassengerId)
         {
             int status = 0;
-            if(tripDto.status?.ToLower() == "pending")
+            if (tripDto.status?.ToLower() == "pending")
                 status = 0;
-            else if(tripDto.status?.ToLower() == "ongoing")
+            else if (tripDto.status?.ToLower() == "ongoing")
                 status = 1;
-            else if(tripDto.status?.ToLower() == "completed")
+            else if (tripDto.status?.ToLower() == "completed")
                 status = 2;
-            else if(tripDto.status?.ToLower() == "canceled")
+            else if (tripDto.status?.ToLower() == "canceled")
                 status = 3;
             Trip trip = new()
             {
                 status = (TripStatus)status,
                 PassengerId = PassengerId,
-                PaymentTransactionId = tripDto.PaymentTransactionId,
                 PickUpPointId = tripDto.PickUpPointId,
-                DropOffPointId = tripDto.DropOffPointId
-            };
+                FinishedAt = tripDto.FinishedAt
+            };              
+            
             _context.Trips.Add(trip);
 
-            return SaveChanges();
+            return _mapper.Map<TripDto>(trip);
         }
 
-        public TripDto GetTripById(int id)
+        public TripDto GetTripById(int id, int PassengerId)
         {
             return _context
                 .Trips
-                .Where(t => t.Id == id)
+                .Where(t => t.Id == id && t.PassengerId == PassengerId)
                 .ProjectTo<TripDto>(_mapper.ConfigurationProvider)
                 .SingleOrDefault()!;
         }
@@ -73,9 +73,10 @@ namespace API.Data
             return _context.SaveChanges() > 0;
         }
 
-        public void Update(TripDto trip)
+        public void Update(TripUpdateDto tripUpdateDto, int id)
         {
-            _context.Entry(trip).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            var trip = _context.Trips.Find(id);
+            _mapper.Map(tripUpdateDto, trip);
         }
     }
 }

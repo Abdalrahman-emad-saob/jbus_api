@@ -59,7 +59,10 @@ namespace API.Data
 
         public bool SaveChanges() => _context.SaveChanges() > 0;
 
-        public void Update(PassengerDto passenger) => _context.Entry(passenger).State = EntityState.Modified;
+        public void Update(PassengerDto passenger)
+        {
+            _context.Entry(passenger).State = EntityState.Modified;
+        }
 
         public RegisterResponseDto CreatePassenger(RegisterDto registerDto)
         {

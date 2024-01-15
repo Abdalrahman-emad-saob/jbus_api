@@ -33,7 +33,8 @@ namespace API.Data
             {
                 Name = interestPointDto.Name,
                 Logo = interestPointDto.Logo,
-                LocationId = point.Id
+                LocationId = point.Id,
+                CreatedAt = DateTime.UtcNow
             };
             _context.InterestPoints.Add(interestPoint);
 

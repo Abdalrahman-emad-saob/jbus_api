@@ -237,7 +237,7 @@ namespace API.Data
 
         public static async Task SeedOTP(DataContext context)
         {
-            if (await context.Passengers.AnyAsync()) return;
+            if (await context.OTPs.AnyAsync()) return;
             var passenger = await context.Passengers.FindAsync(1);
             var user = await context.Users.FindAsync(passenger!.UserId);
             if (passenger != null && user != null)
@@ -250,6 +250,57 @@ namespace API.Data
                 context.OTPs.Add(otp);
                 await context.SaveChangesAsync();
             }
+        }
+        public static async Task SeedCreditCards(DataContext context)
+        {
+            if (await context.CreditCards.AnyAsync()) return;
+            CreditCard creditCard1 = new()
+            {
+                CardType = "VISA",
+                CardNumber = 1234123412341234,
+                CVC = 123,
+                ExpirationDate = new DateOnly(2025, 1, 16),
+                Balance = 999999999999999
+            };
+            CreditCard creditCard2 = new()
+            {
+                CardType = "MASTER_CARD",
+                CardNumber = 4321432143214321,
+                CVC = 321,
+                ExpirationDate = new DateOnly(2025, 1, 16),
+                Balance = 999999999999999
+            };
+            CreditCard creditCard3 = new()
+            {
+                CardType = "VISA",
+                CardNumber = 1234567812345678,
+                CVC = 123,
+                ExpirationDate = new DateOnly(2025, 1, 16),
+                Balance = 0
+            };
+            CreditCard creditCard4 = new()
+            {
+                CardType = "VISA",
+                CardNumber = 1234561234561234,
+                CVC = 123,
+                ExpirationDate = new DateOnly(2023, 1, 16),
+                Balance = 999999999999999
+            };
+            // CreditCard creditCard5 = new()
+            // {
+            //     CardType = "VISA",
+            //     CardNumber = 1234123412341234,
+            //     CVC = 123,
+            //     ExpirationDate = new DateOnly(2025, 1, 16),
+            //     Balance = 200
+            // };
+            context.CreditCards.Add(creditCard1);
+            context.CreditCards.Add(creditCard2);
+            context.CreditCards.Add(creditCard3);
+            context.CreditCards.Add(creditCard4);
+            // context.CreditCards.Add(creditCard5);
+
+            await context.SaveChangesAsync();
         }
     }
 }

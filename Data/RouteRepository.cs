@@ -45,7 +45,9 @@ namespace API.Data
                 WaypointsGoing = routeDto.WaypointsGoing,
                 WaypointsReturning = routeDto.WaypointsReturning,
                 StartingPointId = interestPoint1.Id,
-                EndingPointId = interestPoint2.Id
+                EndingPointId = interestPoint2.Id,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             };
             _context.Routes.Add(route);
             

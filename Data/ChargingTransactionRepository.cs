@@ -3,6 +3,7 @@ using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Bogus.DataSets;
 
 namespace API.Data
 {
@@ -17,21 +18,28 @@ namespace API.Data
             _mapper = mapper;
         }
 
-        public bool CreateChargingTransaction(ChargingTransactionCreateDto chargingTransactionDto)
+        public bool CreateChargingTransaction(ChargingTransactionCreateDto chargingTransactionCreateDto, int id)
         {
             var chargeMethod = ChargingMethod.MASTERCARD;
-            if(chargingTransactionDto.paymentMethod?.ToLower() == ChargingMethod.MASTERCARD.ToString())
+            if(chargingTransactionCreateDto.paymentMethod?.ToUpper() == ChargingMethod.MASTERCARD.ToString())
                 chargeMethod = ChargingMethod.MASTERCARD;
-            else if(chargingTransactionDto.paymentMethod?.ToLower() == ChargingMethod.VISA.ToString())
+            else if(chargingTransactionCreateDto.paymentMethod?.ToUpper() == ChargingMethod.VISA.ToString())
                 chargeMethod = ChargingMethod.VISA;
+            else if(chargingTransactionCreateDto.paymentMethod?.ToUpper() == ChargingMethod.FAZAA.ToString())
+                chargeMethod = ChargingMethod.FAZAA;
+            else if(chargingTransactionCreateDto.paymentMethod?.ToUpper() == ChargingMethod.BALANCE_TRANSFER.ToString())
+                chargeMethod = ChargingMethod.BALANCE_TRANSFER;
+                
             ChargingTransaction chargingTransaction = new()
             {
                 ChargingMethod = chargeMethod,
-                Amount = chargingTransactionDto.Amount,
-                PassengerId = chargingTransactionDto.PassengerId
+                Amount = chargingTransactionCreateDto.Amount,
+                PassengerId = id,
+                TimeStamp = DateTime.UtcNow
             };
+            _context.Passengers.Find(id)!.Wallet += chargingTransactionCreateDto.Amount;
             _context.ChargingTransactions.Add(chargingTransaction);
-            return SaveChanges();
+            return true;
         }
 
         public ChargingTransactionDto GetChargingTransactionById(int id)

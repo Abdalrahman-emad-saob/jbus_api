@@ -120,6 +120,37 @@ namespace API.Migrations
                     b.ToTable("ChargingTransactions");
                 });
 
+            modelBuilder.Entity("API.Entities.CreditCard", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<long>("Balance")
+                        .HasColumnType("bigint");
+
+                    b.Property<short>("CVC")
+                        .HasColumnType("smallint");
+
+                    b.Property<long>("CardNumber")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("CardType")
+                        .HasColumnType("text");
+
+                    b.Property<DateOnly>("ExpirationDate")
+                        .HasColumnType("date");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CardNumber")
+                        .IsUnique();
+
+                    b.ToTable("CreditCards");
+                });
+
             modelBuilder.Entity("API.Entities.Driver", b =>
                 {
                     b.Property<int>("Id")
@@ -437,12 +468,6 @@ namespace API.Migrations
                     b.Property<int?>("PredefinedStopsId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("TripDropoffId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("TripPickupId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("PredefinedStopsId");
@@ -557,13 +582,11 @@ namespace API.Migrations
 
                     b.HasIndex("DriverTripId");
 
-                    b.HasIndex("DropOffPointId")
-                        .IsUnique();
+                    b.HasIndex("DropOffPointId");
 
                     b.HasIndex("PassengerId");
 
-                    b.HasIndex("PickUpPointId")
-                        .IsUnique();
+                    b.HasIndex("PickUpPointId");
 
                     b.ToTable("Trips");
                 });
@@ -811,8 +834,8 @@ namespace API.Migrations
                         .HasForeignKey("DriverTripId");
 
                     b.HasOne("API.Entities.Point", "DropOffPoint")
-                        .WithOne("TripDropoff")
-                        .HasForeignKey("API.Entities.Trip", "DropOffPointId")
+                        .WithMany("TripDropoff")
+                        .HasForeignKey("DropOffPointId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("API.Entities.Passenger", "Passenger")
@@ -820,8 +843,8 @@ namespace API.Migrations
                         .HasForeignKey("PassengerId");
 
                     b.HasOne("API.Entities.Point", "PickUpPoint")
-                        .WithOne("TripPickup")
-                        .HasForeignKey("API.Entities.Trip", "PickUpPointId")
+                        .WithMany("TripPickup")
+                        .HasForeignKey("PickUpPointId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("DriverTrip");

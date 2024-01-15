@@ -9,6 +9,7 @@ namespace API.Interfaces
         IEnumerable<PointDto> GetPoints();
         PointDto GetPointById(int id);
         Point CreatePoint(PointCreateDto pointDto);
+        PointDto PointExists(double lat, double lon);
         bool SaveChanges();
     }
 }

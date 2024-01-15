@@ -6,7 +6,7 @@ namespace API.Interfaces
     {
         IEnumerable<ChargingTransactionDto> GetChargingTransactions();
         ChargingTransactionDto GetChargingTransactionById(int id);
-        bool CreateChargingTransaction(ChargingTransactionCreateDto chargingTransactionDto);
+        bool CreateChargingTransaction(ChargingTransactionCreateDto chargingTransactionDto, int id);
         bool SaveChanges();
     }
 }

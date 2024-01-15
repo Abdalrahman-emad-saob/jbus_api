@@ -1,6 +1,7 @@
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
+using AutoMapper;
 
 namespace API.Data
 {
@@ -8,7 +9,9 @@ namespace API.Data
     {
         private readonly DataContext _context;
 
-        public OTPRepository(DataContext context)
+        public OTPRepository(
+            DataContext context
+            )
         {
             _context = context;
         }
@@ -20,7 +23,8 @@ namespace API.Data
             OTP oTP = new()
             {
                 Otp = otp,
-                PassengerEmail = Email
+                PassengerEmail = Email,
+                CreatedAt = DateTime.UtcNow
             };
             _context.OTPs.Add(oTP);
             _context.SaveChanges();
@@ -38,9 +42,12 @@ namespace API.Data
             return false;
         }
 
-        public OTP GetOTPByEmail(string Email)
+        public OTP GetOTPByEmail(string? Email)
         {
-            return _context.OTPs.Where(otp => otp.PassengerEmail == Email).SingleOrDefault()!;
+            return _context.OTPs
+                    .Where(otp => otp.PassengerEmail == Email)
+                    .OrderByDescending(otp => otp.CreatedAt)
+                    .FirstOrDefault()!;
         }
 
         public bool SaveChanges()

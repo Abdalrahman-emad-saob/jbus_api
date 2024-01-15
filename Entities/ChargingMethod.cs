@@ -1,6 +1,5 @@
 namespace API.Entities
 {
-    // TODO Payment Methods
         public enum ChargingMethod
         {
             MASTERCARD = 0,

@@ -50,15 +50,19 @@ namespace API.Controllers
             bool friendReqeustExists = _friendsRepository.FriendRequestExists(friendsCreateDto.FriendId, Id);
             if (friendReqeustExists)
                 return BadRequest("Friend Request Exists");
-
+            
             if (_friendsRepository.SendFriendRequest(friendsCreateDto, Id))
+            {
+                if(!_friendsRepository.SaveChanges())
+                    return StatusCode(500, "Server Error1");
                 return StatusCode(201);
-
+            }
+            
             return StatusCode(500, "Internal Server Error2");
         }
 
-        [HttpPut("confirmFriendRequest")]
-        public ActionResult confirmFriendRequest(int friendId)
+        [HttpPut("confirmFriendRequest/{id}")]
+        public ActionResult confirmFriendRequest(int id)
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
@@ -72,11 +76,15 @@ namespace API.Controllers
             ))
                 return Unauthorized("Not authorized2");
 
-            _friendsRepository.ConfirmFriendRequest(friendId, Id);
+            if(_friendsRepository.ConfirmFriendRequest(id, Id))
+            {
+            _friendsRepository.SaveChanges();
             return NoContent();
+            }
+            return StatusCode(500, "Server Error");
         }
-        [HttpGet("getFriendById")]
-        public ActionResult<FriendsDto> getFriendById(int FriendId)
+        [HttpGet("getFriendById/{id}")]
+        public ActionResult<FriendDto> getFriendById(int id)
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
@@ -90,17 +98,21 @@ namespace API.Controllers
             ))
                 return Unauthorized("Not authorized2");
 
-            var friend = _friendsRepository.GetFriendById(FriendId, Id);
+            var friend = _friendsRepository.GetFriendById(id, Id);
             if (friend == null || friend.Friend == null)
                 return NotFound("Friend Not Found");
+            FriendDto trueFriend;
 
+                if(friend.Passenger!.Id == Id)
+                    trueFriend = friend.Friend;
+                else
+                    trueFriend = friend.Passenger;
 
-
-            return Ok(friend);
+            return Ok(trueFriend);
         }
 
         [HttpGet("getFriends")]
-        public ActionResult<IEnumerable<FriendsDto>> getFriends()
+        public ActionResult<IEnumerable<FriendDto>> getFriends()
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
@@ -115,10 +127,17 @@ namespace API.Controllers
                 return Unauthorized("Not authorized2");
 
             var friends = _friendsRepository.GetFriends(Id);
-            if (friends == null)
+            if (friends == null || !friends.Any())
                 return NotFound("No Friends, forever alone!");
-
-            return Ok(friends);
+            List<FriendDto> friendss = [];
+            foreach(var fri in friends)
+            {
+                if(fri.Passenger!.Id == Id)
+                    friendss.Add(fri.Friend!);
+                if(fri.Friend!.Id == Id)
+                    friendss.Add(fri.Passenger!);
+            }
+            return Ok(friendss);
         }
 
         [HttpGet("getFriendRequests")]
@@ -137,13 +156,14 @@ namespace API.Controllers
                 return Unauthorized("Not authorized2");
 
             var friendsRequests = _friendsRepository.GetFriendRequests(Id);
-            if (friendsRequests == null)
+            if (friendsRequests == null || !friendsRequests.Any())
                 return NotFound("No Friends Requests, No one loves you");
+
             return Ok(friendsRequests);
         }
 
-        [HttpDelete("deleteFriend")]
-        public ActionResult deleteFriend(int friendId)
+        [HttpDelete("deleteFriend/{id}")]
+        public ActionResult deleteFriend(int id)
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
@@ -157,10 +177,11 @@ namespace API.Controllers
             ))
                 return Unauthorized("Not authorized2");
 
-            bool result = _friendsRepository.DeleteFriend(friendId, Id);
+            bool result = _friendsRepository.DeleteFriend(id, Id);
             if (!result)
-                return NotFound("Friend Not Found3");
-
+                return NotFound("Friend Not Found");
+            if(!_friendsRepository.SaveChanges())
+                return StatusCode(500, "Server Error1");
             return NoContent();
         }
     }

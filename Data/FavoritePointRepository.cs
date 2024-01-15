@@ -64,7 +64,8 @@ namespace API.Data
                 {
                     Latitude = favoritePointCreateDto.Lat,
                     Longitude = favoritePointCreateDto.Long,
-                    Name = favoritePointCreateDto.Name
+                    Name = favoritePointCreateDto.Name,
+                    CreatedAt = DateTime.UtcNow
                 };
                 FavoritePoint favoritePoint = new()
                 {

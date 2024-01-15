@@ -3,6 +3,7 @@ using API.DTOs;
 using API.Entities;
 using API.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,6 +40,7 @@ namespace API.Controllers.v1
             OTP otp = _oTPRepository.GetOTPByEmail(registerDto.Email!);
             if (otp == null)
                 return NotFound(new { Message = "OTP not found" });
+
             if (otp.Otp != OTP)
                 return BadRequest("Invalid OTP");
 
@@ -114,7 +116,7 @@ namespace API.Controllers.v1
             int otp = _oTPRepository.CreateOTP(sendOTPDto.Email!);
             return Ok(otp);
         }
-
+        [Authorize]
         [HttpPost("logout")]
         public ActionResult logout()
         {

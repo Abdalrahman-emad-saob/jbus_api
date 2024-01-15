@@ -4,18 +4,14 @@ namespace API.DTOs
 {
     public class TripCreateDto
     {
-        [Required]
+        [Required(ErrorMessage = "The StartedAt field is required.")]
         public DateTime StartedAt { get; set; }
         public DateTime FinishedAt { get; set; }
-        [Required]
+        [Required(ErrorMessage = "The Status field is required.")]
         public string? status { get; set; }
-        [Required]
-        public int PassengerId { get; set; }
-        [Required]
         public int PaymentTransactionId { get; set; }
-        [Required]
+        [Required(ErrorMessage = "The PickUpPointId field is required.")]
         public int PickUpPointId { get; set; }
-        [Required]
         public int DropOffPointId { get; set; }
     }
 }

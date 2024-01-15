@@ -23,7 +23,8 @@ namespace API.Data
             {
                 Name = pointDto.Name,
                 Latitude = pointDto.Latitude,
-                Longitude = pointDto.Longitude
+                Longitude = pointDto.Longitude,
+                CreatedAt = DateTime.UtcNow
             };
             _context.Points.Add(point);
 
@@ -45,6 +46,15 @@ namespace API.Data
                 .Points
                 .ProjectTo<PointDto>(_mapper.ConfigurationProvider)
                 .ToList();
+        }
+
+        public PointDto PointExists(double lat, double lon)
+        {
+            return _context
+                    .Points
+                    .Where(p => p.Latitude == lat && p.Longitude == lon)
+                    .ProjectTo<PointDto>(_mapper.ConfigurationProvider)
+                    .SingleOrDefault()!;
         }
 
         public bool SaveChanges()

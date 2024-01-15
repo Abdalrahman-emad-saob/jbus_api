@@ -8,6 +8,7 @@ namespace API.Data
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Bus> Buses { get; set; }
         public DbSet<ChargingTransaction> ChargingTransactions { get; set; }
+        public DbSet<CreditCard> CreditCards { get; set; }
         public DbSet<Driver> Drivers { get; set; }
         public DbSet<FavoritePoint> FavoritePoints { get; set; }
         public DbSet<InterestPoint> InterestPoints { get; set; }
@@ -31,6 +32,10 @@ namespace API.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<CreditCard>()
+                        .HasIndex(c => c.CardNumber)
+                        .IsUnique();
+
             modelBuilder.Entity<User>()
                         .HasOne(p => p.Passenger)
                         .WithOne(u => u.User)
@@ -47,14 +52,16 @@ namespace API.Data
                         .HasOne(d => d.Bus)
                         .WithOne(b => b.Driver)
                         .HasForeignKey<Bus>(b => b.DriverId)
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired(false);
 
             // one-to-one
             modelBuilder.Entity<Trip>()
                         .HasOne(t => t.PaymentTransaction)
                         .WithOne(pt => pt.Trip)
                         .HasForeignKey<PaymentTransaction>(pt => pt.TripId)
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired(false);
             // one-to-many
             // modelBuilder.Entity<Entities.Route>()
             //             .HasMany(r => r.Trips)
@@ -80,17 +87,18 @@ namespace API.Data
                         .HasForeignKey<InterestPoint>(ip => ip.LocationId)
                         .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Trip>()
-                        .HasOne(t => t.PickUpPoint)
-                        .WithOne(p => p.TripPickup)
-                        .HasForeignKey<Trip>(t => t.PickUpPointId)
-                        .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Point>()
+                        .HasMany(p => p.TripPickup)
+                        .WithOne(p => p.PickUpPoint)
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired(false);
 
-            modelBuilder.Entity<Trip>()
-                        .HasOne(t => t.DropOffPoint)
-                        .WithOne(p => p.TripDropoff)
-                        .HasForeignKey<Trip>(t => t.DropOffPointId)
-                        .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Point>()
+                        .HasMany(p => p.TripDropoff)
+                        .WithOne(p => p.DropOffPoint)
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired(false);
+
 
             modelBuilder.Entity<Passenger>()
                         .HasOne(p => p.Creditor)
@@ -108,7 +116,8 @@ namespace API.Data
                         .HasOne(r => r.PredefinedStops)
                         .WithOne(ps => ps.Route)
                         .HasForeignKey<PredefinedStops>(ps => ps.RouteId)
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired(false);
 
         }
     }

@@ -20,7 +20,7 @@ namespace API.Extensions
             services.AddSwaggerGen();
 
             services.AddCors();
-
+            services.AddScoped<DataContext>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPassengerRepository, PassengerRepository>();
@@ -42,6 +42,7 @@ namespace API.Extensions
             services.AddScoped<IAdminRepository, AdminRepository>();
             services.AddScoped<INotisTokenRepository, NotisTokenRepository>();
             services.AddScoped<IBlacklistedTokenRepository, BlacklistedTokenRepository>();
+            services.AddScoped<ICreditCardsRepository, CreditCardsRepository>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<NotificationService>();

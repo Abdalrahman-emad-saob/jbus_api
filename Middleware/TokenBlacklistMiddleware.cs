@@ -1,54 +1,64 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Threading.Tasks;
 using API.Data;
-using Microsoft.AspNetCore.Http;
 
-public class TokenBlacklistMiddleware
+namespace API.Middleware
 {
-    private readonly RequestDelegate _next;
-    private readonly DataContext _context;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public TokenBlacklistMiddleware(
-        RequestDelegate next,
-         DataContext context,
-         IHttpContextAccessor httpContextAccessor
-        )
+    public class TokenBlacklistMiddleware
     {
-        _next = next;
-        _context = context;
-        _httpContextAccessor = httpContextAccessor;
-    }
+        private readonly RequestDelegate _next;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IServiceProvider _serviceProvider;
 
-    public async Task Invoke(HttpContext context)
-    {
-        var authorizationHeader = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].FirstOrDefault();
-
-        if (authorizationHeader != null && authorizationHeader.StartsWith("Bearer "))
+        public TokenBlacklistMiddleware(
+            RequestDelegate next,
+             IHttpContextAccessor httpContextAccessor,
+             IServiceProvider serviceProvider
+            )
         {
-            var token = authorizationHeader.Substring("Bearer ".Length).Trim();
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var jsonToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
-
-            if (jsonToken == null)
-            {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                return;
-            }
-
-            if (IsTokenBlacklisted(token))
-            {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                return;
-            }
-
+            _next = next;
+            _httpContextAccessor = httpContextAccessor;
+            _serviceProvider = serviceProvider;
         }
-        await _next(context);
+
+        public async Task Invoke(HttpContext context)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+                var authorizationHeader = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].FirstOrDefault();
+
+                if (authorizationHeader != null && authorizationHeader.StartsWith("Bearer "))
+                {
+                    var token = authorizationHeader.Substring("Bearer ".Length).Trim();
+                    var tokenHandler = new JwtSecurityTokenHandler();
+                    var jsonToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
+
+                    if (jsonToken == null)
+                    {
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        return;
+                    }
+
+                    if (IsTokenBlacklisted(token))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        return;
+                    }
+
+                }
+            }
+            await _next(context);
+        }
+
+        private bool IsTokenBlacklisted(string token)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+                return dataContext.BlacklistedTokens.Any(t => t.Token == token);
+            }
+        }
     }
 
-    private bool IsTokenBlacklisted(string token)
-    {
-        return _context.BlacklistedTokens.Any(t => t.Token == token);
-    }
 }
-

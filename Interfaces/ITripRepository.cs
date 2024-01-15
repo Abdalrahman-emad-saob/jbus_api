@@ -4,11 +4,11 @@ namespace API.Interfaces
 {
     public interface ITripRepository
     {
-        void Update(TripDto trip);
+        void Update(TripUpdateDto trip, int id);
         IEnumerable<TripDto> GetTrips(int PassengerId);
-        TripDto GetTripById(int id);
+        TripDto GetTripById(int id, int PassengerId);
         IEnumerable<TripDto> GetTripsById(int id);
-        bool CreateTrip(TripCreateDto tripDto, int PassengerId);
+        TripDto CreateTrip(TripCreateDto tripDto, int PassengerId);
         bool SaveChanges();
     }
 }

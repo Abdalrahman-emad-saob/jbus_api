@@ -50,48 +50,50 @@ namespace API.Controllers.v1
             role.ToUpper() != Role.PASSENGER.ToString()
             ))
                 return Unauthorized("Not authorized");
-            // TODO Give Passnger id for further valdiation
-            return _tripRepository.GetTripById(id);
+
+            return _tripRepository.GetTripById(id, Id);
         }
-        // TODO Update Trip
-        // [HttpPut]
-        // public ActionResult updateTrip(PassengerUpdateDto passengerUpdateDto)
-        // {
-        //     int Id = _tokenHandlerService.TokenHandler();
-        //     if (Id == -1)
-        //         return Unauthorized("Not authorized");
+        [HttpPut("{id}")]
+        public IActionResult updateTrip(TripUpdateDto tripUpdateDto, int id)
+        {
+            int Id = _tokenHandlerService.TokenHandler();
+            if (Id == -1)
+                return Unauthorized("Not authorized");
 
-        //     string role = _tokenHandlerService.ExtractUserRole();
-        //     if (role == "Not" || role.ToUpper() != Role.PASSENGER.ToString())
-        //         return Unauthorized("Not authorized");
+            string role = _tokenHandlerService.ExtractUserRole();
+            if (role == "Not" || 
+            role.ToUpper() != Role.PASSENGER.ToString()
+            )
+                return Unauthorized("Not authorized");
 
-        //     var passenger = _passengerRepository.GetPassengerById(Id);
-        //     var user = _userRepository.GetUserById((int)passenger.UserId!);
+            var tripDto = _tripRepository.GetTripById(id, Id);
 
-        //     if (passenger == null || user == null)
-        //         return NotFound();
-        //     _mapper.Map(passengerUpdateDto, passenger);
-        //     _mapper.Map(passengerUpdateDto.User, user);
+            if (tripDto == null)
+                return NotFound();
 
-        //     if (_passengerRepository.SaveChanges())
-        //         return NoContent();
-        //     return BadRequest("Failed to Update Passenger");
-        // }
-        [HttpPost("CreateTrip")]
+            _tripRepository.Update(tripUpdateDto, id);
+
+            if (_tripRepository.SaveChanges())
+                return NoContent();
+
+            return StatusCode(500, "Server Error1");
+        }
+        [HttpPost]
         public ActionResult CreateTrip(TripCreateDto tripCreateDto)
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
                 return Unauthorized("Not authorized");
+                
             string role = _tokenHandlerService.ExtractUserRole();
             if (role == "Not" || 
-            (
-            role.ToUpper() != Role.SUPER_ADMIN.ToString() && 
-            role.ToUpper() != Role.ADMIN.ToString()
-            ))
+            role.ToUpper() != Role.PASSENGER.ToString()
+            )
                 return Unauthorized("Not authorized");
 
             _tripRepository.CreateTrip(tripCreateDto, Id);
+           if(!_tripRepository.SaveChanges())
+                    return StatusCode(500, "Server Error1");
             
             return StatusCode(201);
         }

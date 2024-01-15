@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace API.DTOs
 {
@@ -9,7 +10,12 @@ namespace API.DTOs
         [Required]
         public double Amount { get; set; }
         [Required]
-        public int PassengerId { get; set; }
+        public long CardNumber { get; set; }
+        [Required]
+        public short CVC { get; set; }
+        [Required]
+        public DateOnly ExpirationDate { get; set; }
+        [JsonIgnore]
         public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
     }
 }

@@ -23,7 +23,8 @@ namespace API.Data
             {
                 Amount = paymentTransactionDto.Amount,
                 PassengerId = paymentTransactionDto.PassengerId,
-                TripId = paymentTransactionDto.TripId
+                TripId = paymentTransactionDto.TripId,
+                TimeStamp = DateTime.UtcNow
             };
             _context.PaymentTransactions.Add(paymentTransaction);
 

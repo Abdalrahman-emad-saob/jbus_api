@@ -58,7 +58,7 @@ namespace API.Controllers
 
         private string? GetDeviceTokenFromUserId(int? PassengerId)
         {
-            return _notisTokenRepository.GetDevieToken(PassengerId);
+            return _notisTokenRepository.GetDeviceToken(PassengerId);
         }
     }
 }
