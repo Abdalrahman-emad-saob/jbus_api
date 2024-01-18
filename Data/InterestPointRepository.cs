@@ -24,17 +24,21 @@ namespace API.Data
         {
             PointCreateDto pointCreateDto = new()
             {
-                Name = interestPointDto.PointName,
+                Name = interestPointDto.Name,
                 Latitude = interestPointDto.Latitude,
-                Longitude = interestPointDto.Longitude
+                Longitude = interestPointDto.Longitude,
+                CreatedAt = DateTime.UtcNow
             };
             var point = _pointRepository.CreatePoint(pointCreateDto);
+            _context.Points.Add(point);
+            SaveChanges();
             InterestPoint interestPoint = new()
             {
                 Name = interestPointDto.Name,
                 Logo = interestPointDto.Logo,
                 LocationId = point.Id,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             };
             _context.InterestPoints.Add(interestPoint);
 
@@ -51,7 +55,10 @@ namespace API.Data
 
         public IEnumerable<InterestPointDto> GetInterestPoints()
         {
-            return _context.InterestPoints.ProjectTo<InterestPointDto>(_mapper.ConfigurationProvider);
+            return _context
+            .InterestPoints
+            .ProjectTo<InterestPointDto>(_mapper.ConfigurationProvider)
+            .ToList();
         }
 
         public bool SaveChanges()

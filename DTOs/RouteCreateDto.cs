@@ -8,8 +8,9 @@ namespace API.DTOs
         [Required]
         public string? Name { get; set; }
         [Required]
-        public string? WaypointsGoing { get; set; }
+        public double Fee { get; set; }
         [Required]
+        public string? WaypointsGoing { get; set; }
         public string? WaypointsReturning { get; set; }
         [Required]
         public InterestPointCreateDto? StartingPoint { get; set; }

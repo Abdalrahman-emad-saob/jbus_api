@@ -11,24 +11,25 @@ namespace API.Controllers.v1
 {
     public class AdminAccountController : BaseApiController
     {
-        private readonly DataContext _context;
         private readonly IAdminRepository _adminRepository;
         private readonly IUserRepository _userRepository;
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
+        private readonly IBlacklistedTokenRepository _blacklistedTokenRepository;
 
         public AdminAccountController(
-            DataContext context,
             IAdminRepository adminRepository,
             IUserRepository userRepository,
             ITokenService tokenService,
-            IMapper mapper)
+            IMapper mapper,
+            IBlacklistedTokenRepository blacklistedTokenRepository
+            )
         {
-            _context = context;
             _adminRepository = adminRepository;
             _userRepository = userRepository;
             _tokenService = tokenService;
             _mapper = mapper;
+            _blacklistedTokenRepository = blacklistedTokenRepository;
         }
         
         [HttpPost("login")]
@@ -67,6 +68,14 @@ namespace API.Controllers.v1
             {
                 return StatusCode(500, "Internal Server Error");
             }
+        }
+        [Authorize]
+        [HttpPost("logout")]
+        public ActionResult logout()
+        {
+            var token = _tokenService.GetToken();
+            _blacklistedTokenRepository.BlacklistTokenAsync(token);
+            return Ok(new { Message = "Logged Out Successfully" });
         }
 
     }

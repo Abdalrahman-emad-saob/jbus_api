@@ -79,7 +79,7 @@ namespace API.Controllers.v1
                 if (passwordVerificationResult != PasswordVerificationResult.Success)
                     return Unauthorized("Not Authorized2");
 
-                var passengerDto = _mapper.Map<PassengerDto>(_passengerRepository.GetPassengerById(user.Id));
+                var passengerDto = _passengerRepository.GetPassengerDtoByEmail(loginDto.Email);
 
                 if (passengerDto == null)
                     return Unauthorized("Not Authorized3");

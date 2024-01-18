@@ -57,7 +57,7 @@ namespace API.Helpers
             .ForMember(p => p.Creditor, opt => opt.Ignore())
             .ForMember(p => p.InDebtId, opt => opt.Ignore())
             .ForMember(p => p.InDebt, opt => opt.Ignore())
-            .ForMember(p => p.ProfileImage, opt => opt.PreCondition(src => src.ProfileImage != null)); ;
+            .ForMember(p => p.ProfileImage, opt => opt.PreCondition(src => src.ProfileImage != null));
 
             CreateMap<PaymentTransaction, PaymentTransactionDto>();
             CreateMap<PaymentTransactionCreateDto, PaymentTransaction>();
@@ -71,7 +71,14 @@ namespace API.Helpers
 
             CreateMap<Entities.Route, RouteDto>();
             CreateMap<RouteCreateDto, Entities.Route>();
-            CreateMap<RouteUpdateDto, Entities.Route>();
+            CreateMap<RouteUpdateDto, Entities.Route>()
+            .ForMember(r => r.Name, opt => opt.PreCondition(src => !string.IsNullOrEmpty(src.Name)))
+            .ForMember(r => r.Fee, opt => opt.PreCondition(src => src.Fee > 0))
+            .ForMember(r => r.WaypointsGoing, opt => opt.PreCondition(src => !string.IsNullOrEmpty(src.WaypointsGoing)))
+            .ForMember(r => r.WaypointsReturning, opt => opt.PreCondition(src => !string.IsNullOrEmpty(src.WaypointsReturning)))
+            .ForMember(r => r.UpdatedAt, opt => opt.PreCondition(src => src.UpdatedAt != default))
+            .ForMember(r => r.StartingPoint, opt => opt.PreCondition(src => src.StartingPoint != null))
+            .ForMember(r => r.EndingPoint, opt => opt.PreCondition(src => src.EndingPoint != null));
 
             CreateMap<Trip, TripDto>()
             .ForMember(td => td.Status, opt => opt.MapFrom(t => t.status.ToString()));
@@ -88,8 +95,8 @@ namespace API.Helpers
 
 
             CreateMap<User, UserDto>()
-            .ForMember(ud => ud.Sex, opt => opt.MapFrom(u => u.Sex.ToString()))
-            .ForMember(ud => ud.Role, opt => opt.MapFrom(u => u.Role.ToString()));
+            .ForMember(ud => ud.Sex, opt => opt.MapFrom(u => u.Sex.ToString()));
+            // .ForMember(ud => ud.Role, opt => opt.MapFrom(u => u.Role.ToString()));
             CreateMap<UserUpdateDto, User>()
             .ForMember(u => u.Sex, opt => opt.MapFrom(uud => Enum.Parse<Sex>(uud.Sex!)))
             .ForMember(u => u.Name, opt => opt.PreCondition(src => !string.IsNullOrEmpty(src.Name)))

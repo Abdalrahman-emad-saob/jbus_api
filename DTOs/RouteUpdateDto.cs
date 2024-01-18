@@ -5,18 +5,14 @@ namespace API.DTOs
 {
     public class RouteUpdateDto
     {
-        [Required]
         public string? Name { get; set; }
-        [Required]
+        public double Fee { get; set; }
         public string? WaypointsGoing { get; set; }
-        [Required]
         public string? WaypointsReturning { get; set; }
         [JsonIgnore]
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-        [Required]
-        public int StartingPointId { get; set; }
-        [Required]
-        public int EndingPointId { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public InterestPointCreateDto? StartingPoint { get; set; }
+        public InterestPointCreateDto? EndingPoint { get; set; }
         
     }
 }

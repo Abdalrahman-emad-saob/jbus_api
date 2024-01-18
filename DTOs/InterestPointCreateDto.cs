@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace API.DTOs
 {
@@ -7,16 +8,14 @@ namespace API.DTOs
         [Required]
         public string? Name { get; set; }
         [Required]
-        public string? Logo { get; set; }   
-        [Required]     
-        public string? PointName { get; set; }
+        public string? Logo { get; set; }
         [Required]
         public double Latitude { get; set; }
         [Required]
         public double Longitude { get; set; }
-        [Required]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        [Required]
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        [JsonIgnore]
+        public DateTime CreatedAt { get; set; }
+        [JsonIgnore]
+        public DateTime UpdatedAt { get; set; }
     }
 }

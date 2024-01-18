@@ -49,7 +49,7 @@ namespace API.Controllers
                 return BadRequest("Duplicated Record");
             }
             if (!result)
-                return StatusCode(500, "Internal Server Error");
+                return StatusCode(500, "Server Error");
 
             return StatusCode(201);
         }

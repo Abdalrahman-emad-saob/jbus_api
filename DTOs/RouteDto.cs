@@ -4,6 +4,7 @@ namespace API.DTOs
     {
         public int Id { get; set; }
         public string? Name { get; set; }
+        public double Fee { get; set; }
         public string? WaypointsGoing { get; set; }
         public string? WaypointsReturning { get; set; }
         public DateTime CreatedAt { get; set; }

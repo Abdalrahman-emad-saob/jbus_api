@@ -50,15 +50,15 @@ namespace API.Controllers
             bool friendReqeustExists = _friendsRepository.FriendRequestExists(friendsCreateDto.FriendId, Id);
             if (friendReqeustExists)
                 return BadRequest("Friend Request Exists");
-            
+
             if (_friendsRepository.SendFriendRequest(friendsCreateDto, Id))
             {
-                if(!_friendsRepository.SaveChanges())
+                if (!_friendsRepository.SaveChanges())
                     return StatusCode(500, "Server Error1");
                 return StatusCode(201);
             }
-            
-            return StatusCode(500, "Internal Server Error2");
+
+            return StatusCode(500, "Server Error2");
         }
 
         [HttpPut("confirmFriendRequest/{id}")]
@@ -76,10 +76,10 @@ namespace API.Controllers
             ))
                 return Unauthorized("Not authorized2");
 
-            if(_friendsRepository.ConfirmFriendRequest(id, Id))
+            if (_friendsRepository.ConfirmFriendRequest(id, Id))
             {
-            _friendsRepository.SaveChanges();
-            return NoContent();
+                _friendsRepository.SaveChanges();
+                return NoContent();
             }
             return StatusCode(500, "Server Error");
         }
@@ -103,10 +103,10 @@ namespace API.Controllers
                 return NotFound("Friend Not Found");
             FriendDto trueFriend;
 
-                if(friend.Passenger!.Id == Id)
-                    trueFriend = friend.Friend;
-                else
-                    trueFriend = friend.Passenger;
+            if (friend.Passenger!.Id == Id)
+                trueFriend = friend.Friend;
+            else
+                trueFriend = friend.Passenger;
 
             return Ok(trueFriend);
         }
@@ -127,14 +127,12 @@ namespace API.Controllers
                 return Unauthorized("Not authorized2");
 
             var friends = _friendsRepository.GetFriends(Id);
-            if (friends == null || !friends.Any())
-                return NotFound("No Friends, forever alone!");
             List<FriendDto> friendss = [];
-            foreach(var fri in friends)
+            foreach (var fri in friends)
             {
-                if(fri.Passenger!.Id == Id)
+                if (fri.Passenger!.Id == Id)
                     friendss.Add(fri.Friend!);
-                if(fri.Friend!.Id == Id)
+                if (fri.Friend!.Id == Id)
                     friendss.Add(fri.Passenger!);
             }
             return Ok(friendss);
@@ -156,8 +154,6 @@ namespace API.Controllers
                 return Unauthorized("Not authorized2");
 
             var friendsRequests = _friendsRepository.GetFriendRequests(Id);
-            if (friendsRequests == null || !friendsRequests.Any())
-                return NotFound("No Friends Requests, No one loves you");
 
             return Ok(friendsRequests);
         }
@@ -180,8 +176,8 @@ namespace API.Controllers
             bool result = _friendsRepository.DeleteFriend(id, Id);
             if (!result)
                 return NotFound("Friend Not Found");
-            if(!_friendsRepository.SaveChanges())
-                return StatusCode(500, "Server Error1");
+            if (!_friendsRepository.SaveChanges())
+                return StatusCode(500, "Server Error");
             return NoContent();
         }
     }

@@ -70,7 +70,7 @@ namespace API.Controllers.v1
             if (admin == null || adminUpdateDto.User == null)
                 return NotFound();
 
-            var user = _userRepository.GetUserById(admin.UserId);
+            var user = _userRepository.GetUserById(admin.UserId!);
             if (user == null)
                 return NotFound();
                 

@@ -7,7 +7,6 @@ namespace API.DTOs
     {
         [Required]
         public string? Name { get; set; }
-        [Required]
         public string? PhoneNumber { get; set; }
         [EmailAddress(ErrorMessage = "Invalid email address")]
         [Required]

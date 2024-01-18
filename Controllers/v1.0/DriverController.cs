@@ -94,7 +94,7 @@ namespace API.Controllers.v1
             if (driver == null || driverUpdateDto.User == null)
                 return NotFound();
 
-            var user = _userRepository.GetUserById(driver.UserId!);
+            var user = _userRepository.GetUserById(driver.UserId);
 
             if (user == null)
                 return NotFound();
@@ -119,5 +119,6 @@ namespace API.Controllers.v1
         {
             return _userRepository.GetUserByEmail(Email!) != null;
         }
+        
     }
 }

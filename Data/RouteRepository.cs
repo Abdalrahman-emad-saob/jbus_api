@@ -25,20 +25,23 @@ namespace API.Data
             {
                 Name = routeDto.StartingPoint!.Name,
                 Logo = routeDto.StartingPoint.Logo,
-                PointName = routeDto.StartingPoint.PointName,
                 Latitude = routeDto.StartingPoint.Latitude,
-                Longitude = routeDto.StartingPoint.Longitude
+                Longitude = routeDto.StartingPoint.Longitude,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             };
             InterestPointCreateDto interestPointCreateDto2 = new()
             {
                 Name = routeDto.EndingPoint!.Name,
                 Logo = routeDto.EndingPoint.Logo,
-                PointName = routeDto.EndingPoint.PointName,
                 Latitude = routeDto.EndingPoint.Latitude,
-                Longitude = routeDto.EndingPoint.Longitude
+                Longitude = routeDto.EndingPoint.Longitude,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             };
             var interestPoint1 = _interestPointRepository.CreateInterestPoint(interestPointCreateDto1);
             var interestPoint2 = _interestPointRepository.CreateInterestPoint(interestPointCreateDto2);
+            SaveChanges();
             Entities.Route route = new()
             {
                 Name = routeDto.Name,
@@ -51,7 +54,7 @@ namespace API.Data
             };
             _context.Routes.Add(route);
             
-            return SaveChanges();
+            return true;
         }
 
         public RouteDto GetRouteById(int id)
@@ -62,12 +65,21 @@ namespace API.Data
             .SingleOrDefault()!;
         }
 
-        public IEnumerable<RouteDto> GetRoutes() => _context.Routes
+        public IEnumerable<RouteDto> GetRoutes()
+        {
+            return _context.Routes
                 .ProjectTo<RouteDto>(_mapper.ConfigurationProvider)
                 .ToList();
+        }
 
-        public bool SaveChanges() => _context.SaveChanges() > 0;
+        public bool SaveChanges()
+        {
+            return _context.SaveChanges() > 0;
+        }
 
-        public void Update(RouteDto route) => _context.Entry(route).State = EntityState.Modified;
+        public void Update(RouteDto route)
+        {
+            _context.Entry(route).State = EntityState.Modified;
+        }
     }
 }

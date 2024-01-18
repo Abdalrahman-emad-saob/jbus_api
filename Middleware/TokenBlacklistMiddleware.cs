@@ -53,11 +53,9 @@ namespace API.Middleware
 
         private bool IsTokenBlacklisted(string token)
         {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-                return dataContext.BlacklistedTokens.Any(t => t.Token == token);
-            }
+            using var scope = _serviceProvider.CreateScope();
+            var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+            return dataContext.BlacklistedTokens.Any(t => t.Token == token);
         }
     }
 
