@@ -2,13 +2,12 @@ using API.Controllers.v1;
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+using API.Validations;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers.v1
 {
-    [Authorize]
+    [CustomAuthorize("PASSENGER")]
     public class ChargingBalanceController : BaseApiController
     {
         private readonly ITokenHandlerService _tokenHandlerService;
@@ -31,15 +30,8 @@ namespace api.Controllers.v1
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized("Not authorized1");
+                return Unauthorized("Not authorized");
 
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (
-            role == "Not" ||
-            (
-            role.ToUpper() != Role.PASSENGER.ToString()
-            ))
-                return Unauthorized("Not authorized2");
             var creditCard = _creditCardsRepository.GetCreditCardByCardNumber(chargingTransactionCreateDto.CardNumber);
             if (creditCard == null)
                 return NotFound("No Matching Card Found, Best Luck Next Time");
@@ -49,6 +41,8 @@ namespace api.Controllers.v1
                 return BadRequest("CVC is not Correct, Stealing Credit Cards? eh?");
             if (creditCard.ExpirationDate < DateOnly.FromDateTime(DateTime.UtcNow))
                 return BadRequest("Card Expired, go outside once and renew it");
+            if (creditCard.ExpirationDate != chargingTransactionCreateDto.ExpirationDate)
+                return BadRequest("Bad Thief Catch him ... or her i don't know");
             if (creditCard.Balance < chargingTransactionCreateDto.Amount)
                 return BadRequest("Insuffucient Balance, so POOOOOOOOOR!");
             if (!_chargingTransactionRepository.CreateChargingTransaction(chargingTransactionCreateDto, Id))

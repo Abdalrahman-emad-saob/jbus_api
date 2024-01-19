@@ -2,6 +2,7 @@ using API.Data;
 using API.Interfaces;
 using API.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 namespace API.Extensions
 {
@@ -11,13 +12,39 @@ namespace API.Extensions
         {
             services.AddDbContext<DataContext>(opt =>
         {
-            opt.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
-            .LogTo(Console.WriteLine, LogLevel.Information);
+            opt.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+            // .LogTo(Console.WriteLine, LogLevel.Information);
             // opt.UseSqlServer(configuration.GetConnectionString("MSSqlServer"))
         });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen();
+            services.AddSwaggerGen(c =>
+                {
+                    c.SwaggerDoc("v1", new OpenApiInfo { Title = "JBus-api", Version = "v1" });
+
+                    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                    {
+                        Description = "JWT Authorization header using the Bearer scheme",
+                        Name = "Authorization",
+                        In = ParameterLocation.Header,
+                        Type = SecuritySchemeType.ApiKey
+                    });
+
+                    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                }
+                            },
+                            new List<string>()
+                        }
+                    });
+                });
 
             services.AddCors();
             services.AddScoped<DataContext>();

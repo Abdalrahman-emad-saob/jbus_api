@@ -28,14 +28,31 @@ namespace API.Data
                 status = 2;
             else if (tripDto.status?.ToLower() == "canceled")
                 status = 3;
+            Point pointPick = new()
+            {
+                Latitude = tripDto.PickUpPoint!.Latitude,
+                Longitude = tripDto.PickUpPoint.Longitude
+            };
+            if(tripDto.DropOffPoint != null)
+                if (tripDto.DropOffPoint.Longitude != 0 && tripDto.DropOffPoint.Longitude != 0)
+                {
+                    Point pointDrop = new()
+                    {
+                        Latitude = tripDto.DropOffPoint!.Latitude,
+                        Longitude = tripDto.DropOffPoint.Longitude
+                    };
+                    _context.Points.Add(pointDrop);
+                }
+            _context.Points.Add(pointPick);
+            SaveChanges();
             Trip trip = new()
             {
                 status = (TripStatus)status,
                 PassengerId = PassengerId,
-                PickUpPointId = tripDto.PickUpPointId,
-                FinishedAt = tripDto.FinishedAt
-            };              
-            
+                PickUpPointId = pointPick.Id,
+                StartedAt = tripDto.StartedAt
+            };
+
             _context.Trips.Add(trip);
 
             return _mapper.Map<TripDto>(trip);

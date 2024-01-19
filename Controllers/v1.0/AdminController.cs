@@ -1,12 +1,13 @@
 using API.DTOs;
+using API.Entities;
 using API.Interfaces;
+using API.Validations;
 using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers.v1
 {
-    [Authorize]
+    [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
     public class AdminController : BaseApiController
     {
         private readonly IAdminRepository _adminRepository;
@@ -27,15 +28,14 @@ namespace API.Controllers.v1
         }
 
         [HttpGet("getAdmins")]
-        public ActionResult<IEnumerable<AdminDto>> GetAdmins() => Ok(_adminRepository.GetAdmins());
+        public ActionResult<IEnumerable<AdminDto>> GetAdmins()
+        {
+            return Ok(_adminRepository.GetAdmins());
+        }
 
         [HttpGet("{id}")]
         public ActionResult<AdminDto> GetAdminById(int Id)
         {
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
-                return Unauthorized("Not authorized");
-
             var admin = _adminRepository.GetAdminDtoById(Id);
 
             if (admin == null)
@@ -49,10 +49,6 @@ namespace API.Controllers.v1
             if (UserExists(registerAdminDto.Email))
                 return BadRequest("Admin Exists");
 
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
-                return Unauthorized("Not authorized");
-
             _adminRepository.CreateAdmin(registerAdminDto);
 
             return StatusCode(201);
@@ -60,20 +56,16 @@ namespace API.Controllers.v1
         [HttpPut("{id}")]
         public ActionResult updateAdmin(AdminUpdateDto adminUpdateDto, int Id)
         {
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" || (role.ToUpper() != "SUPER_ADMIN" && role.ToUpper() != "ADMIN"))
-                return Unauthorized("Not authorized");
-
             var admin = _adminRepository.GetAdminById(Id);
 
 
             if (admin == null || adminUpdateDto.User == null)
-                return NotFound();
+                return NotFound("Admin Not Found");
 
             var user = _userRepository.GetUserById(admin.UserId!);
             if (user == null)
-                return NotFound();
-                
+                return NotFound("User Not Found");
+
             if (adminUpdateDto.User.Sex != null)
                 adminUpdateDto.User.Sex = adminUpdateDto.User.Sex.ToUpper();
 

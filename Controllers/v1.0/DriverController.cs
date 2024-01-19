@@ -1,13 +1,13 @@
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
+using API.Validations;
 using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers.v1
 {
-    [Authorize]
+    [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
     public class DriverController : BaseApiController
     {
         private readonly IDriverRepository _driverRepository;
@@ -16,11 +16,11 @@ namespace API.Controllers.v1
         private readonly IMapper _mapper;
 
         public DriverController(
-                                IDriverRepository driverRepository,
-                                IUserRepository userRepository,
-                                ITokenHandlerService tokenHandlerService,
-                                IMapper mapper
-                                )
+                IDriverRepository driverRepository,
+                IUserRepository userRepository,
+                ITokenHandlerService tokenHandlerService,
+                IMapper mapper
+                )
         {
             _driverRepository = driverRepository;
             _userRepository = userRepository;
@@ -30,29 +30,11 @@ namespace API.Controllers.v1
         [HttpGet]
         public ActionResult<IEnumerable<DriverDto>> GetDrivers()
         {
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (
-            role == "Not" ||
-            (
-            role.ToUpper() != Role.SUPER_ADMIN.ToString() &&
-            role.ToUpper() != Role.ADMIN.ToString()
-            ))
-                return Unauthorized("Not authorized");
-
             return Ok(_driverRepository.GetDrivers());
         }
         [HttpGet("{id}")]
         public ActionResult<DriverDto> GetDriverById(int id)
         {
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (
-            role == "Not" ||
-            (
-            role.ToUpper() != Role.SUPER_ADMIN.ToString() &&
-            role.ToUpper() != Role.ADMIN.ToString()
-            ))
-                return Unauthorized("Not authorized");
-
             var driverDto = _driverRepository.GetDriverDtoById(id);
             if (driverDto == null)
                 return NotFound("Driver Not Found");
@@ -61,15 +43,6 @@ namespace API.Controllers.v1
         [HttpPost("addDriver")]
         public ActionResult<DriverDto> CreateDriver(RegisterDriverDto registerDriverDto)
         {
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (
-            role == "Not" ||
-            (
-            role.ToUpper() != Role.SUPER_ADMIN.ToString() &&
-            role.ToUpper() != Role.ADMIN.ToString()
-            ))
-                return Unauthorized("Not authorized");
-
             if (UserExists(registerDriverDto.Email))
             {
                 return BadRequest("Driver Exists");
@@ -80,24 +53,15 @@ namespace API.Controllers.v1
         [HttpPut("{id}")]
         public ActionResult updateDriver(int id, DriverUpdateDto driverUpdateDto)
         {
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (
-            role == "Not" ||
-            (
-            role.ToUpper() != Role.SUPER_ADMIN.ToString() &&
-            role.ToUpper() != Role.ADMIN.ToString()
-            ))
-                return Unauthorized("Not authorized");
-
             var driver = _driverRepository.GetDriverById(id);
 
             if (driver == null || driverUpdateDto.User == null)
-                return NotFound();
+                return NotFound("Driver Not Found");
 
             var user = _userRepository.GetUserById(driver.UserId);
 
             if (user == null)
-                return NotFound();
+                return NotFound("Driver Not Found");
 
             if (driverUpdateDto.User.Sex != null)
                 driverUpdateDto.User.Sex = driverUpdateDto.User.Sex.ToUpper();
@@ -119,6 +83,6 @@ namespace API.Controllers.v1
         {
             return _userRepository.GetUserByEmail(Email!) != null;
         }
-        
+
     }
 }

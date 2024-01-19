@@ -3,6 +3,7 @@ using API.DTOs;
 using API.Entities;
 using API.Interfaces;
 using AutoMapper;
+using FirebaseAdmin.Messaging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +32,7 @@ namespace API.Controllers.v1
             _mapper = mapper;
             _blacklistedTokenRepository = blacklistedTokenRepository;
         }
-        
+
         [HttpPost("login")]
         public ActionResult<LoginDriverResponseDto> Login(LoginDto loginDto)
         {
@@ -40,21 +41,21 @@ namespace API.Controllers.v1
                 var user = _userRepository.GetUserByEmail(loginDto.Email!);
 
                 if (user == null)
-                    return Unauthorized("Not Authorized1");
+                    return NotFound(new { Error = "USER_DOES_NOT_EXIST" });
 
                 var passwordHasher = new PasswordHasher<User>();
                 var passwordVerificationResult = passwordHasher.VerifyHashedPassword(user, user.PasswordHash!, loginDto.Password!);
 
                 if (passwordVerificationResult != PasswordVerificationResult.Success)
-                    return Unauthorized("Not Authorized2");
+                    return Unauthorized("Not Authorized1");
 
-                if(user.Email == null)
-                    return Unauthorized("Not Authorized3");
+                if (user.Email == null)
+                    return Unauthorized("Not Authorized2");
 
                 var driverDto = _mapper.Map<DriverDto>(_driverRepository.GetDriverByEmail(user.Email));
 
                 if (driverDto == null)
-                    return Unauthorized("Not Authorized4");
+                    return Unauthorized("Not Authorized3");
 
                 var token = _tokenService.CreateToken(user, driverDto.Id);
 

@@ -2,11 +2,12 @@ using API.Controllers.v1;
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
-using Microsoft.AspNetCore.Http.HttpResults;
+using API.Validations;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    [CustomAuthorize("PASSENGER")]
     public class PointController : BaseApiController
     {
         private readonly IPointRepository _pointRepository;

@@ -10,8 +10,8 @@ namespace API.DTOs
         [Required(ErrorMessage = "The Status field is required.")]
         public string? status { get; set; }
         public int PaymentTransactionId { get; set; }
-        [Required(ErrorMessage = "The PickUpPointId field is required.")]
-        public int PickUpPointId { get; set; }
-        public int DropOffPointId { get; set; }
+        [Required(ErrorMessage = "The PickUpPoint field is required.")]
+        public PointCreateDto? PickUpPoint { get; set; }
+        public PointCreateDto? DropOffPoint { get; set; }
     }
 }

@@ -1,40 +1,28 @@
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
+using API.Validations;
 using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers.v1
 {
-    [Authorize]
+    [CustomAuthorize("PASSENGER")]
     public class FavoritePointController : BaseApiController
     {
         private readonly IFavoritePointRepository _favoritePointRepository;
-        private readonly IMapper _mapper;
         private readonly ITokenHandlerService _tokenHandlerService;
 
         public FavoritePointController(
             IFavoritePointRepository favoritePointRepository,
-            IMapper mapper,
             ITokenHandlerService tokenHandlerService)
         {
             _favoritePointRepository = favoritePointRepository;
-            _mapper = mapper;
             _tokenHandlerService = tokenHandlerService;
         }
         [HttpGet("{id}")]
         public ActionResult<FavoritePointDto> GetFavoritePointById(int id)
         {
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (
-            role == "Not" ||
-            (
-            role.ToUpper() != Role.PASSENGER.ToString()
-            )
-            )
-                return Unauthorized("Not authorized");
-
             return Ok(_favoritePointRepository.GetFavoritePointById(id));
         }
         [HttpGet("favoritepoints")]
@@ -42,35 +30,22 @@ namespace API.Controllers.v1
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized();
-
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (
-            role == "Not" ||
-            (
-            role.ToUpper() != Role.PASSENGER.ToString()
-            ))
                 return Unauthorized("Not authorized");
 
             return Ok(_favoritePointRepository.GetFavoritePoints(Id));
         }
+
         [HttpDelete("{id}")]
         public ActionResult DeleteFavoritePoint(int id)
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized("Not authorized1");
+                return Unauthorized("Not authorized");
 
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (
-            role == "Not" ||
-            (
-            role.ToUpper() != Role.PASSENGER.ToString()
-            ))
-                return Unauthorized("Not authorized2");
             if (_favoritePointRepository.DeleteFavoritePoint(id, Id))
                 if (_favoritePointRepository.SaveChanges())
                     return NoContent();
+
             return StatusCode(500, "Server Error");
         }
         [HttpPost("addfavoritepoint")]
@@ -78,15 +53,8 @@ namespace API.Controllers.v1
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized("Not authorized1");
+                return Unauthorized("Not authorized");
 
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (
-            role == "Not" ||
-            (
-            role.ToUpper() != Role.PASSENGER.ToString()
-            ))
-                return Unauthorized("Not authorized2");
             try
             {
                 if (_favoritePointRepository.InsertFavoritePoint(favoritePointCreateDto, Id))

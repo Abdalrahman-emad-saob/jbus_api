@@ -1,14 +1,12 @@
 using API.Controllers.v1;
 using API.DTOs;
-using API.Entities;
 using API.Interfaces;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+using API.Validations;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Authorize]
+    [CustomAuthorize("PASSENGER")]
     public class FriendsController : BaseApiController
     {
         private readonly IFriendsRepository _friendsRepository;
@@ -18,7 +16,8 @@ namespace API.Controllers
         public FriendsController(
             IFriendsRepository friendsRepository,
             IPassengerRepository passengerRepository,
-            ITokenHandlerService tokenHandlerService)
+            ITokenHandlerService tokenHandlerService
+            )
         {
             _friendsRepository = friendsRepository;
             _passengerRepository = passengerRepository;
@@ -31,14 +30,6 @@ namespace API.Controllers
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
                 return Unauthorized("Not authorized1");
-
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (
-            role == "Not" ||
-            (
-            role.ToUpper() != Role.PASSENGER.ToString()
-            ))
-                return Unauthorized("Not authorized2");
 
             var passenger = _passengerRepository.GetPassengerDtoById(friendsCreateDto.FriendId);
             if (passenger == null)
@@ -66,15 +57,7 @@ namespace API.Controllers
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized("Not authorized1");
-
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (
-            role == "Not" ||
-            (
-            role.ToUpper() != Role.PASSENGER.ToString()
-            ))
-                return Unauthorized("Not authorized2");
+                return Unauthorized("Not authorized");
 
             if (_friendsRepository.ConfirmFriendRequest(id, Id))
             {
@@ -83,20 +66,13 @@ namespace API.Controllers
             }
             return StatusCode(500, "Server Error");
         }
+
         [HttpGet("getFriendById/{id}")]
         public ActionResult<FriendDto> getFriendById(int id)
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
                 return Unauthorized("Not authorized1");
-
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (
-            role == "Not" ||
-            (
-            role.ToUpper() != Role.PASSENGER.ToString()
-            ))
-                return Unauthorized("Not authorized2");
 
             var friend = _friendsRepository.GetFriendById(id, Id);
             if (friend == null || friend.Friend == null)
@@ -118,14 +94,6 @@ namespace API.Controllers
             if (Id == -1)
                 return Unauthorized("Not authorized1");
 
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (
-            role == "Not" ||
-            (
-            role.ToUpper() != Role.PASSENGER.ToString()
-            ))
-                return Unauthorized("Not authorized2");
-
             var friends = _friendsRepository.GetFriends(Id);
             List<FriendDto> friendss = [];
             foreach (var fri in friends)
@@ -145,14 +113,6 @@ namespace API.Controllers
             if (Id == -1)
                 return Unauthorized("Not authorized1");
 
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (
-            role == "Not" ||
-            (
-            role.ToUpper() != Role.PASSENGER.ToString()
-            ))
-                return Unauthorized("Not authorized2");
-
             var friendsRequests = _friendsRepository.GetFriendRequests(Id);
 
             return Ok(friendsRequests);
@@ -164,14 +124,6 @@ namespace API.Controllers
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
                 return Unauthorized("Not authorized1");
-
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (
-            role == "Not" ||
-            (
-            role.ToUpper() != Role.PASSENGER.ToString()
-            ))
-                return Unauthorized("Not authorized2");
 
             bool result = _friendsRepository.DeleteFriend(id, Id);
             if (!result)

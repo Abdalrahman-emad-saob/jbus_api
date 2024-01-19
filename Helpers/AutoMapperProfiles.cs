@@ -91,12 +91,11 @@ namespace API.Helpers
             .ForMember(t => t.DropOffPoint, opt => opt.PreCondition(src => src.DropOffPoint != null));;
             CreateMap<TripCreateDto, Trip>()
             .ForMember(t => t.status, opt => opt.MapFrom(tcd => Enum.Parse<TripStatus>(tcd.status!)));
-               
-
-
+            
+            
             CreateMap<User, UserDto>()
-            .ForMember(ud => ud.Sex, opt => opt.MapFrom(u => u.Sex.ToString()));
-            // .ForMember(ud => ud.Role, opt => opt.MapFrom(u => u.Role.ToString()));
+            .ForMember(ud => ud.Sex, opt => opt.MapFrom(u => u.Sex.ToString()))
+            .ForMember(ud => ud.Role, opt => opt.MapFrom(u => u.Role.ToString()));
             CreateMap<UserUpdateDto, User>()
             .ForMember(u => u.Sex, opt => opt.MapFrom(uud => Enum.Parse<Sex>(uud.Sex!)))
             .ForMember(u => u.Name, opt => opt.PreCondition(src => !string.IsNullOrEmpty(src.Name)))

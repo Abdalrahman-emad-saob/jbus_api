@@ -1,4 +1,3 @@
-using API.Data;
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
@@ -40,21 +39,21 @@ namespace API.Controllers.v1
                 var user = _userRepository.GetUserByEmail(loginDto.Email!);
 
                 if (user == null)
-                    return Unauthorized("Not Authorized1");
+                    return NotFound(new { Error = "USER_DOES_NOT_EXIST" });
 
                 var passwordHasher = new PasswordHasher<User>();
                 var passwordVerificationResult = passwordHasher.VerifyHashedPassword(user, user.PasswordHash!, loginDto.Password!);
 
                 if (passwordVerificationResult != PasswordVerificationResult.Success)
-                    return Unauthorized("Not Authorized2");
+                    return Unauthorized("Not Authorized1");
 
                 if(user.Email == null)
-                    return Unauthorized("Not Authorized3");
+                    return Unauthorized("Not Authorized2");
 
                 var adminDto = _mapper.Map<AdminDto>(_adminRepository.GetAdminByEmail(user.Email));
 
                 if (adminDto == null)
-                    return Unauthorized("Not Authorized4");
+                    return Unauthorized("Not Authorized3");
 
                 var token = _tokenService.CreateToken(user, adminDto.Id);
 

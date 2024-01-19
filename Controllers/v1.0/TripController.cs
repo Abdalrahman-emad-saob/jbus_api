@@ -1,10 +1,12 @@
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
+using API.Validations;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers.v1
 {
+    [CustomAuthorize("PASSENGER")]
     public class TripController : BaseApiController
     {
         private readonly ITokenHandlerService _tokenHandlerService;
@@ -25,14 +27,6 @@ namespace API.Controllers.v1
             if (Id == -1)
                 return Unauthorized("Not authorized");
 
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (
-            role == "Not" || 
-            (
-            role.ToUpper() != Role.PASSENGER.ToString()
-            ))
-                return Unauthorized("Not authorized");
-
             return Ok(_tripRepository.GetTrips(Id));
         }
 
@@ -49,7 +43,7 @@ namespace API.Controllers.v1
             (
             role.ToUpper() != Role.PASSENGER.ToString()
             ))
-                return Unauthorized("Not authorized");
+                return Forbid("Not authorized");
 
             return _tripRepository.GetTripById(id, Id);
         }
@@ -60,35 +54,23 @@ namespace API.Controllers.v1
             if (Id == -1)
                 return Unauthorized("Not authorized");
 
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" || 
-            role.ToUpper() != Role.PASSENGER.ToString()
-            )
-                return Unauthorized("Not authorized");
-
             var tripDto = _tripRepository.GetTripById(id, Id);
 
             if (tripDto == null)
-                return NotFound();
+                return NotFound("Trip Not Found");
 
             _tripRepository.Update(tripUpdateDto, id);
 
             if (_tripRepository.SaveChanges())
                 return NoContent();
 
-            return StatusCode(500, "Server Error1");
+            return BadRequest("No Changes Made");
         }
         [HttpPost]
         public ActionResult CreateTrip(TripCreateDto tripCreateDto)
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized("Not authorized");
-                
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" || 
-            role.ToUpper() != Role.PASSENGER.ToString()
-            )
                 return Unauthorized("Not authorized");
 
             _tripRepository.CreateTrip(tripCreateDto, Id);
