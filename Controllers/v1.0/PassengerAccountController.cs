@@ -121,6 +121,46 @@ namespace API.Controllers.v1
         [HttpPost("sendOTP")]
         public IActionResult SendOtp(sendOTPDto sendOTPDto)
         {
+
+            // if (UserExists(sendOTPDto.Email))
+            // {
+            //     return BadRequest("Passenger exists");
+            // }
+            // string senderEmail = "aboodsaob1139@gmail.com";
+            // // string senderPassword = "dugm cixm ychg qjjc";
+            // int otp = _oTPRepository.CreateOTP(sendOTPDto.Email!);
+            // MailMessage mail = new()
+            // {
+            //     From = new MailAddress(senderEmail)
+            // };
+            // mail.To.Add(sendOTPDto.Email!);
+            // mail.Subject = "JBus OTP";
+            // mail.Body = otp.ToString();
+
+            // SmtpClient smtpClient = new("localhost")
+            // {
+            //     Port = 25,
+            //     // Credentials = new NetworkCredential(senderEmail, senderPassword),
+            //     // EnableSsl = true
+            // };
+
+            // try
+            // {
+            //     smtpClient.Send(mail);
+            //     Console.WriteLine("Email sent successfully!");
+
+            //     return Ok();
+            // }
+            // catch (Exception ex)
+            // {
+            //     Console.WriteLine($"Error sending email: {ex.Message}");
+            //     return StatusCode(500, "Server Error");
+            // }
+
+
+
+
+
             if (UserExists(sendOTPDto.Email))
             {
                 return BadRequest("Passenger exists");
