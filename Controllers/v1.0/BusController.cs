@@ -1,6 +1,5 @@
 using API.Controllers.v1;
 using API.DTOs;
-using API.Entities;
 using API.Interfaces;
 using API.Validations;
 using AutoMapper;
@@ -12,16 +11,14 @@ namespace api.Controllers.v1
     {
         private readonly IBusRepository _busRepository;
         private readonly IMapper _mapper;
-        private readonly ITokenHandlerService _tokenHandlerService;
 
         public BusController(
             IBusRepository busRepository,
-            IMapper mapper,
-            ITokenHandlerService tokenHandlerService)
+            IMapper mapper
+            )
         {
             _busRepository = busRepository;
             _mapper = mapper;
-            _tokenHandlerService = tokenHandlerService;
         }
 
         [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
@@ -32,14 +29,14 @@ namespace api.Controllers.v1
             return StatusCode(201);
         }
 
-        [CustomAuthorize("PASSENGER", "SUPER_ADMIN", "ADMIN")]
+        [CustomAuthorize("PASSENGER", "SUPER_ADMIN", "ADMIN", "DRIVER")]
         [HttpGet("getBuses")]
         public ActionResult<IEnumerable<BusDto>> GetBuses()
         {
             return Ok(_busRepository.GetBuses());
         }
 
-        [CustomAuthorize("PASSENGER", "SUPER_ADMIN", "ADMIN")]
+        [CustomAuthorize("PASSENGER", "SUPER_ADMIN", "ADMIN", "DRIVER")]
         [HttpGet("{id}")]
         public ActionResult<BusDto> GetBusById(int id)
         {

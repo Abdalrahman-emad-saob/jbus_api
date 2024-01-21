@@ -1,6 +1,5 @@
 using API.Controllers.v1;
 using API.DTOs;
-using API.Entities;
 using API.Interfaces;
 using API.Validations;
 using Microsoft.AspNetCore.Mvc;

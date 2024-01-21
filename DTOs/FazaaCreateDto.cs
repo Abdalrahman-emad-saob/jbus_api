@@ -8,7 +8,7 @@ namespace API.DTOs
         [Required]
         public double Amount { get; set; }
         [Required]
-        public int CreditorId { get; set; }
+        public int InDebtId { get; set; }
         [JsonIgnore]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }

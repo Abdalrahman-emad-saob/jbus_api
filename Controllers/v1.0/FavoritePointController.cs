@@ -1,8 +1,6 @@
 using API.DTOs;
-using API.Entities;
 using API.Interfaces;
 using API.Validations;
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers.v1

@@ -2,6 +2,7 @@ namespace API.Entities
 {
     public class Route
     {
+        // TODO - Add Soft Delete
         public int Id { get; set; }
         public string? Name { get; set; }
         public string? WaypointsGoing { get; set; }

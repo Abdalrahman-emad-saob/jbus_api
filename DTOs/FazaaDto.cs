@@ -7,7 +7,7 @@ namespace API.DTOs
         public DateTime ReturnedAt { get; set; }
         public double Amount { get; set; }
         public bool Paid { get; set; }
-        public int InDebtId { get; set; }
-        public int CreditorId { get; set; }
+        public PassengerDto? InDebt { get; set; }
+        public PassengerDto? Creditor { get; set; }
     }
 }

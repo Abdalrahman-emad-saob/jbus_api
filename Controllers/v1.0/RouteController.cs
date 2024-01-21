@@ -43,7 +43,7 @@ namespace api.Controllers.v1
             return Ok(_routeRepository.GetRoutes());
         }
 
-        [CustomAuthorize("PASSENGER", "SUPER_ADMIN", "ADMIN")]
+        [CustomAuthorize("PASSENGER", "SUPER_ADMIN", "ADMIN", "DRIVER")]
         [HttpGet("{id}")]
         public ActionResult<RouteDto> GetRouteById(int id)
         {
@@ -59,10 +59,11 @@ namespace api.Controllers.v1
             if (route == null) 
                 return NotFound("Route Not Found");
 
-            _mapper.Map(routeUpdateDto, route);
-
-            if (_routeRepository.SaveChanges()) 
-                return NoContent();
+            
+            // _mapper.Map(routeUpdateDto, route);
+            if(_routeRepository.Update(routeUpdateDto, id))
+                if (_routeRepository.SaveChanges()) 
+                    return NoContent();
 
             return BadRequest("Failed to Update Route");
         }

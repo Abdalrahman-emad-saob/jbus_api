@@ -77,9 +77,12 @@ namespace API.Data
             return _context.SaveChanges() > 0;
         }
 
-        public void Update(RouteDto route)
+        public bool Update(RouteUpdateDto routeUpdateDto, int id)
         {
-            _context.Entry(route).State = EntityState.Modified;
+            var route = _context.Routes.Find(id);
+            _mapper.Map(routeUpdateDto, route);
+            return true;
+            // _context.Entry(route).State = EntityState.Modified;
         }
     }
 }

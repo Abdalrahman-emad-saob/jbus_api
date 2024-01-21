@@ -18,7 +18,7 @@ namespace API.Data
             _mapper = mapper;
         }
 
-        public bool StoreFazaas(FazaaCreateDto fazaaCreateDto, int InDebtId)
+        public bool StoreFazaas(FazaaCreateDto fazaaCreateDto, int CreditorId)
         {
                 // var passenger =_context.Passengers.Find(fazaa.CreditorId);
                 Fazaa newFazaa = new()
@@ -26,8 +26,8 @@ namespace API.Data
                     CreatedAt = DateTime.UtcNow,
                     Paid = false,
                     Amount = fazaaCreateDto.Amount,
-                    CreditorId = fazaaCreateDto.CreditorId,
-                    InDebtId = InDebtId
+                    CreditorId = CreditorId,
+                    InDebtId = fazaaCreateDto.InDebtId
                 };
                 _context.Fazaas.Add(newFazaa);
             return SaveChanges();
@@ -46,7 +46,7 @@ namespace API.Data
         {
             return _context
            .Fazaas
-           .Where(dt => dt.InDebtId == InDebtId)
+           .Where(dt => dt.InDebtId == InDebtId || dt.CreditorId == InDebtId)
            .ProjectTo<FazaaDto>(_mapper.ConfigurationProvider)
            .ToList();
         }

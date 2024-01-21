@@ -57,7 +57,7 @@ namespace API.Data
         public bool FriendRequestExists(int FriendId, int PassengerId)
         {
             bool friendExists = _context.Friends
-                                .Any(f => f.FriendId == FriendId && f.PassengerId == PassengerId);
+                                .Any(f => (f.FriendId == FriendId && f.PassengerId == PassengerId) || (f.FriendId == PassengerId && f.PassengerId == FriendId));
 
             return friendExists;
         }

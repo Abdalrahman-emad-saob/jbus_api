@@ -4,7 +4,7 @@ namespace API.Interfaces
 {
     public interface IRouteRepository
     {
-        void Update(RouteDto route);
+        bool Update(RouteUpdateDto routeUpdateDto, int id);
         IEnumerable<RouteDto> GetRoutes();
         RouteDto GetRouteById(int id);
         bool CreateRoute(RouteCreateDto routeDto);

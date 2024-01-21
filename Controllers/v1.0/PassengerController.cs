@@ -1,14 +1,11 @@
 using API.DTOs;
 using API.Interfaces;
 using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using API.Entities;
 using API.Validations;
 
 namespace API.Controllers.v1
 {
-    [Authorize]
     public class PassengerController : BaseApiController
     {
         private readonly IPassengerRepository _passengerRepository;

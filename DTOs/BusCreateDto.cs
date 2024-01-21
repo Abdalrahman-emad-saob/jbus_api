@@ -7,6 +7,8 @@ namespace API.DTOs
     {
         [Required]
         public string? BusNumber { get; set; }
+        [Required]
+        public int Capacity { get; set; }
         // [Required]
         public int RouteId { get; set; }
         // [Required]

@@ -1,9 +1,6 @@
-using System.Diagnostics;
 using System.Net;
 using System.Net.Mail;
-using System.Text;
 using System.Text.RegularExpressions;
-using API.Data;
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
@@ -11,9 +8,6 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using OneSignalApi.Api;
-using OneSignalApi.Client;
-using OneSignalApi.Model;
 
 namespace API.Controllers.v1
 {
