@@ -81,6 +81,7 @@ namespace API.Data
         {
             var route = _context.Routes.Find(id);
             _mapper.Map(routeUpdateDto, route);
+            route!.UpdatedAt = DateTime.UtcNow;
             return true;
             // _context.Entry(route).State = EntityState.Modified;
         }

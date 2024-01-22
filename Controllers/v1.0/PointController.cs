@@ -1,6 +1,5 @@
 using API.Controllers.v1;
 using API.DTOs;
-using API.Entities;
 using API.Interfaces;
 using API.Validations;
 using Microsoft.AspNetCore.Mvc;
@@ -11,24 +10,16 @@ namespace API.Controllers
     public class PointController : BaseApiController
     {
         private readonly IPointRepository _pointRepository;
-        private readonly ITokenHandlerService _tokenHandlerService;
 
         public PointController(
-            IPointRepository pointRepository,
-            ITokenHandlerService tokenHandlerService
+            IPointRepository pointRepository
             )
         {
             _pointRepository = pointRepository;
-            _tokenHandlerService = tokenHandlerService;
         }
         [HttpPost]
         public ActionResult<PointDto> CreatePoint(PointCreateDto pointCreateDto)
         {
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" ||
-            role.ToUpper() != Role.PASSENGER.ToString()
-            )
-                return Unauthorized("Not authorized");
             PointDto point = PointExists(pointCreateDto.Latitude, pointCreateDto.Longitude);
             if (point == null)
             {
@@ -43,12 +34,6 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public ActionResult<PointDto> GetPointById(int id)
         {
-            string role = _tokenHandlerService.ExtractUserRole();
-            if (role == "Not" ||
-            role.ToUpper() != Role.PASSENGER.ToString()
-            )
-                return Unauthorized("Not authorized");
-
             var pointDto = _pointRepository.GetPointById(id);
 
             if (pointDto == null)
@@ -56,7 +41,6 @@ namespace API.Controllers
 
             return pointDto;
         }
-        [NonAction]
         private PointDto PointExists(double lat, double lon)
         {
             return _pointRepository.PointExists(lat, lon);

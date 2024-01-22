@@ -30,7 +30,7 @@ namespace API.Data
                     InDebtId = fazaaCreateDto.InDebtId
                 };
                 _context.Fazaas.Add(newFazaa);
-            return SaveChanges();
+            return true;
         }
 
         public FazaaDto GetFazaaById(int id)

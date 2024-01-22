@@ -1,4 +1,5 @@
 using API.DTOs;
+using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -16,16 +17,25 @@ namespace API.Data
             _mapper = mapper;
         }
 
-        public bool CreatePredefinedStop(PredefinedStopsCreateDto predefinedStopsCreateDto)
+        public PredefinedStopsDto CreatePredefinedStops(PredefinedStopsCreateDto predefinedStopsCreateDto)
         {
-            throw new NotImplementedException();
+            PredefinedStops predefinedStops = new()
+            {
+                RouteId = predefinedStopsCreateDto.RouteId,
+                points = _mapper.Map<List<Point>>(predefinedStopsCreateDto.points),
+                CreatedAt = predefinedStopsCreateDto.CreatedAt,
+                UpdatedAt = predefinedStopsCreateDto.UpdatedAt
+            };
+
+            _context.PredefinedStops.Add(predefinedStops);
+            return _mapper.Map<PredefinedStopsDto>(predefinedStops);
         }
 
         public PredefinedStopsDto GetPredefinedStopById(int id)
         {
             return _context
            .PredefinedStops
-           .Where(dt => dt.Id == id)
+           .Where(dt => dt.RouteId == id)
            .ProjectTo<PredefinedStopsDto>(_mapper.ConfigurationProvider)
            .SingleOrDefault()!;
         }

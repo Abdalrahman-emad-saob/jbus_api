@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using API.Interfaces;
 
 namespace API.Services;
@@ -12,8 +13,9 @@ public class CryptoService : ICryptoService
 
     public CryptoService(string key, string iv)
     {
-        _key = Encoding.UTF8.GetBytes(key);
-        _iv = Encoding.UTF8.GetBytes(iv);
+        using var sha256 = SHA256.Create();
+        _key = sha256.ComputeHash(Encoding.UTF8.GetBytes(key));
+        _iv = Encoding.UTF8.GetBytes(iv[..16]);
     }
 
     public string Encrypt(string plainText)
@@ -30,12 +32,19 @@ public class CryptoService : ICryptoService
         {
             swEncrypt.Write(plainText);
         }
+       string encryptedText = Convert.ToBase64String(msEncrypt.ToArray());
 
-        return Convert.ToBase64String(msEncrypt.ToArray());
+    if (string.IsNullOrWhiteSpace(encryptedText) || encryptedText.Length % 4 != 0 || !Regex.IsMatch(encryptedText, @"^[a-zA-Z0-9\+/]*={0,3}$", RegexOptions.None))
+    {
+        throw new ArgumentException("The encryptedText is not a valid Base-64 string.", nameof(encryptedText));
+    }
+        return encryptedText;
     }
 
     public string Decrypt(string cipherText)
     {
+        
+        
         using var aes = Aes.Create();
         aes.Key = _key;
         aes.IV = _iv;

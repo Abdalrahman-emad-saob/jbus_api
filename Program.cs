@@ -28,7 +28,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseMiddleware<TokenBlacklistMiddleware>();
-app.UseIpRateLimiting();
+// app.UseIpRateLimiting();
 // if (app.Environment.IsDevelopment())
 // {
 app.UseSwagger();

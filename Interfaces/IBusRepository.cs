@@ -4,8 +4,9 @@ namespace API.Interfaces
 {
     public interface IBusRepository
     {
-        void Update(BusDto busDto);
+        bool Update(BusUpdateDto busUpdateDto, int id);
         IEnumerable<BusDto> GetBuses();
+        IEnumerable<BusDto> GetActiveBuses();
         BusDto GetBusById(int id);
         bool CreateBus(BusCreateDto busCreateDto);
         bool SaveChanges();

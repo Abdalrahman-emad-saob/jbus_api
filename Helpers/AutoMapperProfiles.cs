@@ -14,7 +14,8 @@ namespace API.Helpers
             .ForMember(p => p.UserId, opt => opt.Ignore())
             .ForMember(p => p.User, opt => opt.Ignore());
 
-            CreateMap<Bus, BusDto>();
+            CreateMap<Bus, BusDto>()
+            .ForMember(bd => bd.Going, opt => opt.MapFrom(b => b.Going.ToString()));
             CreateMap<BusCreateDto, Bus>();
             CreateMap<BusUpdateDto, Bus>();
 
@@ -53,10 +54,8 @@ namespace API.Helpers
             CreateMap<PassengerUpdateDto, Passenger>()
             .ForMember(p => p.UserId, opt => opt.Ignore())
             .ForMember(p => p.User, opt => opt.Ignore())
-            .ForMember(p => p.CreditorId, opt => opt.Ignore())
-            .ForMember(p => p.Creditor, opt => opt.Ignore())
-            .ForMember(p => p.InDebtId, opt => opt.Ignore())
-            .ForMember(p => p.InDebt, opt => opt.Ignore())
+            .ForMember(p => p.Creditors, opt => opt.Ignore())
+            .ForMember(p => p.InDebts, opt => opt.Ignore())
             .ForMember(p => p.ProfileImage, opt => opt.PreCondition(src => src.ProfileImage != null));
 
             CreateMap<PaymentTransaction, PaymentTransactionDto>();

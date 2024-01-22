@@ -11,9 +11,9 @@ namespace API.Entities
         public double Amount { get; set; }
         public bool Paid { get; set; }
         // * Link
-        public int InDebtId { get; set; }
+        public int? InDebtId { get; set; }
         public Passenger? InDebt { get; set; }
-        public int CreditorId { get; set; }
+        public int? CreditorId { get; set; }
         public Passenger? Creditor { get; set; }
     }
 }

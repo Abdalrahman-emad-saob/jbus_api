@@ -77,6 +77,12 @@ namespace API.Migrations
                     b.Property<int?>("DriverId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("Going")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.Property<int?>("RouteId")
                         .HasColumnType("integer");
 
@@ -258,10 +264,10 @@ namespace API.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("CreditorId")
+                    b.Property<int?>("CreditorId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("InDebtId")
+                    b.Property<int?>("InDebtId")
                         .HasColumnType("integer");
 
                     b.Property<bool>("Paid")
@@ -272,11 +278,9 @@ namespace API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreditorId")
-                        .IsUnique();
+                    b.HasIndex("CreditorId");
 
-                    b.HasIndex("InDebtId")
-                        .IsUnique();
+                    b.HasIndex("InDebtId");
 
                     b.ToTable("Fazaas");
                 });
@@ -380,9 +384,6 @@ namespace API.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CreditorId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("FacebookToken")
                         .HasColumnType("text");
 
@@ -391,9 +392,6 @@ namespace API.Migrations
 
                     b.Property<string>("GoogleToken")
                         .HasColumnType("text");
-
-                    b.Property<int>("InDebtId")
-                        .HasColumnType("integer");
 
                     b.Property<string>("ProfileImage")
                         .HasColumnType("text");
@@ -423,7 +421,16 @@ namespace API.Migrations
                     b.Property<double>("Amount")
                         .HasColumnType("double precision");
 
+                    b.Property<int?>("BusId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DriverId")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("PassengerId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("RouteId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("TimeStamp")
@@ -434,7 +441,13 @@ namespace API.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BusId");
+
+                    b.HasIndex("DriverId");
+
                     b.HasIndex("PassengerId");
+
+                    b.HasIndex("RouteId");
 
                     b.HasIndex("TripId")
                         .IsUnique();
@@ -516,6 +529,9 @@ namespace API.Migrations
 
                     b.Property<double>("Fee")
                         .HasColumnType("double precision");
+
+                    b.Property<int>("IsActive")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -726,16 +742,12 @@ namespace API.Migrations
             modelBuilder.Entity("API.Entities.Fazaa", b =>
                 {
                     b.HasOne("API.Entities.Passenger", "Creditor")
-                        .WithOne("Creditor")
-                        .HasForeignKey("API.Entities.Fazaa", "CreditorId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .WithMany("Creditors")
+                        .HasForeignKey("CreditorId");
 
                     b.HasOne("API.Entities.Passenger", "InDebt")
-                        .WithOne("InDebt")
-                        .HasForeignKey("API.Entities.Fazaa", "InDebtId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .WithMany("InDebts")
+                        .HasForeignKey("InDebtId");
 
                     b.Navigation("Creditor");
 
@@ -779,16 +791,34 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Entities.PaymentTransaction", b =>
                 {
+                    b.HasOne("API.Entities.Bus", "Bus")
+                        .WithMany()
+                        .HasForeignKey("BusId");
+
+                    b.HasOne("API.Entities.Driver", "Driver")
+                        .WithMany()
+                        .HasForeignKey("DriverId");
+
                     b.HasOne("API.Entities.Passenger", "Passenger")
                         .WithMany("PaymentTransactions")
                         .HasForeignKey("PassengerId");
+
+                    b.HasOne("API.Entities.Route", "Route")
+                        .WithMany()
+                        .HasForeignKey("RouteId");
 
                     b.HasOne("API.Entities.Trip", "Trip")
                         .WithOne("PaymentTransaction")
                         .HasForeignKey("API.Entities.PaymentTransaction", "TripId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.Navigation("Bus");
+
+                    b.Navigation("Driver");
+
                     b.Navigation("Passenger");
+
+                    b.Navigation("Route");
 
                     b.Navigation("Trip");
                 });
@@ -805,7 +835,7 @@ namespace API.Migrations
                     b.HasOne("API.Entities.Route", "Route")
                         .WithOne("PredefinedStops")
                         .HasForeignKey("API.Entities.PredefinedStops", "RouteId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Route");
                 });
@@ -884,11 +914,11 @@ namespace API.Migrations
                 {
                     b.Navigation("ChargingTransactions");
 
-                    b.Navigation("Creditor");
+                    b.Navigation("Creditors");
 
                     b.Navigation("FavoritePoints");
 
-                    b.Navigation("InDebt");
+                    b.Navigation("InDebts");
 
                     b.Navigation("PaymentTransactions");
 

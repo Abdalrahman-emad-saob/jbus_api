@@ -55,19 +55,12 @@ namespace API.Data
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired(false);
 
-            // one-to-one
             modelBuilder.Entity<Trip>()
                         .HasOne(t => t.PaymentTransaction)
                         .WithOne(pt => pt.Trip)
                         .HasForeignKey<PaymentTransaction>(pt => pt.TripId)
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired(false);
-            // one-to-many
-            // modelBuilder.Entity<Entities.Route>()
-            //             .HasMany(r => r.Trips)
-            //             .WithOne(t => t.Route)
-            //             .HasForeignKey(t => t.RouteId)
-            //             .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<InterestPoint>()
                         .HasOne(ip => ip.RouteStart)
@@ -96,28 +89,24 @@ namespace API.Data
             modelBuilder.Entity<Point>()
                         .HasMany(p => p.TripDropoff)
                         .WithOne(p => p.DropOffPoint)
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired(false);
+                        .OnDelete(DeleteBehavior.Restrict);
 
 
-            modelBuilder.Entity<Passenger>()
-                        .HasOne(p => p.Creditor)
-                        .WithOne(f => f.Creditor)
-                        .HasForeignKey<Fazaa>(f => f.CreditorId)
-                        .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<Fazaa>()
+                        .HasOne(f => f.InDebt)
+                        .WithMany(p => p.InDebts)
+                        .HasForeignKey(f => f.InDebtId);
 
-            modelBuilder.Entity<Passenger>()
-                        .HasOne(p => p.InDebt)
-                        .WithOne(f => f.InDebt)
-                        .HasForeignKey<Fazaa>(f => f.InDebtId)
-                        .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<Fazaa>()
+                        .HasOne(f => f.Creditor)
+                        .WithMany(p => p.Creditors)
+                        .HasForeignKey(f => f.CreditorId);
 
             modelBuilder.Entity<Entities.Route>()
                         .HasOne(r => r.PredefinedStops)
                         .WithOne(ps => ps.Route)
                         .HasForeignKey<PredefinedStops>(ps => ps.RouteId)
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired(false);
+                        .OnDelete(DeleteBehavior.NoAction);
 
         }
     }

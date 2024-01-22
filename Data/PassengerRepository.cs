@@ -57,7 +57,10 @@ namespace API.Data
                 .ProjectTo<PassengerDto>(_mapper.ConfigurationProvider)
                 .ToList();
 
-        public bool SaveChanges() => _context.SaveChanges() > 0;
+        public bool SaveChanges()
+        {
+            return _context.SaveChanges() > 0;
+        }
 
         public void Update(PassengerDto passenger)
         {

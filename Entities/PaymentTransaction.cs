@@ -5,7 +5,7 @@ namespace API.Entities
         public int Id { get; set; }
         public double Amount { get; set; }
         public DateTime TimeStamp { get; set; }
-        public bool IsValid { get; set; } = false;
+        // public bool IsValid { get; set; } = false;
 
         // * Link
         public int? PassengerId { get; set; }

@@ -19,11 +19,10 @@ namespace API.Controllers.v1
             _cryptoService = cryptoService;
         }
 
-        [HttpGet]
+        [HttpPost]
         public ActionResult<string> GenerateQrCode(PaymentTransactionCreateDto paymentTransactionCreateDto)
         {
-            Guid guid = Guid.NewGuid();
-            string data = $"{guid},{paymentTransactionCreateDto.DriverId},{paymentTransactionCreateDto.BusId},{paymentTransactionCreateDto.RouteId},{DateTime.UtcNow}";
+            string data = $"{paymentTransactionCreateDto.DriverId},{paymentTransactionCreateDto.BusId},{paymentTransactionCreateDto.RouteId},{DateTime.UtcNow}";
 
             string signature = GenerateSignature(data);
 
@@ -32,11 +31,16 @@ namespace API.Controllers.v1
             string encryptedData = Encrypt(combinedData);
 
             QRCodeGenerator qrGenerator = new();
-            QRCodeData qrCodeData = qrGenerator.CreateQrCode(encryptedData, QRCodeGenerator.ECCLevel.L);
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode(encryptedData, QRCodeGenerator.ECCLevel.Q);
             PngByteQRCode qrCode = new(qrCodeData);
             byte[] qrCodeAsPngByteArr = qrCode.GetGraphic(10);
             string base64String = Convert.ToBase64String(qrCodeAsPngByteArr);
-            return Ok(signature);
+            return Ok(base64String);
+        }
+        private string DecryptQrCode(string encryptedData)
+        {
+            string decryptedData = _cryptoService.Decrypt(encryptedData);
+            return decryptedData;
         }
 
         private string GenerateSignature(string inputText)
@@ -45,10 +49,10 @@ namespace API.Controllers.v1
             return encryptedText;
         }
 
-        private string Encrypt(string encryptedText)
+        private string Encrypt(string plainText)
         {
-            string decryptedText = _cryptoService.Decrypt(encryptedText);
-            return decryptedText;
+            string encryptedText = _cryptoService.Encrypt(plainText);
+            return encryptedText;
         }
 
     }

@@ -23,11 +23,13 @@ namespace API.Data
                 BusNumber = busCreateDto.BusNumber,
                 RouteId = busCreateDto.RouteId,
                 DriverId = busCreateDto.DriverId,
+                IsActive = false,
+                Going = BusStatus.Idle,
                 CreatedAt = DateTime.UtcNow
             };
             _context.Buses.Add(bus);
 
-            return SaveChanges();
+            return true;
         }
 
         public BusDto GetBusById(int id)
@@ -46,15 +48,27 @@ namespace API.Data
                 .ProjectTo<BusDto>(_mapper.ConfigurationProvider)
                 .ToList();
         }
+        public IEnumerable<BusDto> GetActiveBuses()
+        {
+            return _context
+                .Buses
+                .ProjectTo<BusDto>(_mapper.ConfigurationProvider)
+                .Where(b => b.IsActive == true)
+                .ToList();
+        }
 
         public bool SaveChanges()
         {
             return _context.SaveChanges() > 0;
         }
 
-        public void Update(BusDto busDto)
+        public bool Update(BusUpdateDto busUpdateDto, int id)
         {
-            _context.Entry(busDto).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            var bus = _context.Buses.Find(id);
+            _mapper.Map(busUpdateDto, bus);
+            // bus!.UpdatedAt = DateTime.UtcNow;
+            _context.Entry(busUpdateDto).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            return true;
         }
     }
 }

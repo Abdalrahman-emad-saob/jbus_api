@@ -8,6 +8,7 @@ namespace API.Entities
         public string? WaypointsGoing { get; set; }
         public string? WaypointsReturning { get; set; }
         public double Fee { get; set; }
+        public int IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 

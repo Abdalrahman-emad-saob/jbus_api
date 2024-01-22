@@ -16,9 +16,7 @@ namespace API.Entities
         public User? User { get; set; }
         public List<PaymentTransaction> PaymentTransactions { get; set; } = [];
         public List<Trip> Trips { get; set; } = [];
-        public int InDebtId { get; set; }
-        public Fazaa? InDebt { get; set; }
-        public int CreditorId { get; set; }
-        public Fazaa? Creditor { get; set; }
+        public List<Fazaa>? InDebts { get; set; } = [];
+        public List<Fazaa>? Creditors { get; set; } = [];
     }
 }

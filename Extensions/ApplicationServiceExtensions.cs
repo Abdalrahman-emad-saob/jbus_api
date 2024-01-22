@@ -76,15 +76,16 @@ namespace API.Extensions
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<ITokenHandlerService, TokenHandlerService>();
-            string key = configuration["Crypto:Key"];
-            string iv = configuration["Crypto:Iv"];
+            string key = configuration["Crypto:Key"] ?? string.Empty;
+            string iv = configuration["Crypto:Iv"] ?? string.Empty;
             services.AddScoped<ICryptoService>(provider => new CryptoService(key, iv));
             services.AddSingleton<NotificationService>();
-            services.AddMemoryCache();
-            services.Configure<IpRateLimitOptions>(configuration.GetSection("IpRateLimiting"));
-            services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
-            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
-            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+            // services.AddMemoryCache();
+            // services.AddSingleton<IProcessingStrategy, FixedWindowProcessingStrategy>();
+            // services.Configure<IpRateLimitOptions>(configuration.GetSection("IpRateLimiting"));
+            // services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+            // services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+            // services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
             return services;
         }

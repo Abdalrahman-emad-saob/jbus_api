@@ -60,7 +60,6 @@ namespace api.Controllers.v1
                 return NotFound("Route Not Found");
 
             
-            // _mapper.Map(routeUpdateDto, route);
             if(_routeRepository.Update(routeUpdateDto, id))
                 if (_routeRepository.SaveChanges()) 
                     return NoContent();

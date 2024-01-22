@@ -6,7 +6,7 @@ namespace API.Interfaces
     {
         IEnumerable<PredefinedStopsDto> GetPredefinedStops();
         PredefinedStopsDto GetPredefinedStopById(int id);
-        bool CreatePredefinedStop(PredefinedStopsCreateDto predefinedStopsCreateDto);
+        PredefinedStopsDto CreatePredefinedStops(PredefinedStopsCreateDto predefinedStopsCreateDto);
         bool SaveChanges();
     }
 }

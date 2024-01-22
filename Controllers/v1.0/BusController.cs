@@ -10,15 +10,12 @@ namespace api.Controllers.v1
     public class BusController : BaseApiController
     {
         private readonly IBusRepository _busRepository;
-        private readonly IMapper _mapper;
 
         public BusController(
-            IBusRepository busRepository,
-            IMapper mapper
+            IBusRepository busRepository
             )
         {
             _busRepository = busRepository;
-            _mapper = mapper;
         }
 
         [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
@@ -26,7 +23,9 @@ namespace api.Controllers.v1
         public ActionResult CreateBus(BusCreateDto busCreateDto)
         {
             _busRepository.CreateBus(busCreateDto);
-            return StatusCode(201);
+            if (_busRepository.SaveChanges())
+                return NoContent();
+            return StatusCode(500, "Server Error");
         }
 
         [CustomAuthorize("PASSENGER", "SUPER_ADMIN", "ADMIN", "DRIVER")]
@@ -34,6 +33,13 @@ namespace api.Controllers.v1
         public ActionResult<IEnumerable<BusDto>> GetBuses()
         {
             return Ok(_busRepository.GetBuses());
+        }
+
+        [CustomAuthorize("PASSENGER", "SUPER_ADMIN", "ADMIN")]
+        [HttpGet("getActiveBuses")]
+        public ActionResult<IEnumerable<BusDto>> GetActiveBuses()
+        {
+            return Ok(_busRepository.GetActiveBuses());
         }
 
         [CustomAuthorize("PASSENGER", "SUPER_ADMIN", "ADMIN", "DRIVER")]
@@ -47,12 +53,12 @@ namespace api.Controllers.v1
         [HttpPut("{id}")]
         public ActionResult updateBus(BusUpdateDto busUpdateDto, int id)
         {
-            var route = _busRepository.GetBusById(id);
+            var bus = _busRepository.GetBusById(id);
 
-            if (route == null)
+            if (bus == null)
                 return NotFound();
 
-            _mapper.Map(busUpdateDto, route);
+            _busRepository.Update(busUpdateDto, id);
 
             if (_busRepository.SaveChanges())
                 return NoContent();
