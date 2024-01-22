@@ -12,6 +12,7 @@
 Data/Migrations
 Migrations
 appsettings.Development.json
+appsettings.json
 .vs/
 
 # User-specific files (MonoDevelop/Xamarin Studio)

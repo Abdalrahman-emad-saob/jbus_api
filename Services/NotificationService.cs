@@ -1,6 +1,8 @@
 using FirebaseAdmin.Messaging;
 using System.Threading.Tasks;
 
+namespace API.Services;
+
 public class NotificationService
 {
     public async Task SendNotificationAsync(string deviceToken, string title, string body)

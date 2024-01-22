@@ -24,10 +24,10 @@ namespace API.Services
         {
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Email, user.Email!),
-                new Claim(JwtRegisteredClaimNames.Name, user.Name!),
-                new Claim(JwtRegisteredClaimNames.NameId, passengerId.ToString()),
-                new Claim("Role", user.Role.ToString())
+                new(JwtRegisteredClaimNames.Email, user.Email!),
+                new(JwtRegisteredClaimNames.Name, user.Name!),
+                new(JwtRegisteredClaimNames.NameId, passengerId.ToString()),
+                new("Role", user.Role.ToString())
             };
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
 
@@ -53,9 +53,8 @@ namespace API.Services
             {
                 token = authorizationHeader.Substring("Bearer ".Length).Trim();
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var jsonToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
 
-                if (jsonToken == null)
+                if (tokenHandler.ReadToken(token) is not JwtSecurityToken jsonToken)
                 {
                     return "";
                 }

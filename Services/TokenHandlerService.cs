@@ -13,7 +13,7 @@ namespace API.Services
         }
         public int TokenHandler()
         {
-            var authorizationHeader = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].FirstOrDefault();
+            var authorizationHeader = _httpContextAccessor.HttpContext?.Request.Headers.Authorization.FirstOrDefault();
 
             if (authorizationHeader != null && authorizationHeader.StartsWith("Bearer "))
             {
@@ -39,15 +39,14 @@ namespace API.Services
 
         public string ExtractUserRole()
         {
-            var authorizationHeader = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].FirstOrDefault();
+            var authorizationHeader = _httpContextAccessor.HttpContext?.Request.Headers.Authorization.FirstOrDefault();
 
             if (authorizationHeader != null && authorizationHeader.StartsWith("Bearer "))
             {
-                var token = authorizationHeader.Substring("Bearer ".Length).Trim();
+                var token = authorizationHeader["Bearer ".Length..].Trim();
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var jsonToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
 
-                if (jsonToken == null)
+                if (tokenHandler.ReadToken(token) is not JwtSecurityToken jsonToken)
                 {
                     return "Not";
                 }

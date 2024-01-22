@@ -1,6 +1,7 @@
 using API.Data;
 using API.Interfaces;
 using API.Services;
+using AspNetCoreRateLimit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -8,7 +9,10 @@ namespace API.Extensions
 {
     public static class ApplicationServiceExtensions
     {
-        public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddApplicationServices(
+            this IServiceCollection services,
+            IConfiguration configuration
+            )
         {
             services.AddDbContext<DataContext>(opt =>
         {
@@ -48,7 +52,6 @@ namespace API.Extensions
 
             services.AddCors();
             services.AddScoped<DataContext>();
-            services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPassengerRepository, PassengerRepository>();
             services.AddScoped<IBusRepository, BusRepository>();
@@ -61,7 +64,6 @@ namespace API.Extensions
             services.AddScoped<IPaymentTransactionRepository, PaymentTransactionRepository>();
             services.AddScoped<ITripRepository, TripRepository>();
             services.AddScoped<IPointRepository, PointRepository>();
-            services.AddScoped<ITokenHandlerService, TokenHandlerService>();
             services.AddScoped<IDriverTripRepository, DriverTripRepository>();
             services.AddScoped<IFazaaRepository, FazaaRepository>();
             services.AddScoped<IPredefinedStopsRepository, PredefinedStopsRepository>();
@@ -72,7 +74,17 @@ namespace API.Extensions
             services.AddScoped<ICreditCardsRepository, CreditCardsRepository>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<ITokenHandlerService, TokenHandlerService>();
+            string key = configuration["Crypto:Key"];
+            string iv = configuration["Crypto:Iv"];
+            services.AddScoped<ICryptoService>(provider => new CryptoService(key, iv));
             services.AddSingleton<NotificationService>();
+            services.AddMemoryCache();
+            services.Configure<IpRateLimitOptions>(configuration.GetSection("IpRateLimiting"));
+            services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
             return services;
         }
