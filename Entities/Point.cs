@@ -9,11 +9,11 @@ namespace API.Entities
         public DateTime CreatedAt { get; set; }
 
         // * Link
-        public List<FavoritePoint>? FavoritePoint { get; set; }
+        public virtual List<FavoritePoint>? FavoritePoint { get; set; }
         public int? InterestPointId { get; set; }
-        public InterestPoint? InterestPoint { get; set; }
-        public List<Trip>? TripPickup { get; set; }
-        public List<Trip>? TripDropoff { get; set; }
+        public virtual InterestPoint? InterestPoint { get; set; }
+        public virtual List<Trip>? TripPickup { get; set; }
+        public virtual List<Trip>? TripDropoff { get; set; }
 
     }
 }

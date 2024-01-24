@@ -28,14 +28,14 @@ namespace API.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult<PredefinedStopsDto> PredefinedStopsById(int id)
+        public ActionResult<PredefinedStopsDto> getPredefinedStopsById(int id)
         {
-            var predefinedStops = _predefinedStopsRepository.GetPredefinedStopById(id);
-
-            if (predefinedStops == null)
+            PredefinedStopsDto predefinedStops = _predefinedStopsRepository.GetPredefinedStopById(id);
+            
+            if(predefinedStops == null)
                 return NotFound("No Predefined Stops Defined");
 
-            return predefinedStops;
+            return Ok(predefinedStops);
         }
         // private PointDto PointExists(double lat, double lon)
         // {

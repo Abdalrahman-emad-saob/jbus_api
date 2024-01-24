@@ -32,19 +32,19 @@ public class CryptoService : ICryptoService
         {
             swEncrypt.Write(plainText);
         }
-       string encryptedText = Convert.ToBase64String(msEncrypt.ToArray());
+        string encryptedText = Convert.ToBase64String(msEncrypt.ToArray());
 
-    if (string.IsNullOrWhiteSpace(encryptedText) || encryptedText.Length % 4 != 0 || !Regex.IsMatch(encryptedText, @"^[a-zA-Z0-9\+/]*={0,3}$", RegexOptions.None))
-    {
-        throw new ArgumentException("The encryptedText is not a valid Base-64 string.", nameof(encryptedText));
-    }
+        
         return encryptedText;
     }
 
     public string Decrypt(string cipherText)
     {
-        
-        
+        if (string.IsNullOrWhiteSpace(cipherText) || cipherText.Length % 4 != 0 || !Regex.IsMatch(cipherText, @"^[a-zA-Z0-9\+/]*={0,3}$", RegexOptions.None))
+        {
+            throw new ArgumentException("The encryptedText is not a valid Base-64 string.", nameof(cipherText));
+        }
+
         using var aes = Aes.Create();
         aes.Key = _key;
         aes.IV = _iv;

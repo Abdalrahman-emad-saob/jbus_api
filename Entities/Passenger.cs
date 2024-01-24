@@ -10,13 +10,13 @@ namespace API.Entities
         public string? FcmToken { get; set; }
 
         // * Link
-        public List<ChargingTransaction> ChargingTransactions { get; set; } = [];
-        public List<FavoritePoint> FavoritePoints { get; set; } = [];
+        public virtual List<ChargingTransaction> ChargingTransactions { get; set; } = [];
+        public virtual List<FavoritePoint> FavoritePoints { get; set; } = [];
         public int? UserId { get; set; }
-        public User? User { get; set; }
-        public List<PaymentTransaction> PaymentTransactions { get; set; } = [];
-        public List<Trip> Trips { get; set; } = [];
-        public List<Fazaa>? InDebts { get; set; } = [];
-        public List<Fazaa>? Creditors { get; set; } = [];
+        public virtual User? User { get; set; }
+        public virtual List<PaymentTransaction> PaymentTransactions { get; set; } = [];
+        public virtual List<Trip> Trips { get; set; } = [];
+        public virtual List<Fazaa>? InDebts { get; set; } = [];
+        public virtual List<Fazaa>? Creditors { get; set; } = [];
     }
 }

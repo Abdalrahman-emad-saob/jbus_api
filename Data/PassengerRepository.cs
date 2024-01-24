@@ -42,6 +42,7 @@ namespace API.Data
         public Passenger GetPassengerById(int id)
         {
             return _context.Passengers
+            .Include(p => p.Trips)
                 .Where(p => p.UserId == id)
                 .SingleOrDefault()!;
         }
@@ -62,8 +63,11 @@ namespace API.Data
             return _context.SaveChanges() > 0;
         }
 
-        public void Update(PassengerDto passenger)
+        public void Update(PassengerUpdateDto passengerUpdateDto, Passenger passenger, User user)
         {
+            _mapper.Map(passengerUpdateDto, passenger);
+            _mapper.Map(passengerUpdateDto.User, user);
+
             _context.Entry(passenger).State = EntityState.Modified;
         }
 
@@ -89,7 +93,7 @@ namespace API.Data
 
             _context.Users.Add(user);
             _context.Passengers.Add(passenger);
-            SaveChanges();
+            // SaveChanges();
 
             var passengerDto = _mapper.Map<PassengerDto>(passenger);
             return new RegisterResponseDto

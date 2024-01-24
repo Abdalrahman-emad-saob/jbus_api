@@ -6,11 +6,11 @@ namespace API.Entities
         public DateTime CreatedAt { get; set; }
         // * Link
         public int? PassengerId { get; set; }
-        public Passenger? Passenger { get; set; }
+        public virtual Passenger? Passenger { get; set; }
         public int? PointId { get; set; }
-        public Point? Point { get; set; }       
+        public virtual Point? Point { get; set; }       
         public int? RouteId { get; set; }
-        public Route? Route { get; set; }
+        public virtual Route? Route { get; set; }
         
     }
 }

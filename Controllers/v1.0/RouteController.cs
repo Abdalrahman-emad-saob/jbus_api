@@ -50,7 +50,7 @@ namespace api.Controllers.v1
             return _routeRepository.GetRouteById(id);
         }
 
-        [CustomAuthorize("PASSENGER", "SUPER_ADMIN", "ADMIN")]
+        [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
         [HttpPut("{id}")]
         public ActionResult updateRoute(RouteUpdateDto routeUpdateDto, int id)
         {
@@ -65,6 +65,23 @@ namespace api.Controllers.v1
                     return NoContent();
 
             return BadRequest("Failed to Update Route");
+        }
+
+        [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
+        [HttpDelete("{id}")]
+        public ActionResult deleteRoute(int id)
+        {
+            var route = _routeRepository.GetRouteById(id);
+
+            if (route == null) 
+                return NotFound("Route Not Found");
+
+            
+            if(_routeRepository.Delete(id))
+                if (_routeRepository.SaveChanges()) 
+                    return NoContent();
+
+            return BadRequest("Failed to Delete Route");
         }
         [CustomAuthorize("PASSENGER")]
         [HttpGet("{id}/favoritepoints")]

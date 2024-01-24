@@ -5,7 +5,7 @@ namespace API.Interfaces
 {
     public interface IPassengerRepository
     {
-        void Update(PassengerDto passenger);
+        void Update(PassengerUpdateDto passengerUpdateDto, Passenger passenger, User user);
         RegisterResponseDto CreatePassenger(RegisterDto registerDto);
         IEnumerable<PassengerDto> GetPassengers();
         PassengerDto GetPassengerDtoById(int id);

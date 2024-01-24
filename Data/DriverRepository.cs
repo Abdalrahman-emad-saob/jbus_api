@@ -4,6 +4,7 @@ using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
@@ -53,6 +54,9 @@ namespace API.Data
         {
             return _context
             .Drivers
+            .Include(d => d.Bus)
+                .ThenInclude(b => b!.Route)
+            .Include(d => d.DriverTrips)
             .Where(d => d.Id == id)
             .SingleOrDefault()!;
         }

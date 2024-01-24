@@ -19,21 +19,27 @@ namespace API.Data
 
         public TripDto CreateTrip(TripCreateDto tripDto, int PassengerId)
         {
-            int status = 0;
-            if (tripDto.status?.ToLower() == "pending")
-                status = 0;
-            else if (tripDto.status?.ToLower() == "ongoing")
-                status = 1;
-            else if (tripDto.status?.ToLower() == "completed")
-                status = 2;
-            else if (tripDto.status?.ToLower() == "canceled")
-                status = 3;
+            // int status = 0;
+            // if (tripDto.status?.ToLower() == "pending")
+            //     status = 0;
+            // else if (tripDto.status?.ToLower() == "ongoing")
+            //     status = 1;
+            // else if (tripDto.status?.ToLower() == "completed")
+            //     status = 2;
+            // else if (tripDto.status?.ToLower() == "canceled")
+            //     status = 3;
+            bool isStatusParsed = Enum.TryParse(tripDto.status, true, out TripStatus status);
+
+            if (!isStatusParsed)
+            {
+                throw new ArgumentException("Invalid status");
+            }
             Point pointPick = new()
             {
                 Latitude = tripDto.PickUpPoint!.Latitude,
                 Longitude = tripDto.PickUpPoint.Longitude
             };
-            if(tripDto.DropOffPoint != null)
+            if (tripDto.DropOffPoint != null)
                 if (tripDto.DropOffPoint.Longitude != 0 && tripDto.DropOffPoint.Longitude != 0)
                 {
                     Point pointDrop = new()
@@ -47,7 +53,7 @@ namespace API.Data
             SaveChanges();
             Trip trip = new()
             {
-                status = (TripStatus)status,
+                status = status,
                 PassengerId = PassengerId,
                 PickUpPointId = pointPick.Id,
                 StartedAt = tripDto.StartedAt

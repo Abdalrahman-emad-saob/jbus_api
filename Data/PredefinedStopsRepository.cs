@@ -3,6 +3,7 @@ using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
@@ -26,8 +27,9 @@ namespace API.Data
                 CreatedAt = predefinedStopsCreateDto.CreatedAt,
                 UpdatedAt = predefinedStopsCreateDto.UpdatedAt
             };
-
             _context.PredefinedStops.Add(predefinedStops);
+            SaveChanges();
+            _context.Routes.Find(predefinedStopsCreateDto.RouteId)!.PredefinedStopsId = predefinedStops.Id;
             return _mapper.Map<PredefinedStopsDto>(predefinedStops);
         }
 
@@ -35,7 +37,8 @@ namespace API.Data
         {
             return _context
            .PredefinedStops
-           .Where(dt => dt.RouteId == id)
+           .Include(dt => dt.points)
+           .Where(dt => dt.RouteId == id && dt.IsActive == ActiveStatus.Active)
            .ProjectTo<PredefinedStopsDto>(_mapper.ConfigurationProvider)
            .SingleOrDefault()!;
         }
@@ -44,6 +47,8 @@ namespace API.Data
         {
             return _context
            .PredefinedStops
+           .Include(dt => dt.points)
+           .Where(dt => dt.IsActive == ActiveStatus.Active)
            .ProjectTo<PredefinedStopsDto>(_mapper.ConfigurationProvider)
            .ToList();
         }

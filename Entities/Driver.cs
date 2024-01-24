@@ -5,9 +5,9 @@ namespace API.Entities
         public int Id { get; set; }
         // * LINK
         public int UserId { get; set; }
-        public User? User { get; set; }
+        public virtual User? User { get; set; }
         public int? BusId { get; set; }
-        public Bus? Bus { get; set; }
-        public List<DriverTrip>? DriverTrips { get; set; }
+        public virtual Bus? Bus { get; set; }
+        public virtual List<DriverTrip>? DriverTrips { get; set; }
     }
 }

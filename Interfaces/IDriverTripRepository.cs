@@ -6,7 +6,7 @@ namespace API.Interfaces
     {
         IEnumerable<DriverTripDto> GetDriverTrips();
         DriverTripDto GetDriverTripById(int id);
-        bool CreateDriverTrip(DriverTripCreateDto driverTripCreateDto);
+        DriverTripDto CreateDriverTrip(DriverTripCreateDto driverTripCreateDto, int id);
         bool SaveChanges();
     }
 }

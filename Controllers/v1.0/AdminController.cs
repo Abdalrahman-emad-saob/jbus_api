@@ -83,7 +83,6 @@ namespace API.Controllers.v1
             return BadRequest("Failed to Update Passenger");
         }
 
-        [NonAction]
         private bool UserExists(string? Email)
         {
             return _userRepository.GetUserByEmail(Email!) != null;

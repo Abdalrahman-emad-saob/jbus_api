@@ -1,6 +1,5 @@
 using API.DTOs;
 using API.Interfaces;
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using API.Validations;
 
@@ -10,18 +9,15 @@ namespace API.Controllers.v1
     {
         private readonly IPassengerRepository _passengerRepository;
         private readonly IUserRepository _userRepository;
-        private readonly IMapper _mapper;
         private readonly ITokenHandlerService _tokenHandlerService;
 
         public PassengerController(
             IPassengerRepository passengerRepository,
             IUserRepository userRepository,
-            IMapper mapper,
             ITokenHandlerService tokenHandlerService)
         {
             _passengerRepository = passengerRepository;
             _userRepository = userRepository;
-            _mapper = mapper;
             _tokenHandlerService = tokenHandlerService;
         }
         [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
@@ -54,11 +50,12 @@ namespace API.Controllers.v1
 
             if (passenger == null || user == null)
                 return NotFound();
-            _mapper.Map(passengerUpdateDto, passenger);
-            _mapper.Map(passengerUpdateDto.User, user);
+
+            _passengerRepository.Update(passengerUpdateDto, passenger, user);
 
             if (_passengerRepository.SaveChanges())
                 return NoContent();
+
             return BadRequest("Failed to Update Passenger");
         }
 
@@ -70,19 +67,17 @@ namespace API.Controllers.v1
             var user = _userRepository.GetUserById((int)passenger.UserId!);
             if (passenger == null || user == null || passengerUpdateDto.User == null)
                 return NotFound();
-            if(passengerUpdateDto.User.Sex != null)
+            if (passengerUpdateDto.User.Sex != null)
                 passengerUpdateDto.User.Sex = passengerUpdateDto.User.Sex.ToUpper();
             if (user.Email != passengerUpdateDto.User.Email)
                 if (UserExists(passengerUpdateDto.User.Email))
-                {
                     return BadRequest("Email Duplicated");
-                }
-            _mapper.Map(passengerUpdateDto, passenger);
-            _mapper.Map(passengerUpdateDto.User, user);
+                
+            _passengerRepository.Update(passengerUpdateDto, passenger, user);
 
             if (_passengerRepository.SaveChanges())
                 return NoContent();
-                
+
             return BadRequest("Failed to Update Passenger");
         }
         [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
@@ -106,10 +101,9 @@ namespace API.Controllers.v1
             }
 
             _passengerRepository.CreatePassenger(registerDto);
-            
+
             return StatusCode(201);
         }
-        [NonAction]
         private bool UserExists(string? Email)
         {
             return _userRepository.GetUserByEmail(Email!) != null;

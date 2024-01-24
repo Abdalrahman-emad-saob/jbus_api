@@ -8,6 +8,7 @@ namespace API.Interfaces
         IEnumerable<RouteDto> GetRoutes();
         RouteDto GetRouteById(int id);
         bool CreateRoute(RouteCreateDto routeDto);
+        bool Delete(int id);
         bool SaveChanges();
     }
 }

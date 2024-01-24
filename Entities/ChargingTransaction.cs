@@ -9,6 +9,6 @@ namespace API.Entities
 
         // * Link
         public int? PassengerId { get; set; }
-        public Passenger? Passenger { get; set; }
+        public virtual Passenger? Passenger { get; set; }
     }
 }

@@ -12,9 +12,9 @@ namespace API.Entities
         public DateTime UpdatedAt { get; set; }
         // * Link
         public int? RouteId { get; set; }
-        public Route? Route { get; set; }
+        public virtual Route? Route { get; set; }
         public int? DriverId { get; set; }
-        public Driver? Driver { get; set; }
-        public List<DriverTrip>? DriverTrips { get; set; }
+        public virtual Driver? Driver { get; set; }
+        public virtual List<DriverTrip>? DriverTrips { get; set; }
     }
 }

@@ -10,11 +10,11 @@ namespace API.Entities
         
         // * Link
         public int? RouteStartId { get; set; }
-        public Route? RouteStart { get; set; }
+        public virtual Route? RouteStart { get; set; }
         public int? RouteEndId { get; set; }
-        public Route? RouteEnd { get; set; }
+        public virtual Route? RouteEnd { get; set; }
         public int? LocationId { get; set; }
-        public Point? Location { get; set; }
+        public virtual Point? Location { get; set; }
         
         
 

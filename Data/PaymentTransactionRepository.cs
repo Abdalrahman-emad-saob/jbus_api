@@ -28,7 +28,7 @@ namespace API.Data
             };
             _context.PaymentTransactions.Add(paymentTransaction);
 
-            return SaveChanges();
+            return true;
         }
 
         public PaymentTransactionDto GetPaymentTransactionById(int id)

@@ -4,7 +4,6 @@ using System.Text.RegularExpressions;
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -17,24 +16,24 @@ namespace API.Controllers.v1
         private readonly IUserRepository _userRepository;
         private readonly IOTPRepository _oTPRepository;
         private readonly ITokenService _tokenService;
-        private readonly IMapper _mapper;
         private readonly IBlacklistedTokenRepository _blacklistedTokenRepository;
+        private readonly IConfiguration _configuration;
 
         public PassengerAccountController(
             IPassengerRepository passengerRepository,
             IUserRepository userRepository,
             IOTPRepository oTPRepository,
             ITokenService tokenService,
-            IMapper mapper,
-            IBlacklistedTokenRepository blacklistedTokenRepository
+            IBlacklistedTokenRepository blacklistedTokenRepository,
+            IConfiguration configuration
             )
         {
             _passengerRepository = passengerRepository;
             _userRepository = userRepository;
             _oTPRepository = oTPRepository;
             _tokenService = tokenService;
-            _mapper = mapper;
             _blacklistedTokenRepository = blacklistedTokenRepository;
+            _configuration = configuration;
         }
         [HttpPost("register/{OTP}")]
         public ActionResult<LoginResponseDto> Register(RegisterDto registerDto, int OTP)
@@ -58,7 +57,10 @@ namespace API.Controllers.v1
             var passengerDto = CreatePassenger.passengerDto;
 
             if (passengerDto == null || user == null)
-                return StatusCode(500, "Internal Server Error inside");
+                return StatusCode(500, "Server Error1");
+                
+            if(_passengerRepository.SaveChanges() == false)
+                return StatusCode(500, "Server Error2");
 
             var token = _tokenService.CreateToken(user, passengerDto.Id);
             return StatusCode(201, new LoginResponseDto
@@ -80,7 +82,7 @@ namespace API.Controllers.v1
                 if (user == null || user.PasswordHash == null || loginDto.Password == null)
                     return NotFound(new { Error = "USER_DOES_NOT_EXIST" });
 
-                var passwordHasher = new PasswordHasher<Entities.User>();
+                var passwordHasher = new PasswordHasher<User>();
                 var passwordVerificationResult = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginDto.Password);
 
                 if (passwordVerificationResult != PasswordVerificationResult.Success)
@@ -159,8 +161,8 @@ namespace API.Controllers.v1
             {
                 return BadRequest("Passenger exists");
             }
-            string senderEmail = "aboodsaob1139@gmail.com";
-            string senderPassword = "dugm cixm ychg qjjc";
+            string senderEmail = "no.reply.jbus@gmail.com";
+            string senderPassword = _configuration["MailPassword"]!;
             int otp = _oTPRepository.CreateOTP(sendOTPDto.Email!);
             MailMessage mail = new()
             {

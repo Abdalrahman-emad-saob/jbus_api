@@ -1,4 +1,5 @@
 using API.DTOs;
+using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -47,6 +48,7 @@ namespace API.Data
                 Name = routeDto.Name,
                 WaypointsGoing = routeDto.WaypointsGoing,
                 WaypointsReturning = routeDto.WaypointsReturning,
+                Fee = routeDto.Fee,
                 StartingPointId = interestPoint1.Id,
                 EndingPointId = interestPoint2.Id,
                 CreatedAt = DateTime.UtcNow,
@@ -59,8 +61,9 @@ namespace API.Data
 
         public RouteDto GetRouteById(int id)
         {
-            return _context.Routes
-            .Where(r => r.Id == id)
+            return _context
+            .Routes
+            .Where(r => r.Id == id && r.IsActive == ActiveStatus.Active)
             .ProjectTo<RouteDto>(_mapper.ConfigurationProvider)
             .SingleOrDefault()!;
         }
@@ -68,6 +71,7 @@ namespace API.Data
         public IEnumerable<RouteDto> GetRoutes()
         {
             return _context.Routes
+                .Where(r => r.IsActive == ActiveStatus.Active)
                 .ProjectTo<RouteDto>(_mapper.ConfigurationProvider)
                 .ToList();
         }
@@ -82,8 +86,22 @@ namespace API.Data
             var route = _context.Routes.Find(id);
             _mapper.Map(routeUpdateDto, route);
             route!.UpdatedAt = DateTime.UtcNow;
-            return true;
             // _context.Entry(route).State = EntityState.Modified;
+            return true;
+        }
+
+        public bool Delete(int id)
+        {
+            var route = _context.Routes.Find(id);
+            var predefinedStops = _context.PredefinedStops.Where(ps => ps.RouteId == id).SingleOrDefault()!;
+            route!.IsActive = ActiveStatus.Deleted;
+            route!.UpdatedAt = DateTime.UtcNow;
+            if (predefinedStops != null)
+            {
+                predefinedStops.IsActive = ActiveStatus.Deleted;
+                predefinedStops.UpdatedAt = DateTime.UtcNow;
+            }
+            return true;
         }
     }
 }

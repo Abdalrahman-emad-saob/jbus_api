@@ -15,8 +15,8 @@ namespace API.Entities
         public DateOnly DateOfBirth { get; set; }
 
         // * Link
-        public Passenger? Passenger { get; set; }
-        public Driver? Driver { get; set; }
-        public Admin? Admin { get; set; }
+        public virtual Passenger? Passenger { get; set; }
+        public virtual Driver? Driver { get; set; }
+        public virtual Admin? Admin { get; set; }
     }
 }

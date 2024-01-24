@@ -77,7 +77,6 @@ namespace API.Controllers.v1
 
             return BadRequest("Failed to Update Driver");
         }
-        [NonAction]
         private bool UserExists(string? Email)
         {
             return _userRepository.GetUserByEmail(Email!) != null;

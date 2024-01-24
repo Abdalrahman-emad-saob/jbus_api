@@ -31,8 +31,13 @@ namespace API.Helpers
 
             CreateMap<DriverTrip, DriverTripDto>()
             .ForMember(dtd => dtd.status, opt => opt.MapFrom(dt => dt.status.ToString()));
-            CreateMap<DriverTripCreateDto, DriverTrip>()
-            .ForMember(dtc => dtc.status, opt => opt.MapFrom(dt => Enum.Parse<TripStatus>(dt.status!)));
+            CreateMap<DriverTripCreateDto, DriverTrip>();
+            CreateMap<DriverTripUpdateDto, DriverTrip>()
+            .ForMember(dtc => dtc.status, opt => opt.MapFrom(dt => Enum.Parse<TripStatus>(dt.status!)))
+            .ForMember(dtc => dtc.FinishedAt, opt => opt.PreCondition(src => src.FinishedAt != default))
+            .ForMember(dtc => dtc.Rating, opt => opt.PreCondition(src => src.Rating != default))
+            .ForMember(dtc => dtc.Trips, opt => opt.PreCondition(src => src.Trips != null))
+            .ForMember(dtc => dtc.status, opt => opt.PreCondition(src => !string.IsNullOrEmpty(src.status)));
 
             CreateMap<FavoritePoint, FavoritePointDto>();
 
@@ -68,7 +73,9 @@ namespace API.Helpers
             CreateMap<PredefinedStops, PredefinedStopsDto>();
             CreateMap<PredefinedStopsCreateDto, PredefinedStops>();
 
-            CreateMap<Entities.Route, RouteDto>();
+            CreateMap<Entities.Route, RouteDto>()
+            .ForMember(r => r.PredefinedStops, opt => opt.MapFrom(r => r.PredefinedStops))
+            .ForMember(r => r.PredefinedStops, opt => opt.PreCondition(src => src.PredefinedStops != null));
             CreateMap<RouteCreateDto, Entities.Route>();
             CreateMap<RouteUpdateDto, Entities.Route>()
             .ForMember(r => r.Name, opt => opt.PreCondition(src => !string.IsNullOrEmpty(src.Name)))
