@@ -7,19 +7,14 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services
 {
-    public class TokenService : ITokenService
+    public class TokenService(
+        IConfiguration config,
+        IHttpContextAccessor httpContextAccessor
+            ) : ITokenService
     {
-        private readonly SymmetricSecurityKey _key;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly SymmetricSecurityKey _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"]!));
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
-        public TokenService(
-            IConfiguration config,
-            IHttpContextAccessor httpContextAccessor
-            )
-        {
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"]!));
-            _httpContextAccessor = httpContextAccessor;
-        }
         public string CreateToken(User user, int passengerId)
         {
             var claims = new List<Claim>

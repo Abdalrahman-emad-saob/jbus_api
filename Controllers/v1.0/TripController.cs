@@ -34,7 +34,7 @@ namespace API.Controllers.v1
 
             string role = _tokenHandlerService.ExtractUserRole();
             if (
-            role == "Not" || 
+            role == "Not" ||
             (
             role.ToUpper() != Role.PASSENGER.ToString()
             ))
@@ -69,9 +69,9 @@ namespace API.Controllers.v1
                 return Unauthorized("Not authorized");
 
             await _tripRepository.CreateTrip(tripCreateDto, Id);
-           if(!await _tripRepository.SaveChanges())
-                    return StatusCode(500, "Server Error1");
-            
+            if (!await _tripRepository.SaveChanges())
+                return StatusCode(500, "Server Error1");
+
             return StatusCode(201);
         }
     }

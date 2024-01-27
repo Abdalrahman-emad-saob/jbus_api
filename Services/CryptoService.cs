@@ -6,17 +6,10 @@ using API.Interfaces;
 namespace API.Services;
 
 
-public class CryptoService : ICryptoService
+public class CryptoService(string key, string iv) : ICryptoService
 {
-    private readonly byte[] _key;
-    private readonly byte[] _iv;
-
-    public CryptoService(string key, string iv)
-    {
-        using var sha256 = SHA256.Create();
-        _key = sha256.ComputeHash(Encoding.UTF8.GetBytes(key));
-        _iv = Encoding.UTF8.GetBytes(iv[..16]);
-    }
+    private readonly byte[] _key = SHA256.HashData(Encoding.UTF8.GetBytes(key));
+    private readonly byte[] _iv = Encoding.UTF8.GetBytes(iv[..16]);
 
     public string Encrypt(string plainText)
     {

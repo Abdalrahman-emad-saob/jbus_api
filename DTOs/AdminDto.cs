@@ -4,5 +4,6 @@ namespace API.DTOs
     {
         public int Id { get; set; }
         public UserDto? User { get; set; }
+        public string? Role { get; set; }
     }
 }

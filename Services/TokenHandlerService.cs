@@ -3,14 +3,10 @@ using API.Interfaces;
 
 namespace API.Services
 {
-    public class TokenHandlerService : ITokenHandlerService
+    public class TokenHandlerService(IHttpContextAccessor httpContextAccessor) : ITokenHandlerService
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
-        public TokenHandlerService(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
         public int TokenHandler()
         {
             var authorizationHeader = _httpContextAccessor.HttpContext?.Request.Headers.Authorization.FirstOrDefault();

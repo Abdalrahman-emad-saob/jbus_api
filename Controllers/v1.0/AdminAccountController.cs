@@ -38,7 +38,7 @@ namespace API.Controllers.v1
                 if (passwordVerificationResult != PasswordVerificationResult.Success)
                     return Unauthorized("Not Authorized1");
 
-                if(user.Email == null)
+                if (user.Email == null)
                     return Unauthorized("Not Authorized2");
 
                 var adminDto = _mapper.Map<AdminDto>(await _adminRepository.GetAdminByEmail(user.Email));
@@ -48,15 +48,17 @@ namespace API.Controllers.v1
 
                 var token = _tokenService.CreateToken(user, adminDto.Id);
 
+                adminDto.Role = user.Role.ToString();
+
                 return new LoginAdminResponseDto
                 {
                     adminDto = adminDto,
                     Token = token
                 };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, "Internal Server Error");
+                return StatusCode(500, $"Server Error {ex}");
             }
         }
         [Authorize]
