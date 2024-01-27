@@ -5,55 +5,51 @@ using API.Validations;
 
 namespace API.Controllers.v1
 {
-    public class PassengerController : BaseApiController
+    public class PassengerController(
+        IPassengerRepository passengerRepository,
+        IUserRepository userRepository,
+        ITokenHandlerService tokenHandlerService) : BaseApiController
     {
-        private readonly IPassengerRepository _passengerRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly ITokenHandlerService _tokenHandlerService;
+        private readonly IPassengerRepository _passengerRepository = passengerRepository;
+        private readonly IUserRepository _userRepository = userRepository;
+        private readonly ITokenHandlerService _tokenHandlerService = tokenHandlerService;
 
-        public PassengerController(
-            IPassengerRepository passengerRepository,
-            IUserRepository userRepository,
-            ITokenHandlerService tokenHandlerService)
-        {
-            _passengerRepository = passengerRepository;
-            _userRepository = userRepository;
-            _tokenHandlerService = tokenHandlerService;
-        }
         [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
         [HttpGet("getPassengers")]
-        public ActionResult<IEnumerable<PassengerDto>> GetPassengers()
+        public async Task<ActionResult<IEnumerable<PassengerDto>>> GetPassengers()
         {
-            return Ok(_passengerRepository.GetPassengers());
+            return Ok(await _passengerRepository.GetPassengers());
         }
         [CustomAuthorize("PASSENGER")]
         [HttpGet]
-        public ActionResult<PassengerDto> GetPassenger()
+        public async Task<ActionResult<PassengerDto?>> GetPassenger()
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
                 return Unauthorized("Not authorized");
 
-            return _passengerRepository.GetPassengerDtoById(Id);
+            return await _passengerRepository.GetPassengerDtoById(Id);
         }
 
         [CustomAuthorize("PASSENGER")]
         [HttpPut]
-        public ActionResult updatePassenger(PassengerUpdateDto passengerUpdateDto)
+        public async Task<ActionResult> updatePassenger(PassengerUpdateDto passengerUpdateDto)
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
                 return Unauthorized("Not authorized");
 
-            var passenger = _passengerRepository.GetPassengerById(Id);
-            var user = _userRepository.GetUserById((int)passenger.UserId!);
+            var passenger = await _passengerRepository.GetPassengerById(Id);
+            if (passenger == null)
+                return NotFound("Passenger Does not Exist");
+            var user = await _userRepository.GetUserById((int)passenger.UserId!);
 
             if (passenger == null || user == null)
                 return NotFound();
 
             _passengerRepository.Update(passengerUpdateDto, passenger, user);
 
-            if (_passengerRepository.SaveChanges())
+            if (await _passengerRepository.SaveChanges())
                 return NoContent();
 
             return BadRequest("Failed to Update Passenger");
@@ -61,30 +57,32 @@ namespace API.Controllers.v1
 
         [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
         [HttpPut("{id}")]
-        public ActionResult updatePassenger(PassengerUpdateDto passengerUpdateDto, int Id)
+        public async Task<ActionResult> updatePassenger(PassengerUpdateDto passengerUpdateDto, int Id)
         {
-            var passenger = _passengerRepository.GetPassengerById(Id);
-            var user = _userRepository.GetUserById((int)passenger.UserId!);
+            var passenger = await _passengerRepository.GetPassengerById(Id);
+            if (passenger == null)
+                return NotFound("Passenger Does not Exist");
+            var user = await _userRepository.GetUserById((int)passenger.UserId!);
             if (passenger == null || user == null || passengerUpdateDto.User == null)
-                return NotFound();
+                return NotFound("User Does not Exist");
             if (passengerUpdateDto.User.Sex != null)
                 passengerUpdateDto.User.Sex = passengerUpdateDto.User.Sex.ToUpper();
             if (user.Email != passengerUpdateDto.User.Email)
-                if (UserExists(passengerUpdateDto.User.Email))
+                if (await UserExists(passengerUpdateDto.User.Email))
                     return BadRequest("Email Duplicated");
                 
             _passengerRepository.Update(passengerUpdateDto, passenger, user);
 
-            if (_passengerRepository.SaveChanges())
+            if (await _passengerRepository.SaveChanges())
                 return NoContent();
 
             return BadRequest("Failed to Update Passenger");
         }
         [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
         [HttpGet("{id}")]
-        public ActionResult<PassengerDto> GetPassengerById(int id)
+        public async Task<ActionResult<PassengerDto>> GetPassengerById(int id)
         {
-            var passenger = _passengerRepository.GetPassengerDtoById(id);
+            var passenger = await _passengerRepository.GetPassengerDtoById(id);
             if (passenger == null)
                 return NotFound("Passenger Does not Exist");
 
@@ -93,20 +91,67 @@ namespace API.Controllers.v1
 
         [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
         [HttpPost("AddPassenger")]
-        public ActionResult AddPassenger(RegisterDto registerDto)
+        public async Task<ActionResult> AddPassenger(RegisterDto registerDto)
         {
-            if (UserExists(registerDto.Email))
+            if (await UserExists(registerDto.Email))
             {
                 return BadRequest("Passenger Exists");
             }
 
-            _passengerRepository.CreatePassenger(registerDto);
+            await _passengerRepository.CreatePassenger(registerDto);
 
             return StatusCode(201);
         }
-        private bool UserExists(string? Email)
+
+        [CustomAuthorize("PASSENGER", "SUPER_ADMIN", "ADMIN")]
+        [HttpPut("updateRewardPoints")]
+        public async Task<ActionResult> UpdateRewardPoints(int rp)
         {
-            return _userRepository.GetUserByEmail(Email!) != null;
+            int Id = _tokenHandlerService.TokenHandler();
+
+            var passenger = _passengerRepository.GetPassengerDtoById(Id);
+            if (passenger == null)
+                return NotFound("Passenger Does not Exist");
+
+            await _passengerRepository.UpdateRewardPoints(rp, Id);
+
+            if (await _passengerRepository.SaveChanges())
+                return NoContent();
+
+            return BadRequest("Failed to Update Reward Points");
+        }
+
+        [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
+        [HttpPut("updateRewardPoints/{Id}")]
+        public async Task<ActionResult> UpdateRewardPoints(int rp, int Id)
+        {
+            var passenger = _passengerRepository.GetPassengerDtoById(Id);
+            if (passenger == null)
+                return NotFound("Passenger Does not Exist");
+
+            await _passengerRepository.UpdateRewardPoints(rp, Id);
+
+            if (await _passengerRepository.SaveChanges())
+                return NoContent();
+
+            return BadRequest("Failed to Update Reward Points");
+        }
+
+        [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
+        [HttpPut("updateRewardPointsToAll")]
+        public async Task<ActionResult> UpdateRewardPointsToAll(int rp)
+        {
+            await _passengerRepository.UpdateRewardPointsToAll(rp);
+
+            if (await _passengerRepository.SaveChanges())
+                return NoContent();
+
+            return BadRequest("Failed to Update Reward Points");
+        }
+
+        private async Task<bool> UserExists(string? Email)
+        {
+            return await _userRepository.GetUserByEmail(Email!) != null;
         }
     }
 }

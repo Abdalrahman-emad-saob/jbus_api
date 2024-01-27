@@ -4,11 +4,13 @@ namespace API.Interfaces
 {
     public interface IBusRepository
     {
-        bool Update(BusUpdateDto busUpdateDto, int id);
-        IEnumerable<BusDto> GetBuses();
-        IEnumerable<BusDto> GetActiveBuses();
-        BusDto GetBusById(int id);
-        bool CreateBus(BusCreateDto busCreateDto);
-        bool SaveChanges();
+        Task<bool> Update(BusUpdateDto busUpdateDto, int id);
+        Task<IEnumerable<BusDto>> GetBuses();
+        Task<IEnumerable<BusDto>> GetActiveBuses();
+        Task<IEnumerable<BusDto>> GetActiveBusesByRoute(int id);
+        Task<BusDto?> GetBusById(int id);
+        Task<bool> CreateBus(BusCreateDto busCreateDto);
+        Task<bool> IsBusActive(int? id);
+        Task<bool> SaveChanges();
     }
 }

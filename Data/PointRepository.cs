@@ -3,21 +3,16 @@ using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class PointRepository : IPointRepository
+    public class PointRepository(DataContext context, IMapper mapper) : IPointRepository
     {
-        private readonly DataContext _context;
-        private readonly IMapper _mapper;
+        private readonly DataContext _context = context;
+        private readonly IMapper _mapper = mapper;
 
-        public PointRepository(DataContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
-
-        public Point CreatePoint(PointCreateDto pointDto)
+        public async Task<Point?> CreatePoint(PointCreateDto pointDto)
         {
             Point point = new()
             {
@@ -26,40 +21,40 @@ namespace API.Data
                 Longitude = pointDto.Longitude,
                 CreatedAt = DateTime.UtcNow
             };
-            _context.Points.Add(point);
+            await _context.Points.AddAsync(point);
 
             return point;
         }
 
-        public PointDto GetPointById(int id)
+        public async Task<PointDto?> GetPointById(int id)
         {
-            return _context
+            return await _context
             .Points
             .Where(p => p.Id == id)
             .ProjectTo<PointDto>(_mapper.ConfigurationProvider)
-            .SingleOrDefault()!;
+            .SingleOrDefaultAsync()!;
         }
 
-        public IEnumerable<PointDto> GetPoints()
+        public async Task<IEnumerable<PointDto?>> GetPoints()
         {
-            return _context
+            return await _context
                 .Points
                 .ProjectTo<PointDto>(_mapper.ConfigurationProvider)
-                .ToList();
+                .ToListAsync();
         }
 
-        public PointDto PointExists(double lat, double lon)
+        public async Task<PointDto?> PointExists(double lat, double lon)
         {
-            return _context
+            return await _context
                     .Points
                     .Where(p => p.Latitude == lat && p.Longitude == lon)
                     .ProjectTo<PointDto>(_mapper.ConfigurationProvider)
-                    .SingleOrDefault()!;
+                    .SingleOrDefaultAsync()!;
         }
 
-        public bool SaveChanges()
+        public async Task<bool> SaveChanges()
         {
-            return _context.SaveChanges() > 0;
+            return await _context.SaveChangesAsync() > 0;
         }
 
         public void Update(PointDto point)

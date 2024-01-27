@@ -7,24 +7,20 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
     [CustomAuthorize("PASSENGER")]
-    public class PointController : BaseApiController
+    public class PointController(
+        IPointRepository pointRepository
+            ) : BaseApiController
     {
-        private readonly IPointRepository _pointRepository;
+        private readonly IPointRepository _pointRepository = pointRepository;
 
-        public PointController(
-            IPointRepository pointRepository
-            )
-        {
-            _pointRepository = pointRepository;
-        }
         [HttpPost]
-        public ActionResult<PointDto> CreatePoint(PointCreateDto pointCreateDto)
+        public async Task<ActionResult<PointDto>> CreatePoint(PointCreateDto pointCreateDto)
         {
-            PointDto point = PointExists(pointCreateDto.Latitude, pointCreateDto.Longitude);
+            PointDto? point = await PointExists(pointCreateDto.Latitude, pointCreateDto.Longitude);
             if (point == null)
             {
-                _pointRepository.CreatePoint(pointCreateDto);
-               if(!_pointRepository.SaveChanges())
+                await _pointRepository.CreatePoint(pointCreateDto);
+               if(!await _pointRepository.SaveChanges())
                     return StatusCode(500, "Server Error1");
                 return StatusCode(201, "Point Created");
             }
@@ -32,18 +28,18 @@ namespace API.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult<PointDto> GetPointById(int id)
+        public async Task<ActionResult<PointDto>> GetPointById(int id)
         {
-            var pointDto = _pointRepository.GetPointById(id);
+            var pointDto = await _pointRepository.GetPointById(id);
 
             if (pointDto == null)
                 return NotFound("Point Not Found");
 
             return pointDto;
         }
-        private PointDto PointExists(double lat, double lon)
+        private async Task<PointDto?> PointExists(double lat, double lon)
         {
-            return _pointRepository.PointExists(lat, lon);
+            return await _pointRepository.PointExists(lat, lon);
         }
     }
 }

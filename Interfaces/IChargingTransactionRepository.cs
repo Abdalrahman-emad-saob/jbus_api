@@ -4,9 +4,9 @@ namespace API.Interfaces
 {
     public interface IChargingTransactionRepository
     {
-        IEnumerable<ChargingTransactionDto> GetChargingTransactions();
-        ChargingTransactionDto GetChargingTransactionById(int id);
-        bool CreateChargingTransaction(ChargingTransactionCreateDto chargingTransactionDto, int id);
-        bool SaveChanges();
+        Task<IEnumerable<ChargingTransactionDto?>> GetChargingTransactions();
+        Task<ChargingTransactionDto?> GetChargingTransactionById(int id);
+        Task<bool> CreateChargingTransaction(ChargingTransactionCreateDto chargingTransactionDto, int id);
+        Task<bool> SaveChanges();
     }
 }

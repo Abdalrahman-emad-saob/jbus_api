@@ -16,5 +16,6 @@ namespace API.DTOs
         // [ValidPassword]
         [Required]
         public string? Password { get; set; }
+        public string? FCMToken { get; set; }
     }
 }

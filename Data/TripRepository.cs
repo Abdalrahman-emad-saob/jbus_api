@@ -3,21 +3,16 @@ using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class TripRepository : ITripRepository
+    public class TripRepository(DataContext context, IMapper mapper) : ITripRepository
     {
-        private readonly DataContext _context;
-        private readonly IMapper _mapper;
+        private readonly DataContext _context = context;
+        private readonly IMapper _mapper = mapper;
 
-        public TripRepository(DataContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
-
-        public TripDto CreateTrip(TripCreateDto tripDto, int PassengerId)
+        public async Task<TripDto?> CreateTrip(TripCreateDto tripDto, int PassengerId)
         {
             // int status = 0;
             // if (tripDto.status?.ToLower() == "pending")
@@ -47,10 +42,10 @@ namespace API.Data
                         Latitude = tripDto.DropOffPoint!.Latitude,
                         Longitude = tripDto.DropOffPoint.Longitude
                     };
-                    _context.Points.Add(pointDrop);
+                    await _context.Points.AddAsync(pointDrop);
                 }
-            _context.Points.Add(pointPick);
-            SaveChanges();
+            await _context.Points.AddAsync(pointPick);
+            await SaveChanges();
             Trip trip = new()
             {
                 status = status,
@@ -59,41 +54,41 @@ namespace API.Data
                 StartedAt = tripDto.StartedAt
             };
 
-            _context.Trips.Add(trip);
+            await _context.Trips.AddAsync(trip);
 
             return _mapper.Map<TripDto>(trip);
         }
 
-        public TripDto GetTripById(int id, int PassengerId)
+        public async Task<TripDto?> GetTripById(int id, int PassengerId)
         {
-            return _context
+            return await _context
                 .Trips
                 .Where(t => t.Id == id && t.PassengerId == PassengerId)
                 .ProjectTo<TripDto>(_mapper.ConfigurationProvider)
-                .SingleOrDefault()!;
+                .SingleOrDefaultAsync()!;
         }
 
-        public IEnumerable<TripDto> GetTrips(int PassengerId)
+        public async Task<IEnumerable<TripDto?>> GetTrips(int PassengerId)
         {
-            return _context
+            return await _context
             .Trips
             .Where(t => t.PassengerId == PassengerId)
             .ProjectTo<TripDto>(_mapper.ConfigurationProvider)
-            .ToList();
+            .ToListAsync();
         }
 
-        public IEnumerable<TripDto> GetTripsById(int id)
+        public async Task<IEnumerable<TripDto?>> GetTripsById(int id)
         {
-            return _context
+            return await _context
             .Trips
             .Where(t => t.PassengerId == id)
             .ProjectTo<TripDto>(_mapper.ConfigurationProvider)
-            .ToList();
+            .ToListAsync();
         }
 
-        public bool SaveChanges()
+        public async Task<bool> SaveChanges()
         {
-            return _context.SaveChanges() > 0;
+            return await _context.SaveChangesAsync() > 0;
         }
 
         public void Update(TripUpdateDto tripUpdateDto, int id)

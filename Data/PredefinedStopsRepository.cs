@@ -7,18 +7,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class PredefinedStopsRepository : IPredefinedStopsRepository
+    public class PredefinedStopsRepository(DataContext context, IMapper mapper) : IPredefinedStopsRepository
     {
-        private readonly DataContext _context;
-        private readonly IMapper _mapper;
+        private readonly DataContext _context = context;
+        private readonly IMapper _mapper = mapper;
 
-        public PredefinedStopsRepository(DataContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
-
-        public PredefinedStopsDto CreatePredefinedStops(PredefinedStopsCreateDto predefinedStopsCreateDto)
+        public async Task<PredefinedStopsDto?> CreatePredefinedStops(PredefinedStopsCreateDto predefinedStopsCreateDto)
         {
             PredefinedStops predefinedStops = new()
             {
@@ -27,35 +21,35 @@ namespace API.Data
                 CreatedAt = predefinedStopsCreateDto.CreatedAt,
                 UpdatedAt = predefinedStopsCreateDto.UpdatedAt
             };
-            _context.PredefinedStops.Add(predefinedStops);
-            SaveChanges();
-            _context.Routes.Find(predefinedStopsCreateDto.RouteId)!.PredefinedStopsId = predefinedStops.Id;
+            await _context.PredefinedStops.AddAsync(predefinedStops);
+            await SaveChanges();
+            (await _context.Routes.FindAsync(predefinedStopsCreateDto.RouteId))!.PredefinedStopsId = predefinedStops.Id;
             return _mapper.Map<PredefinedStopsDto>(predefinedStops);
         }
 
-        public PredefinedStopsDto GetPredefinedStopById(int id)
+        public async Task<PredefinedStopsDto?> GetPredefinedStopById(int id)
         {
-            return _context
+            return await _context
            .PredefinedStops
            .Include(dt => dt.points)
            .Where(dt => dt.RouteId == id && dt.IsActive == ActiveStatus.Active)
            .ProjectTo<PredefinedStopsDto>(_mapper.ConfigurationProvider)
-           .SingleOrDefault()!;
+           .SingleOrDefaultAsync()!;
         }
 
-        public IEnumerable<PredefinedStopsDto> GetPredefinedStops()
+        public async Task<IEnumerable<PredefinedStopsDto?>> GetPredefinedStops()
         {
-            return _context
+            return await _context
            .PredefinedStops
            .Include(dt => dt.points)
            .Where(dt => dt.IsActive == ActiveStatus.Active)
            .ProjectTo<PredefinedStopsDto>(_mapper.ConfigurationProvider)
-           .ToList();
+           .ToListAsync();
         }
 
-        public bool SaveChanges()
+        public async Task<bool> SaveChanges()
         {
-            return _context.SaveChanges() > 0;
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

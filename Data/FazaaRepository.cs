@@ -7,18 +7,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class FazaaRepository : IFazaaRepository
+    public class FazaaRepository(DataContext context, IMapper mapper) : IFazaaRepository
     {
-        private readonly DataContext _context;
-        private readonly IMapper _mapper;
+        private readonly DataContext _context = context;
+        private readonly IMapper _mapper = mapper;
 
-        public FazaaRepository(DataContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
-
-        public bool StoreFazaas(FazaaCreateDto fazaaCreateDto, int CreditorId)
+        public async Task<bool> StoreFazaas(FazaaCreateDto fazaaCreateDto, int CreditorId)
         {
                 // var passenger =_context.Passengers.Find(fazaa.CreditorId);
                 Fazaa newFazaa = new()
@@ -29,31 +23,31 @@ namespace API.Data
                     CreditorId = CreditorId,
                     InDebtId = fazaaCreateDto.InDebtId
                 };
-                _context.Fazaas.Add(newFazaa);
+                await _context.Fazaas.AddAsync(newFazaa);
             return true;
         }
 
-        public FazaaDto GetFazaaById(int id)
+        public async Task<FazaaDto?> GetFazaaById(int id)
         {
-            return _context
+            return await _context
            .Fazaas
            .Where(dt => dt.Id == id)
            .ProjectTo<FazaaDto>(_mapper.ConfigurationProvider)
-           .SingleOrDefault()!;
+           .SingleOrDefaultAsync()!;
         }
 
-        public IEnumerable<FazaaDto> GetFazaas(int InDebtId)
+        public async Task<IEnumerable<FazaaDto?>> GetFazaas(int InDebtId)
         {
-            return _context
+            return await _context
            .Fazaas
            .Where(dt => dt.InDebtId == InDebtId || dt.CreditorId == InDebtId)
            .ProjectTo<FazaaDto>(_mapper.ConfigurationProvider)
-           .ToList();
+           .ToListAsync();
         }
 
-        public bool SaveChanges()
+        public async Task<bool> SaveChanges()
         {
-            return _context.SaveChanges() > 0;
+            return await _context.SaveChangesAsync() > 0;
         }
 
         public void Update(FazaaDto fazaa)

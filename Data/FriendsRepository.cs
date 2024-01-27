@@ -3,21 +3,16 @@ using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class FriendsRepository : IFriendsRepository
+    public class FriendsRepository(DataContext context, IMapper mapper) : IFriendsRepository
     {
-        private readonly DataContext _context;
-        private readonly IMapper _mapper;
+        private readonly DataContext _context = context;
+        private readonly IMapper _mapper = mapper;
 
-        public FriendsRepository(DataContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
-
-        public bool SendFriendRequest(FriendsCreateDto friendCreateDto, int PassengerId)
+        public async Task<bool> SendFriendRequest(FriendsCreateDto friendCreateDto, int PassengerId)
         {
             Friends friends = new()
             {
@@ -25,55 +20,55 @@ namespace API.Data
                 CreatedAt = DateTime.UtcNow,
                 FriendId = friendCreateDto.FriendId,
                 PassengerId = PassengerId,
-                Friend = _context.Passengers.Find(friendCreateDto.FriendId),
-                Passenger = _context.Passengers.Find(PassengerId)
+                Friend = await _context.Passengers.FindAsync(friendCreateDto.FriendId),
+                Passenger = await _context.Passengers.FindAsync(PassengerId)
             };
             
-            _context.Friends.Add(friends);
+            await _context.Friends.AddAsync(friends);
 
             return true;
         }
 
-        public bool ConfirmFriendRequest(int Id, int PassengerId)
+        public async Task<bool> ConfirmFriendRequest(int Id, int PassengerId)
         {
-            var friend = _context
+            var friend = await _context
                         .Friends
                         .Where(f => f.Id == Id && f.FriendId == PassengerId)
-                        .SingleOrDefault();
+                        .SingleOrDefaultAsync();
             friend!.Confirmed = true;
 
             return true;
         }
 
-        public FriendsDto GetFriendById(int Id, int PassengerId)
+        public async Task<FriendsDto?> GetFriendById(int Id, int PassengerId)
         {
-            return _context
+            return await _context
                     .Friends
                     .Where(f => f.Confirmed == true && f.Id == Id && (f.PassengerId == PassengerId || f.FriendId == PassengerId))
                     .ProjectTo<FriendsDto>(_mapper.ConfigurationProvider)
-                    .SingleOrDefault()!;
+                    .SingleOrDefaultAsync()!;
         }
 
-        public bool FriendRequestExists(int FriendId, int PassengerId)
+        public async Task<bool> FriendRequestExists(int FriendId, int PassengerId)
         {
-            bool friendExists = _context.Friends
-                                .Any(f => (f.FriendId == FriendId && f.PassengerId == PassengerId) || (f.FriendId == PassengerId && f.PassengerId == FriendId));
+            bool friendExists = await _context.Friends
+                                .AnyAsync(f => (f.FriendId == FriendId && f.PassengerId == PassengerId) || (f.FriendId == PassengerId && f.PassengerId == FriendId));
 
             return friendExists;
         }
 
-        public IEnumerable<FriendsDto> GetFriends(int id)
+        public async Task<IEnumerable<FriendsDto?>> GetFriends(int id)
         {
-            return _context
+            return await _context
            .Friends
            .Where(f => (f.PassengerId == id || f.FriendId == id) && f.Confirmed == true)
            .ProjectTo<FriendsDto>(_mapper.ConfigurationProvider)
-           .ToList();
+           .ToListAsync();
         }
 
-        public bool SaveChanges()
+        public async Task<bool> SaveChanges()
         {
-            return _context.SaveChanges() > 0;
+            return await _context.SaveChangesAsync() > 0;
         }
 
         public void Update(FriendsDto friend)
@@ -81,24 +76,24 @@ namespace API.Data
             _context.Entry(friend).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         }
 
-        public bool DeleteFriend(int Id, int PassengerId)
+        public async Task<bool> DeleteFriend(int Id, int PassengerId)
         {
-            var friendToDelete = _context
+            var friendToDelete = await _context
                                 .Friends
                                 .Where(f => f.Id == Id && (f.PassengerId == PassengerId || f.FriendId == PassengerId))
-                                .SingleOrDefault();
+                                .SingleOrDefaultAsync();
 
             _context.Friends.Remove(friendToDelete!);
             return true;
         }
 
-        public IEnumerable<FriendsDto> GetFriendRequests(int PassengerId)
+        public async Task<IEnumerable<FriendsDto?>> GetFriendRequests(int PassengerId)
         {
-            var friendsRequests = _context
+            var friendsRequests = await _context
                             .Friends
                             .Where(f => f.FriendId == PassengerId && f.Confirmed == false)
                             .ProjectTo<FriendsDto>(_mapper.ConfigurationProvider)
-                            .ToList();
+                            .ToListAsync();
             return friendsRequests;
         }
     }

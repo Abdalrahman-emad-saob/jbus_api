@@ -7,31 +7,24 @@ using Microsoft.AspNetCore.Mvc;
 namespace api.Controllers.v1
 {
     [CustomAuthorize("PASSENGER")]
-    public class ChargingBalanceController : BaseApiController
+    public class ChargingBalanceController(
+        ITokenHandlerService tokenHandlerService,
+        IChargingTransactionRepository chargingTransactionRepository,
+        ICreditCardsRepository creditCardsRepository
+            ) : BaseApiController
     {
-        private readonly ITokenHandlerService _tokenHandlerService;
-        private readonly IChargingTransactionRepository _chargingTransactionRepository;
-        private readonly ICreditCardsRepository _creditCardsRepository;
-
-        public ChargingBalanceController(
-            ITokenHandlerService tokenHandlerService,
-            IChargingTransactionRepository chargingTransactionRepository,
-            ICreditCardsRepository creditCardsRepository
-            )
-        {
-            _tokenHandlerService = tokenHandlerService;
-            _chargingTransactionRepository = chargingTransactionRepository;
-            _creditCardsRepository = creditCardsRepository;
-        }
+        private readonly ITokenHandlerService _tokenHandlerService = tokenHandlerService;
+        private readonly IChargingTransactionRepository _chargingTransactionRepository = chargingTransactionRepository;
+        private readonly ICreditCardsRepository _creditCardsRepository = creditCardsRepository;
 
         [HttpPost("ChargeWallet")]
-        public ActionResult ChargeWallet(ChargingTransactionCreateDto chargingTransactionCreateDto)
+        public async Task<ActionResult> ChargeWallet(ChargingTransactionCreateDto chargingTransactionCreateDto)
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
                 return Unauthorized("Not authorized");
 
-            var creditCard = _creditCardsRepository.GetCreditCardByCardNumber(chargingTransactionCreateDto.CardNumber);
+            var creditCard = await _creditCardsRepository.GetCreditCardByCardNumber(chargingTransactionCreateDto.CardNumber);
             if (creditCard == null)
                 return NotFound("No Matching Card Found, Best Luck Next Time");
             if(creditCard.CardType != chargingTransactionCreateDto.paymentMethod)
@@ -44,9 +37,9 @@ namespace api.Controllers.v1
                 return BadRequest("Bad Thief Catch him ... or her i don't know");
             if (creditCard.Balance < chargingTransactionCreateDto.Amount)
                 return BadRequest("Insuffucient Balance, so POOOOOOOOOR!");
-            if (!_chargingTransactionRepository.CreateChargingTransaction(chargingTransactionCreateDto, Id))
+            if (!await _chargingTransactionRepository.CreateChargingTransaction(chargingTransactionCreateDto, Id))
                 return StatusCode(500, "Server Error1");
-            if (!_chargingTransactionRepository.SaveChanges())
+            if (!await _chargingTransactionRepository.SaveChanges())
                 return StatusCode(500, "Server Error2");
 
             return StatusCode(201, new { Message = "Charged Successfully, Lucky Booooy" });

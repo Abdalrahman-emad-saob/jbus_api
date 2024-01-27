@@ -10,9 +10,13 @@ namespace API.DTOs
         public string? Going { get; set; }
         [JsonIgnore]
         public bool IsActive { get; set; }
-        public DateTime CreatedAt { get; set; } 
+        [JsonIgnore]
+        public DateTime CreatedAt { get; set; }
+        [JsonIgnore]
         public DateTime UpdatedAt { get; set; }
-        public int RouteId { get; set; }
-        public int DriverId { get; set; }
+        [JsonIgnore]
+        public int? RouteId { get; set; }
+        public RouteDto? Route { get; set; }
+        public DriverDto? Driver { get; set; }
     }
 }

@@ -4,9 +4,9 @@ namespace API.Interfaces
 {
     public interface IPredefinedStopsRepository
     {
-        IEnumerable<PredefinedStopsDto> GetPredefinedStops();
-        PredefinedStopsDto GetPredefinedStopById(int id);
-        PredefinedStopsDto CreatePredefinedStops(PredefinedStopsCreateDto predefinedStopsCreateDto);
-        bool SaveChanges();
+        Task<IEnumerable<PredefinedStopsDto?>> GetPredefinedStops();
+        Task<PredefinedStopsDto?> GetPredefinedStopById(int id);
+        Task<PredefinedStopsDto?> CreatePredefinedStops(PredefinedStopsCreateDto predefinedStopsCreateDto);
+        Task<bool> SaveChanges();
     }
 }

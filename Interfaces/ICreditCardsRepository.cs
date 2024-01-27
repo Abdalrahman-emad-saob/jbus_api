@@ -4,6 +4,6 @@ namespace API.Interfaces
 {
     public interface ICreditCardsRepository
     {
-        CreditCard GetCreditCardByCardNumber(long CardNumber);
+        Task<CreditCard?> GetCreditCardByCardNumber(long CardNumber);
     }
 }

@@ -79,7 +79,7 @@ namespace API.Extensions
             string key = configuration["Crypto:Key"] ?? string.Empty;
             string iv = configuration["Crypto:Iv"] ?? string.Empty;
             services.AddScoped<ICryptoService>(provider => new CryptoService(key, iv));
-            services.AddSingleton<NotificationService>();
+            services.AddScoped<NotificationService>();
             // services.AddMemoryCache();
             // services.AddSingleton<IProcessingStrategy, FixedWindowProcessingStrategy>();
             // services.Configure<IpRateLimitOptions>(configuration.GetSection("IpRateLimiting"));

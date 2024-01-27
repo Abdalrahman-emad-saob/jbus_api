@@ -3,25 +3,20 @@ using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class FavoritePointRepository : IFavoritePointRepository
+    public class FavoritePointRepository(DataContext context, IMapper mapper) : IFavoritePointRepository
     {
-        private readonly DataContext _context;
-        private readonly IMapper _mapper;
+        private readonly DataContext _context = context;
+        private readonly IMapper _mapper = mapper;
 
-        public FavoritePointRepository(DataContext context, IMapper mapper)
+        public async Task<bool> DeleteFavoritePoint(int id, int Id)
         {
-            _context = context;
-            _mapper = mapper;
-        }
-
-        public bool DeleteFavoritePoint(int id, int Id)
-        {
-            var favoritePoint = _context.FavoritePoints
+            var favoritePoint = await _context.FavoritePoints
             .Where(fp => fp.Id == id && fp.PassengerId == Id)
-            .SingleOrDefault();
+            .SingleOrDefaultAsync();
 
             if (favoritePoint != null)
             {
@@ -31,39 +26,39 @@ namespace API.Data
             return false;
         }
 
-        public FavoritePointDto GetFavoritePointById(int id)
+        public async Task<FavoritePointDto?> GetFavoritePointById(int id)
         {
-            return _context
+            return await _context
            .FavoritePoints
            .Where(fp => fp.Id == id)
            .ProjectTo<FavoritePointDto>(_mapper.ConfigurationProvider)
-           .SingleOrDefault()!;
+           .SingleOrDefaultAsync()!;
         }
 
-        public IEnumerable<FavoritePointDto> GetFavoritePoints(int id)
+        public async Task<IEnumerable<FavoritePointDto?>> GetFavoritePoints(int id)
         {
-            return _context
+            return await _context
             .FavoritePoints
             .Where(fp => fp.PassengerId == id)
             .ProjectTo<FavoritePointDto>(_mapper.ConfigurationProvider)
-            .ToList();
+            .ToListAsync();
         }
 
-        public IEnumerable<FavoritePointDto> GetRouteFavoritePointDtos(int PassengerId, int RouteId)
+        public async Task<IEnumerable<FavoritePointDto?>> GetRouteFavoritePointDtos(int PassengerId, int RouteId)
         {
-            return _context
+            return await _context
                 .FavoritePoints
                 .Where(fp => fp.PassengerId == PassengerId && fp.RouteId == RouteId)
                 .ProjectTo<FavoritePointDto>(_mapper.ConfigurationProvider)
-                .ToList();
+                .ToListAsync();
         }
 
-        public bool InsertFavoritePoint(FavoritePointCreateDto favoritePointCreateDto, int id)
+        public async Task<bool> InsertFavoritePoint(FavoritePointCreateDto favoritePointCreateDto, int id)
         {
-            var point = _context
+            var point = await _context
             .Points
             .Where(p => p.Latitude == favoritePointCreateDto.Lat && p.Longitude == favoritePointCreateDto.Long)
-            .SingleOrDefault();
+            .SingleOrDefaultAsync();
 
             if (point == null)
             {
@@ -74,8 +69,8 @@ namespace API.Data
                     Name = favoritePointCreateDto.Name,
                     CreatedAt = DateTime.UtcNow
                 };
-                _context.Points.Add(createPoint);
-                SaveChanges();
+                await _context.Points.AddAsync(createPoint);
+                await SaveChanges();
                 FavoritePoint favoritePoint = new()
                 {
                     PointId = createPoint.Id,
@@ -83,7 +78,7 @@ namespace API.Data
                     PassengerId = id,
                     CreatedAt = DateTime.UtcNow
                 };
-                _context.FavoritePoints.Add(favoritePoint);
+                await _context.FavoritePoints.AddAsync(favoritePoint);
 
                 return true;
             }
@@ -94,13 +89,13 @@ namespace API.Data
                 PassengerId = id,
                 CreatedAt = DateTime.UtcNow
             };
-            _context.FavoritePoints.Add(createfavoritePoint);
+            await _context.FavoritePoints.AddAsync(createfavoritePoint);
             return true;
         }
 
-        public bool SaveChanges()
+        public async Task<bool> SaveChanges()
         {
-            return _context.SaveChanges() > 0;
+            return await _context.SaveChangesAsync() > 0;
         }
 
         public void Update(FavoritePointDto favoritePoint)

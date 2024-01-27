@@ -8,35 +8,26 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers.v1
 {
     [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
-    public class AdminController : BaseApiController
+    public class AdminController(
+        IAdminRepository adminRepository,
+        IUserRepository userRepository,
+        IMapper mapper
+            ) : BaseApiController
     {
-        private readonly IAdminRepository _adminRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly IMapper _mapper;
-        private readonly ITokenHandlerService _tokenHandlerService;
-
-        public AdminController(
-            IAdminRepository adminRepository,
-            IUserRepository userRepository,
-            IMapper mapper,
-            ITokenHandlerService tokenHandlerService)
-        {
-            _adminRepository = adminRepository;
-            _userRepository = userRepository;
-            _mapper = mapper;
-            _tokenHandlerService = tokenHandlerService;
-        }
+        private readonly IAdminRepository _adminRepository = adminRepository;
+        private readonly IUserRepository _userRepository = userRepository;
+        private readonly IMapper _mapper = mapper;
 
         [HttpGet("getAdmins")]
-        public ActionResult<IEnumerable<AdminDto>> GetAdmins()
+        public async Task<ActionResult<IEnumerable<AdminDto>>> GetAdmins()
         {
-            return Ok(_adminRepository.GetAdmins());
+            return Ok(await _adminRepository.GetAdmins());
         }
 
         [HttpGet("{id}")]
-        public ActionResult<AdminDto> GetAdminById(int Id)
+        public async Task<ActionResult<AdminDto>> GetAdminById(int Id)
         {
-            var admin = _adminRepository.GetAdminDtoById(Id);
+            var admin = await _adminRepository.GetAdminDtoById(Id);
 
             if (admin == null)
                 return NotFound("Admin Not Found");
@@ -54,15 +45,15 @@ namespace API.Controllers.v1
             return StatusCode(201);
         }
         [HttpPut("{id}")]
-        public ActionResult updateAdmin(AdminUpdateDto adminUpdateDto, int Id)
+        public async Task<ActionResult> updateAdmin(AdminUpdateDto adminUpdateDto, int Id)
         {
-            var admin = _adminRepository.GetAdminById(Id);
+            var admin = await _adminRepository.GetAdminById(Id);
 
 
             if (admin == null || adminUpdateDto.User == null)
                 return NotFound("Admin Not Found");
 
-            var user = _userRepository.GetUserById(admin.UserId!);
+            var user = await _userRepository.GetUserById(admin.UserId!);
             if (user == null)
                 return NotFound("User Not Found");
 
@@ -75,9 +66,9 @@ namespace API.Controllers.v1
 
             _mapper.Map(adminUpdateDto, admin);
             _mapper.Map(adminUpdateDto.User, user);
-            _adminRepository.Update(Id);
+            await _adminRepository.Update(Id);
 
-            if (_adminRepository.SaveChanges())
+            if (await _adminRepository.SaveChanges())
                 return NoContent();
 
             return BadRequest("Failed to Update Passenger");

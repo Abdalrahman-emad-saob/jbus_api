@@ -1,42 +1,46 @@
 using API.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class NotisTokenRepository : INotisTokenRepository
+    public class NotisTokenRepository(
+        DataContext context
+        ) : INotisTokenRepository
     {
-        private readonly DataContext _context;
+        private readonly DataContext _context = context;
 
-        public NotisTokenRepository(
-            DataContext context
-        )
+        public async Task<string?> GetDeviceToken(int? passengerId)
         {
-            _context = context;
-        }
-
-        public string? GetDeviceToken(int? passengerId)
-        {
-            var passenger = _context.Passengers.Find(passengerId);
+            var passenger = await _context.Passengers.FindAsync(passengerId);
             if(passenger == null)
                 return null;
                 
             return passenger.FcmToken;
         }
 
-        public bool SaveChanges()
+        public async Task<bool> SaveChanges()
         {
-            return _context.SaveChanges() > 0;
+            return await _context.SaveChangesAsync() > 0;
         }
 
-        public bool StoreDeviceToken(int Id, string deviceToken)
+        public async Task<bool> StoreDeviceToken(int Id, string deviceToken)
         {
-            var passenger = _context.Passengers.Find(Id);
+            var passenger = await _context.Passengers.FindAsync(Id);
 
             if (passenger == null)
                 return false;
 
             passenger.FcmToken = deviceToken;
-            SaveChanges();
+            await SaveChanges();
             return true;
+        }
+
+        public async Task<List<string?>> GetDeviceTokens()
+        {
+            return await _context.Passengers
+            .Where(p => p.FcmToken != null)
+            .Select(p => p.FcmToken)
+            .ToListAsync();
         }
     }
 }

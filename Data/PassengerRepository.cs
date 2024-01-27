@@ -8,70 +8,67 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class PassengerRepository : IPassengerRepository
+    public class PassengerRepository(
+        DataContext context,
+        IMapper mapper
+        ) : IPassengerRepository
     {
-        private readonly DataContext _context;
-        private readonly IMapper _mapper;
-        private readonly ITokenService _tokenService;
+        private readonly DataContext _context = context;
+        private readonly IMapper _mapper = mapper;
 
-        public PassengerRepository(DataContext context,
-                                   IMapper mapper,
-                                   ITokenService tokenService)
+        public async Task<PassengerDto?> GetPassengerDtoByEmail(string Email)
         {
-            _context = context;
-            _mapper = mapper;
-            _tokenService = tokenService;
-        }
-
-        public PassengerDto GetPassengerDtoByEmail(string Email)
-        {
-            return _context.Passengers
+            return await _context.Passengers
                 .Where(p => p.User!.Email == Email)
                 .ProjectTo<PassengerDto>(_mapper.ConfigurationProvider)
-                .SingleOrDefault()!;
+                .SingleOrDefaultAsync()!;
         }
 
-        public PassengerDto GetPassengerDtoById(int id)
+        public async Task<PassengerDto?> GetPassengerDtoById(int id)
         {
-            return _context.Passengers
+            return await _context.Passengers
                 .Where(p => p.Id == id)
                 .ProjectTo<PassengerDto>(_mapper.ConfigurationProvider)
-                .SingleOrDefault()!;
+                .SingleOrDefaultAsync()!;
         }
 
-        public Passenger GetPassengerById(int id)
+        public async Task<Passenger?> GetPassengerById(int id)
         {
-            return _context.Passengers
+            return await _context.Passengers
             .Include(p => p.Trips)
                 .Where(p => p.UserId == id)
-                .SingleOrDefault()!;
+                .SingleOrDefaultAsync()!;
         }
 
-        public Passenger GetPassengerByEmail(string? Email)
+        public async Task<Passenger?> GetPassengerByEmail(string? Email)
         {
-            return _context.Passengers
+            return await _context.Passengers
                 .Where(p => p.User!.Email == Email && p.User.Email!.ToLower() == Email!.ToLower())
-                .SingleOrDefault()!;
+                .SingleOrDefaultAsync()!;
         }
 
-        public IEnumerable<PassengerDto> GetPassengers() => _context.Passengers
-                .ProjectTo<PassengerDto>(_mapper.ConfigurationProvider)
-                .ToList();
-
-        public bool SaveChanges()
+        public async Task<IEnumerable<PassengerDto?>> GetPassengers()
         {
-            return _context.SaveChanges() > 0;
+            return await _context.Passengers
+                .ProjectTo<PassengerDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
         }
 
-        public void Update(PassengerUpdateDto passengerUpdateDto, Passenger passenger, User user)
+        public async Task<bool> SaveChanges()
+        {
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public bool Update(PassengerUpdateDto passengerUpdateDto, Passenger passenger, User user)
         {
             _mapper.Map(passengerUpdateDto, passenger);
             _mapper.Map(passengerUpdateDto.User, user);
 
             _context.Entry(passenger).State = EntityState.Modified;
+            return true;
         }
 
-        public RegisterResponseDto CreatePassenger(RegisterDto registerDto)
+        public async Task<RegisterResponseDto?> CreatePassenger(RegisterDto registerDto)
         {
             var user = new User
             {
@@ -88,12 +85,12 @@ namespace API.Data
             var passenger = new Passenger()
             {
                 Wallet = 0,
-                User = user
+                User = user,
+                FcmToken = registerDto.FCMToken
             };
 
-            _context.Users.Add(user);
-            _context.Passengers.Add(passenger);
-            // SaveChanges();
+            await _context.Users.AddAsync(user);
+            await _context.Passengers.AddAsync(passenger);
 
             var passengerDto = _mapper.Map<PassengerDto>(passenger);
             return new RegisterResponseDto
@@ -101,6 +98,26 @@ namespace API.Data
                 user = user,
                 passengerDto = passengerDto
             };
+        }
+
+        public async Task UpdateRewardPoints(int rp, int id)
+        {
+            var passenger = await _context.Passengers
+                .Where(p => p.Id == id)
+                .SingleOrDefaultAsync()!;
+
+            passenger!.RewardPoints += rp;
+        }
+
+        public async Task UpdateRewardPointsToAll(int rp)
+        {
+            var passengers = await _context.Passengers
+                .ToListAsync()!;
+
+            foreach (var passenger in passengers)
+            {
+                passenger.RewardPoints += rp;
+            }
         }
 
     }

@@ -4,10 +4,10 @@ namespace API.Interfaces
 {
     public interface IFazaaRepository
     {
-        IEnumerable<FazaaDto> GetFazaas(int InDebtId);
-        FazaaDto GetFazaaById(int id);
-        bool StoreFazaas(FazaaCreateDto fazaaCreateDto, int InDebtId);
+        Task<IEnumerable<FazaaDto?>> GetFazaas(int InDebtId);
+        Task<FazaaDto?> GetFazaaById(int id);
+        Task<bool> StoreFazaas(FazaaCreateDto fazaaCreateDto, int InDebtId);
         void Update(FazaaDto fazaa);
-        bool SaveChanges();
+        Task<bool> SaveChanges();
     }
 }

@@ -8,35 +8,26 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers.v1
 {
-    public class DriverAccountController : BaseApiController
+    public class DriverAccountController(
+        IDriverRepository driverRepository,
+        IUserRepository userRepository,
+        ITokenService tokenService,
+        IMapper mapper,
+        IBlacklistedTokenRepository blacklistedTokenRepository
+            ) : BaseApiController
     {
-        private readonly IDriverRepository _driverRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly ITokenService _tokenService;
-        private readonly IMapper _mapper;
-        private readonly IBlacklistedTokenRepository _blacklistedTokenRepository;
-
-        public DriverAccountController(
-            IDriverRepository driverRepository,
-            IUserRepository userRepository,
-            ITokenService tokenService,
-            IMapper mapper,
-            IBlacklistedTokenRepository blacklistedTokenRepository
-            )
-        {
-            _driverRepository = driverRepository;
-            _userRepository = userRepository;
-            _tokenService = tokenService;
-            _mapper = mapper;
-            _blacklistedTokenRepository = blacklistedTokenRepository;
-        }
+        private readonly IDriverRepository _driverRepository = driverRepository;
+        private readonly IUserRepository _userRepository = userRepository;
+        private readonly ITokenService _tokenService = tokenService;
+        private readonly IMapper _mapper = mapper;
+        private readonly IBlacklistedTokenRepository _blacklistedTokenRepository = blacklistedTokenRepository;
 
         [HttpPost("login")]
-        public ActionResult<LoginDriverResponseDto> Login(LoginDto loginDto)
+        public async Task<ActionResult<LoginDriverResponseDto>> Login(LoginDto loginDto)
         {
             try
             {
-                var user = _userRepository.GetUserByEmail(loginDto.Email!);
+                var user = await _userRepository.GetUserByEmail(loginDto.Email!);
 
                 if (user == null)
                     return NotFound(new { Error = "USER_DOES_NOT_EXIST" });
@@ -50,7 +41,7 @@ namespace API.Controllers.v1
                 if (user.Email == null)
                     return Unauthorized("Not Authorized2");
 
-                var driverDto = _mapper.Map<DriverDto>(_driverRepository.GetDriverByEmail(user.Email));
+                var driverDto = _mapper.Map<DriverDto>(await _driverRepository.GetDriverByEmail(user.Email));
 
                 if (driverDto == null)
                     return Unauthorized("Not Authorized3");
@@ -70,10 +61,10 @@ namespace API.Controllers.v1
         }
         [Authorize]
         [HttpPost("logout")]
-        public ActionResult logout()
+        public async Task<ActionResult> logout()
         {
             var token = _tokenService.GetToken();
-            _blacklistedTokenRepository.BlacklistTokenAsync(token);
+            await _blacklistedTokenRepository.BlacklistTokenAsync(token);
             return Ok(new { Message = "Logged Out Successfully" });
         }
 

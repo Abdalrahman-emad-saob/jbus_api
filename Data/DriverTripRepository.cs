@@ -3,31 +3,28 @@ using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class DriverTripRepository : IDriverTripRepository
+    public class DriverTripRepository(
+        DataContext context,
+        IMapper mapper,
+        IDriverRepository driverRepository
+    ) : IDriverTripRepository
     {
-        private readonly DataContext _context;
-        private readonly IMapper _mapper;
-        private readonly IDriverRepository _driverRepository;
+        private readonly DataContext _context = context;
+        private readonly IMapper _mapper = mapper;
+        private readonly IDriverRepository _driverRepository = driverRepository;
 
-        public DriverTripRepository(
-            DataContext context, 
-            IMapper mapper,
-            IDriverRepository driverRepository
-            )
+        public async Task<(DriverTripDto, string)> CreateDriverTrip(int id)
         {
-            _context = context;
-            _mapper = mapper;
-            _driverRepository = driverRepository;
-        }
+            var driver = await _driverRepository.GetDriverById(id);
+            if (driver == null)
+                return (null!, "Driver not found")!;
 
-        public DriverTripDto CreateDriverTrip(DriverTripCreateDto driverTripCreateDto, int id)
-        {
-            var driver = _driverRepository.GetDriverById(id);
             if (driver.Bus == null)
-                return null!;
+                return (null!, "Driver has no bus")!;
             DriverTrip driverTrip = new()
             {
                 DriverId = id,
@@ -36,29 +33,62 @@ namespace API.Data
                 RouteId = driver.Bus.RouteId,
                 CreatedAt = DateTime.UtcNow,
             };
-            return _mapper.Map<DriverTripDto>(driverTrip);
+            await _context.DriverTrips.AddAsync(driverTrip);
+            return (_mapper.Map<DriverTripDto>(driverTrip), "Driver trip created");
         }
 
-        public DriverTripDto GetDriverTripById(int id)
+        public async Task<DriverTripDto?> GetDriverTripById(int id)
         {
-            return _context
+            return await _context
            .DriverTrips
            .Where(dt => dt.Id == id)
            .ProjectTo<DriverTripDto>(_mapper.ConfigurationProvider)
-           .SingleOrDefault()!;
+           .SingleOrDefaultAsync()!;
         }
 
-        public IEnumerable<DriverTripDto> GetDriverTrips()
+        public async Task<IEnumerable<DriverTripDto?>> GetDriverTrips()
         {
-            return _context
+            return await _context
            .DriverTrips
            .ProjectTo<DriverTripDto>(_mapper.ConfigurationProvider)
-           .ToList();
+           .ToListAsync();
         }
 
-        public bool SaveChanges()
+        public async Task<(DriverTripDto, string)> updateDriverTrip(int id, DriverTripUpdateDto driverTripUpdateDto)
         {
-            return _context.SaveChanges() > 0;
+            var driverTrip = await _context.DriverTrips.FindAsync(id);
+
+            if (driverTrip == null)
+                return (null, "Driver trip not found")!;
+
+            if (driverTripUpdateDto.status != null)
+            {
+                if (driverTrip.status == Status.COMPLETED)
+                    return (null, "Trip is Completed")!;
+                else if (driverTrip.status == Status.CANCELED)
+                    return (null, "Trip is Canceled")!;
+            }
+            else
+                return (null, "Invalid status1")!;
+
+            var driverTripDto = _mapper.Map<DriverTripDto>(driverTrip);
+
+            if (Enum.TryParse(driverTripUpdateDto.status!.ToUpper(), out Status parsedStatus))
+            {
+                driverTrip.status = parsedStatus;
+                if (parsedStatus == Status.COMPLETED)
+                {
+                    driverTrip.FinishedAt = DateTime.UtcNow;
+                    driverTrip.Rating = driverTripUpdateDto.Rating;
+                }
+                return (driverTripDto, "Driver trip is updated");
+            }
+            return (driverTripDto, "Invalid status");
+        }
+
+        public async Task<bool> SaveChanges()
+        {
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

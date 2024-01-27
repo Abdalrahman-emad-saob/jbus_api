@@ -1,22 +1,16 @@
-using API.DTOs;
 using API.Entities;
 using API.Interfaces;
-using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class OTPRepository : IOTPRepository
+    public class OTPRepository(
+        DataContext context
+            ) : IOTPRepository
     {
-        private readonly DataContext _context;
+        private readonly DataContext _context = context;
 
-        public OTPRepository(
-            DataContext context
-            )
-        {
-            _context = context;
-        }
-
-        public int CreateOTP(string Email)
+        public async Task<int> CreateOTP(string Email)
         {
             Random random = new();
             int otp = random.Next(1000, 10000);
@@ -26,33 +20,33 @@ namespace API.Data
                 PassengerEmail = Email,
                 CreatedAt = DateTime.UtcNow
             };
-            _context.OTPs.Add(oTP);
-            _context.SaveChanges();
+            await _context.OTPs.AddAsync(oTP);
+            await _context.SaveChangesAsync();
             return otp;
         }
 
-        public bool DeleteOTP(int id)
+        public async Task<bool> DeleteOTP(int id)
         {
             var otp = _context.OTPs.Find(id);
             if (otp != null)
             {
                 _context.OTPs.Remove(otp);
-                return SaveChanges();
+                return await SaveChanges();
             }
             return false;
         }
 
-        public OTP GetOTPByEmail(string? Email)
+        public async Task<OTP?> GetOTPByEmail(string? Email)
         {
-            return _context.OTPs
+            return await _context.OTPs
                     .Where(otp => otp.PassengerEmail == Email)
                     .OrderByDescending(otp => otp.CreatedAt)
-                    .FirstOrDefault()!;
+                    .FirstOrDefaultAsync()!;
         }
 
-        public bool SaveChanges()
+        public async Task<bool> SaveChanges()
         {
-            return _context.SaveChanges() > 0;
+            return await _context.SaveChangesAsync() > 0;
         }
 
     }

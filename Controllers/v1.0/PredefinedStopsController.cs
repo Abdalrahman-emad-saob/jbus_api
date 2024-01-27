@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    // [CustomAuthorize("PASSENGER")]
+    [CustomAuthorize("PASSENGER", "SUPER_ADMIN", "ADMIN")]
     public class PredefinedStopsController : BaseApiController
     {
         private readonly IPredefinedStopsRepository _predefinedStopsRepository;
@@ -19,27 +19,23 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public ActionResult<PointDto> CreatePredefinedStops(PredefinedStopsCreateDto predefinedStopsCreateDto)
+        public async Task<ActionResult<PointDto>> CreatePredefinedStops(PredefinedStopsCreateDto predefinedStopsCreateDto)
         {
             var predefinedStops = _predefinedStopsRepository.CreatePredefinedStops(predefinedStopsCreateDto);
-            if(!_predefinedStopsRepository.SaveChanges())
+            if(!await _predefinedStopsRepository.SaveChanges())
                     return StatusCode(500, "Server Error1");
             return Ok(predefinedStops);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<PredefinedStopsDto> getPredefinedStopsById(int id)
+        public async Task<ActionResult<PredefinedStopsDto>> getPredefinedStopsById(int id)
         {
-            PredefinedStopsDto predefinedStops = _predefinedStopsRepository.GetPredefinedStopById(id);
+            PredefinedStopsDto? predefinedStops = await _predefinedStopsRepository.GetPredefinedStopById(id);
             
             if(predefinedStops == null)
                 return NotFound("No Predefined Stops Defined");
 
             return Ok(predefinedStops);
         }
-        // private PointDto PointExists(double lat, double lon)
-        // {
-        //     return _pointRepository.PointExists(lat, lon);
-        // }
     }
 }

@@ -4,14 +4,14 @@ namespace API.Interfaces
 {
     public interface IFriendsRepository
     {
-        IEnumerable<FriendsDto> GetFriends(int id);
-        FriendsDto GetFriendById(int id, int PassengerId);
-        bool SendFriendRequest(FriendsCreateDto friendCreateDto, int PassengerId);
-        bool FriendRequestExists(int FriendId, int PassengerId);
-        bool ConfirmFriendRequest(int FriendId, int PassengerId);
-        IEnumerable<FriendsDto> GetFriendRequests(int PassengerId);
-        bool DeleteFriend(int FriendId, int PassengerId);
+        Task<IEnumerable<FriendsDto?>> GetFriends(int id);
+        Task<FriendsDto?> GetFriendById(int id, int PassengerId);
+        Task<bool> SendFriendRequest(FriendsCreateDto friendCreateDto, int PassengerId);
+        Task<bool> FriendRequestExists(int FriendId, int PassengerId);
+        Task<bool> ConfirmFriendRequest(int FriendId, int PassengerId);
+        Task<IEnumerable<FriendsDto?>> GetFriendRequests(int PassengerId);
+        Task<bool> DeleteFriend(int FriendId, int PassengerId);
         void Update(FriendsDto friend);
-        bool SaveChanges();
+        Task<bool> SaveChanges();
     }
 }

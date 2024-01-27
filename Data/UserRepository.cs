@@ -3,33 +3,28 @@ using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository(DataContext context, IMapper mapper) : IUserRepository
     {
-        private readonly DataContext _context;
-        private readonly IMapper _mapper;
+        private readonly DataContext _context = context;
+        private readonly IMapper _mapper = mapper;
 
-        public UserRepository(DataContext context, IMapper mapper)
+        public async Task<User?> GetUserById(int id)
         {
-            _context = context;
-            _mapper = mapper;
-        }
-
-        public User GetUserById(int id)
-        {
-            return _context.Users
+            return await _context.Users
                 .Where(u => u.Id == id)
-                .SingleOrDefault()!;
+                .SingleOrDefaultAsync()!;
         }
 
-        public UserDto GetUserDtoById(int id)
+        public async Task<UserDto?> GetUserDtoById(int id)
         {
-            return _context.Users
+            return await _context.Users
                 .Where(u => u.Id == id)
                 .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
-                .SingleOrDefault()!;
+                .SingleOrDefaultAsync()!;
         }
 
         public void Update(UserDto userDto)
@@ -37,10 +32,10 @@ namespace API.Data
             _context.Entry(userDto).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         }
 
-        public User GetUserByEmail(string Email)
+        public async Task<User?> GetUserByEmail(string Email)
         {
-            return _context.Users.AsEnumerable()
-                    .FirstOrDefault(x => x.Email != null && x.Email.Equals(Email, StringComparison.CurrentCultureIgnoreCase))!;
+            return await _context.Users
+                    .FirstOrDefaultAsync(x => x.Email != null && EF.Functions.Like(x.Email, Email));
         }
     }
 }

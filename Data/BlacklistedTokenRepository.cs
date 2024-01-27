@@ -3,17 +3,13 @@ using API.Interfaces;
 
 namespace API.Data
 {
-    public class BlacklistedTokenRepository : IBlacklistedTokenRepository
+    public class BlacklistedTokenRepository(DataContext context) : IBlacklistedTokenRepository
     {
-        private readonly DataContext _context;
+        private readonly DataContext _context = context;
 
-        public BlacklistedTokenRepository(DataContext context)
-        {
-            _context = context;
-        }
         public async Task BlacklistTokenAsync(string token)
         {
-            BlacklistedToken blacklistedToken = new BlacklistedToken
+            BlacklistedToken blacklistedToken = new()
             {
                 Token = token
             };

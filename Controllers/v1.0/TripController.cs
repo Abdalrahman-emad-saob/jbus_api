@@ -7,31 +7,26 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers.v1
 {
     [CustomAuthorize("PASSENGER")]
-    public class TripController : BaseApiController
+    public class TripController(
+        ITokenHandlerService tokenHandlerService,
+        ITripRepository tripRepository
+            ) : BaseApiController
     {
-        private readonly ITokenHandlerService _tokenHandlerService;
-        private readonly ITripRepository _tripRepository;
+        private readonly ITokenHandlerService _tokenHandlerService = tokenHandlerService;
+        private readonly ITripRepository _tripRepository = tripRepository;
 
-        public TripController(
-            ITokenHandlerService tokenHandlerService,
-            ITripRepository tripRepository
-            )
-        {
-            _tokenHandlerService = tokenHandlerService;
-            _tripRepository = tripRepository;
-        }
         [HttpGet("getTrips")]
-        public ActionResult<IEnumerable<TripDto>> GetTrips()
+        public async Task<ActionResult<IEnumerable<TripDto>>> GetTrips()
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
                 return Unauthorized("Not authorized");
 
-            return Ok(_tripRepository.GetTrips(Id));
+            return Ok(await _tripRepository.GetTrips(Id));
         }
 
         [HttpGet("{id}")]
-        public ActionResult<TripDto> GetTripById(int id)
+        public async Task<ActionResult<TripDto?>> GetTripById(int id)
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
@@ -45,36 +40,36 @@ namespace API.Controllers.v1
             ))
                 return Forbid("Not authorized");
 
-            return _tripRepository.GetTripById(id, Id);
+            return await _tripRepository.GetTripById(id, Id);
         }
         [HttpPut("{id}")]
-        public IActionResult updateTrip(TripUpdateDto tripUpdateDto, int id)
+        public async Task<IActionResult> updateTrip(TripUpdateDto tripUpdateDto, int id)
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
                 return Unauthorized("Not authorized");
 
-            var tripDto = _tripRepository.GetTripById(id, Id);
+            var tripDto = await _tripRepository.GetTripById(id, Id);
 
             if (tripDto == null)
                 return NotFound("Trip Not Found");
 
             _tripRepository.Update(tripUpdateDto, id);
 
-            if (_tripRepository.SaveChanges())
+            if (await _tripRepository.SaveChanges())
                 return NoContent();
 
             return BadRequest("No Changes Made");
         }
         [HttpPost]
-        public ActionResult CreateTrip(TripCreateDto tripCreateDto)
+        public async Task<ActionResult> CreateTrip(TripCreateDto tripCreateDto)
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
                 return Unauthorized("Not authorized");
 
-            _tripRepository.CreateTrip(tripCreateDto, Id);
-           if(!_tripRepository.SaveChanges())
+            await _tripRepository.CreateTrip(tripCreateDto, Id);
+           if(!await _tripRepository.SaveChanges())
                     return StatusCode(500, "Server Error1");
             
             return StatusCode(201);

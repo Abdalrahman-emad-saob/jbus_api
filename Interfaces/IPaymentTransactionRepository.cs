@@ -4,9 +4,9 @@ namespace API.Interfaces
 {
     public interface IPaymentTransactionRepository
     {
-        IEnumerable<PaymentTransactionDto> GetPaymentTransactions(int id);
-        PaymentTransactionDto GetPaymentTransactionById(int id);
-        bool CreatePaymentTransaction(PaymentTransactionCreateDto paymentTransactionDto);
-        bool SaveChanges();
+        Task<IEnumerable<PaymentTransactionDto?>> GetPaymentTransactions(int id);
+        Task<PaymentTransactionDto?> GetPaymentTransactionById(int id);
+        Task<bool> CreatePaymentTransaction(PaymentTransactionCreateDto paymentTransactionDto);
+        Task<bool> SaveChanges();
     }
 }

@@ -5,12 +5,12 @@ namespace API.Interfaces
 {
     public interface IDriverRepository
     {
-        void Update(DriverDto driver);
-        IEnumerable<DriverDto> GetDrivers();
-        DriverDto GetDriverDtoById(int id);
-        Driver GetDriverById(int id);
-        Driver GetDriverByEmail(string Email);
-        DriverDto CreateDriver(RegisterDriverDto driverDto);
-        bool SaveChanges();
+        void Update(DriverUpdateDto driver);
+        Task<IEnumerable<DriverDto>> GetDrivers();
+        Task<DriverDto?> GetDriverDtoById(int id);
+        Task<Driver?> GetDriverById(int id);
+        Task<Driver?> GetDriverByEmail(string Email);
+        Task<DriverDto> CreateDriver(RegisterDriverDto driverDto);
+        Task<bool> SaveChanges();
     }
 }

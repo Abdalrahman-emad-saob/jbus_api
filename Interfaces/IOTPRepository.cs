@@ -1,13 +1,12 @@
-using API.DTOs;
 using API.Entities;
 
 namespace API.Interfaces
 {
     public interface IOTPRepository
     {
-        OTP GetOTPByEmail(string Email);
-        int CreateOTP(string Email);
-        bool SaveChanges();
-        bool DeleteOTP(int id);
+        Task<OTP?> GetOTPByEmail(string Email);
+        Task<int> CreateOTP(string Email);
+        Task<bool> SaveChanges();
+        Task<bool> DeleteOTP(int id);
     }
 }

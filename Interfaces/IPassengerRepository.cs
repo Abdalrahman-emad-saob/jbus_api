@@ -5,13 +5,15 @@ namespace API.Interfaces
 {
     public interface IPassengerRepository
     {
-        void Update(PassengerUpdateDto passengerUpdateDto, Passenger passenger, User user);
-        RegisterResponseDto CreatePassenger(RegisterDto registerDto);
-        IEnumerable<PassengerDto> GetPassengers();
-        PassengerDto GetPassengerDtoById(int id);
-        PassengerDto GetPassengerDtoByEmail(string Email);
-        Passenger GetPassengerById(int id);
-        Passenger GetPassengerByEmail(string? Email);
-        bool SaveChanges();
+        bool Update(PassengerUpdateDto passengerUpdateDto, Passenger passenger, User user);
+        Task<RegisterResponseDto?> CreatePassenger(RegisterDto registerDto);
+        Task<IEnumerable<PassengerDto?>> GetPassengers();
+        Task<PassengerDto?> GetPassengerDtoById(int id);
+        Task<PassengerDto?> GetPassengerDtoByEmail(string Email);
+        Task<Passenger?> GetPassengerById(int id);
+        Task<Passenger?> GetPassengerByEmail(string? Email);
+        Task UpdateRewardPoints(int rp, int id);
+        Task UpdateRewardPointsToAll(int rp);
+        Task<bool> SaveChanges();
     }
 }

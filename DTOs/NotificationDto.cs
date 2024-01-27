@@ -8,5 +8,7 @@ public class NotificationDto
         public string? Title { get; set; }
         [Required]
         public string? Body { get; set; }
+        public string? Type { get; set; }
+        public string? Value { get; set; }
     }
 }

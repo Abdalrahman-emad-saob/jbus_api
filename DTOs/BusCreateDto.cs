@@ -14,9 +14,9 @@ namespace API.DTOs
         // [Required]
         public int DriverId { get; set; }
         [JsonIgnore]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
         [JsonIgnore]
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; }
 
     }
 }

@@ -8,17 +8,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class DriverRepository : IDriverRepository
+    public class DriverRepository(DataContext context, IMapper mapper) : IDriverRepository
     {
-        private readonly DataContext _context;
-        private readonly IMapper _mapper;
+        private readonly DataContext _context = context;
+        private readonly IMapper _mapper = mapper;
 
-        public DriverRepository(DataContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
-        public DriverDto CreateDriver(RegisterDriverDto registerDriverDto)
+        public async Task<DriverDto> CreateDriver(RegisterDriverDto registerDriverDto)
         {
             var user = new User
             {
@@ -36,54 +31,54 @@ namespace API.Data
             {
                 User = user
             };
-            _context.Users.Add(user);
-            _context.Drivers.Add(driver);
-            SaveChanges();
+            await _context.Users.AddAsync(user);
+            await _context.Drivers.AddAsync(driver);
+            await SaveChanges();
             var driverDto = _mapper.Map<DriverDto>(driver);
             return driverDto;
         }
 
-        public Driver GetDriverByEmail(string Email)
+        public async Task<Driver?> GetDriverByEmail(string Email)
         {
-            return _context.Drivers
+            return await _context.Drivers
                 .Where(p => p.User!.Email == Email)
-                .SingleOrDefault()!;
+                .SingleOrDefaultAsync()!;
         }
 
-        public Driver GetDriverById(int id)
+        public async Task<Driver?> GetDriverById(int id)
         {
-            return _context
+            return await _context
             .Drivers
             .Include(d => d.Bus)
                 .ThenInclude(b => b!.Route)
             .Include(d => d.DriverTrips)
             .Where(d => d.Id == id)
-            .SingleOrDefault()!;
+            .SingleOrDefaultAsync()!;
         }
 
-        public DriverDto GetDriverDtoById(int id)
+        public async Task<DriverDto?> GetDriverDtoById(int id)
         {
-            return _context
+            return await _context
            .Drivers
            .Where(d => d.Id == id)
            .ProjectTo<DriverDto>(_mapper.ConfigurationProvider)
-           .SingleOrDefault()!;
+           .SingleOrDefaultAsync()!;
         }
 
-        public IEnumerable<DriverDto> GetDrivers()
+        public async Task<IEnumerable<DriverDto>> GetDrivers()
         {
-            return _context
+            return await _context
            .Drivers
            .ProjectTo<DriverDto>(_mapper.ConfigurationProvider)
-           .ToList();
+           .ToListAsync();
         }
 
-        public bool SaveChanges()
+        public async Task<bool> SaveChanges()
         {
-            return _context.SaveChanges() > 0;
+            return await _context.SaveChangesAsync() > 0;
         }
 
-        public void Update(DriverDto driver)
+        public void Update(DriverUpdateDto driver)
         {
             _context.Entry(driver).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         }

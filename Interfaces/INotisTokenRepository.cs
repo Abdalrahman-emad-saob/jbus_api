@@ -2,8 +2,9 @@ namespace API.Interfaces
 {
     public interface INotisTokenRepository
     {
-        bool StoreDeviceToken(int Id, string deviceToken);
-        string? GetDeviceToken(int? passengerId);
-        bool SaveChanges();
+        Task<bool> StoreDeviceToken(int Id, string deviceToken);
+        Task<string?> GetDeviceToken(int? passengerId);
+        Task<List<string?>> GetDeviceTokens();
+        Task<bool> SaveChanges();
     }
 }

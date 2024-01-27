@@ -6,8 +6,8 @@ namespace API.Interfaces
     public interface IUserRepository
     {
         void Update(UserDto userDto);
-        UserDto GetUserDtoById(int id);
-        User GetUserByEmail(string Email);
-        User GetUserById(int id);
+        Task<UserDto?> GetUserDtoById(int id);
+        Task<User?> GetUserByEmail(string Email);
+        Task<User?> GetUserById(int id);
     }
 }

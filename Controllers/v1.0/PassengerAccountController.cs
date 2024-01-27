@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
+using API.Validations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,7 @@ namespace API.Controllers.v1
         private readonly IUserRepository _userRepository;
         private readonly IOTPRepository _oTPRepository;
         private readonly ITokenService _tokenService;
+        private readonly ITokenHandlerService _tokenHandlerService;
         private readonly IBlacklistedTokenRepository _blacklistedTokenRepository;
         private readonly IConfiguration _configuration;
 
@@ -24,6 +26,7 @@ namespace API.Controllers.v1
             IUserRepository userRepository,
             IOTPRepository oTPRepository,
             ITokenService tokenService,
+            ITokenHandlerService tokenHandlerService,
             IBlacklistedTokenRepository blacklistedTokenRepository,
             IConfiguration configuration
             )
@@ -32,34 +35,38 @@ namespace API.Controllers.v1
             _userRepository = userRepository;
             _oTPRepository = oTPRepository;
             _tokenService = tokenService;
+            _tokenHandlerService = tokenHandlerService;
             _blacklistedTokenRepository = blacklistedTokenRepository;
             _configuration = configuration;
         }
         [HttpPost("register/{OTP}")]
-        public ActionResult<LoginResponseDto> Register(RegisterDto registerDto, int OTP)
+        public async Task<ActionResult<LoginResponseDto>> Register(RegisterDto registerDto, int OTP)
         {
             string pattern = @"^testemail\d{4}-\d{2}-\d{2}\d{2}\d{2}\d{2}\.\d{6,}@example\.com$";
             if (Regex.IsMatch(registerDto.Email!, pattern) && OTP == 1234) { }
             else
             {
-                OTP otp = _oTPRepository.GetOTPByEmail(registerDto.Email!);
+                var otp = await _oTPRepository.GetOTPByEmail(registerDto.Email!);
                 if (otp == null)
                     return NotFound(new { Message = "OTP not found" });
 
                 if (otp.Otp != OTP)
                     return BadRequest("Invalid OTP");
 
-                _oTPRepository.DeleteOTP(otp.Id);
+                await _oTPRepository.DeleteOTP(otp.Id);
             }
 
-            var CreatePassenger = _passengerRepository.CreatePassenger(registerDto);
+            var CreatePassenger = await _passengerRepository.CreatePassenger(registerDto);
+            if (CreatePassenger == null)
+                return StatusCode(500, "Server Error0");
+
             var user = CreatePassenger.user;
             var passengerDto = CreatePassenger.passengerDto;
 
             if (passengerDto == null || user == null)
                 return StatusCode(500, "Server Error1");
-                
-            if(_passengerRepository.SaveChanges() == false)
+
+            if (await _passengerRepository.SaveChanges() == false)
                 return StatusCode(500, "Server Error2");
 
             var token = _tokenService.CreateToken(user, passengerDto.Id);
@@ -70,14 +77,14 @@ namespace API.Controllers.v1
             });
         }
         [HttpPost("login")]
-        public ActionResult<LoginResponseDto> Login(LoginDto loginDto)
+        public async Task<ActionResult<LoginResponseDto>> Login(LoginDto loginDto)
         {
             try
             {
                 if (loginDto.Email == null)
                     return BadRequest("Email is Empty");
 
-                var user = _userRepository.GetUserByEmail(loginDto.Email);
+                var user = await _userRepository.GetUserByEmail(loginDto.Email);
 
                 if (user == null || user.PasswordHash == null || loginDto.Password == null)
                     return NotFound(new { Error = "USER_DOES_NOT_EXIST" });
@@ -88,10 +95,18 @@ namespace API.Controllers.v1
                 if (passwordVerificationResult != PasswordVerificationResult.Success)
                     return Unauthorized("Not Authorized1");
 
-                var passengerDto = _passengerRepository.GetPassengerDtoByEmail(loginDto.Email);
+                var passengerDto = await _passengerRepository.GetPassengerDtoByEmail(loginDto.Email);
 
                 if (passengerDto == null)
                     return Unauthorized("Not Authorized2");
+
+                var passenger = await _passengerRepository.GetPassengerById(passengerDto.Id);
+                if (loginDto.FCMToken != null)
+                {
+                    passenger!.FcmToken = loginDto.FCMToken;
+                    if (!await _passengerRepository.SaveChanges())
+                        return StatusCode(500, "Server Error3");
+                }
 
                 var token = _tokenService.CreateToken(user, passengerDto.Id);
 
@@ -108,14 +123,13 @@ namespace API.Controllers.v1
         }
 
 
-        [NonAction]
-        private bool UserExists(string? Email)
+        private async Task<bool> UserExists(string? Email)
         {
-            return _userRepository.GetUserByEmail(Email!) != null;
+            return await _userRepository.GetUserByEmail(Email!) != null;
         }
 
         [HttpPost("sendOTP")]
-        public IActionResult SendOtp(sendOTPDto sendOTPDto)
+        public async Task<IActionResult> SendOtp(sendOTPDto sendOTPDto)
         {
 
             // if (UserExists(sendOTPDto.Email))
@@ -157,13 +171,13 @@ namespace API.Controllers.v1
 
 
 
-            if (UserExists(sendOTPDto.Email))
+            if (await UserExists(sendOTPDto.Email))
             {
                 return BadRequest("Passenger exists");
             }
             string senderEmail = "no.reply.jbus@gmail.com";
             string senderPassword = _configuration["MailPassword"]!;
-            int otp = _oTPRepository.CreateOTP(sendOTPDto.Email!);
+            int otp = await _oTPRepository.CreateOTP(sendOTPDto.Email!);
             MailMessage mail = new()
             {
                 From = new MailAddress(senderEmail)
@@ -225,11 +239,29 @@ namespace API.Controllers.v1
         }
         [Authorize]
         [HttpPost("logout")]
-        public ActionResult logout()
+        public async Task<ActionResult> logout()
         {
             var token = _tokenService.GetToken();
-            _blacklistedTokenRepository.BlacklistTokenAsync(token);
+            await _blacklistedTokenRepository.BlacklistTokenAsync(token);
+            (await _passengerRepository.GetPassengerById(_tokenHandlerService.TokenHandler()))!.FcmToken = null;
+            await _passengerRepository.SaveChanges();
             return Ok(new { Message = "Logged Out Successfully" });
+        }
+        [CustomAuthorize("PASSENGER")]
+        [HttpGet("status")]
+        public ActionResult<statusDto> loggedIn()
+        {
+            int Id = _tokenHandlerService.TokenHandler();
+            if (Id == -1)
+                return Ok(new statusDto
+                {
+                    status = ZingyStatus.NOTLOGGEDIN
+                });
+
+            return Ok(new statusDto
+            {
+                status = ZingyStatus.LOGGEDIN
+            });
         }
     }
 }

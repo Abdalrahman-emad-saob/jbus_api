@@ -17,7 +17,12 @@ namespace API.Helpers
             CreateMap<Bus, BusDto>()
             .ForMember(bd => bd.Going, opt => opt.MapFrom(b => b.Going.ToString()));
             CreateMap<BusCreateDto, Bus>();
-            CreateMap<BusUpdateDto, Bus>();
+            CreateMap<BusUpdateDto, Bus>()
+            .ForMember(bus => bus.BusNumber, opt => opt.PreCondition(src => !string.IsNullOrEmpty(src.BusNumber)))
+            .ForMember(bus => bus.Capacity, opt => opt.PreCondition(src => src.Capacity > 0))
+            .ForMember(bus => bus.UpdatedAt, opt => opt.PreCondition(src => src.UpdatedAt != default))
+            .ForMember(bus => bus.RouteId, opt => opt.PreCondition(src => src.RouteId != default))
+            .ForMember(bus => bus.DriverId, opt => opt.PreCondition(src => src.DriverId != default));
 
             CreateMap<ChargingTransaction, ChargingTransactionDto>()
             .ForMember(ctd => ctd.chargingMethod, opt => opt.MapFrom(ct => ct.ChargingMethod.ToString()));
@@ -30,13 +35,12 @@ namespace API.Helpers
             .ForMember(p => p.User, opt => opt.Ignore());
 
             CreateMap<DriverTrip, DriverTripDto>()
+            .ForMember(dtd => dtd.Route, opt => opt.MapFrom(dt => dt.Route))
             .ForMember(dtd => dtd.status, opt => opt.MapFrom(dt => dt.status.ToString()));
             CreateMap<DriverTripCreateDto, DriverTrip>();
             CreateMap<DriverTripUpdateDto, DriverTrip>()
             .ForMember(dtc => dtc.status, opt => opt.MapFrom(dt => Enum.Parse<TripStatus>(dt.status!)))
-            .ForMember(dtc => dtc.FinishedAt, opt => opt.PreCondition(src => src.FinishedAt != default))
             .ForMember(dtc => dtc.Rating, opt => opt.PreCondition(src => src.Rating != default))
-            .ForMember(dtc => dtc.Trips, opt => opt.PreCondition(src => src.Trips != null))
             .ForMember(dtc => dtc.status, opt => opt.PreCondition(src => !string.IsNullOrEmpty(src.status)));
 
             CreateMap<FavoritePoint, FavoritePointDto>();
@@ -94,11 +98,11 @@ namespace API.Helpers
             .ForMember(t => t.status, opt => opt.PreCondition(src => !string.IsNullOrEmpty(src.Status)))
             .ForMember(t => t.PaymentTransactionId, opt => opt.PreCondition(src => src.PaymentTransactionId != default))
             .ForMember(t => t.PickUpPoint, opt => opt.PreCondition(src => src.PickUpPoint != null))
-            .ForMember(t => t.DropOffPoint, opt => opt.PreCondition(src => src.DropOffPoint != null));;
+            .ForMember(t => t.DropOffPoint, opt => opt.PreCondition(src => src.DropOffPoint != null)); ;
             CreateMap<TripCreateDto, Trip>()
             .ForMember(t => t.status, opt => opt.MapFrom(tcd => Enum.Parse<TripStatus>(tcd.status!)));
-            
-            
+
+
             CreateMap<User, UserDto>()
             .ForMember(ud => ud.Sex, opt => opt.MapFrom(u => u.Sex.ToString()))
             .ForMember(ud => ud.Role, opt => opt.MapFrom(u => u.Role.ToString()));

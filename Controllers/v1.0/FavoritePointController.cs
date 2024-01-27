@@ -6,48 +6,43 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers.v1
 {
     [CustomAuthorize("PASSENGER")]
-    public class FavoritePointController : BaseApiController
+    public class FavoritePointController(
+        IFavoritePointRepository favoritePointRepository,
+        ITokenHandlerService tokenHandlerService) : BaseApiController
     {
-        private readonly IFavoritePointRepository _favoritePointRepository;
-        private readonly ITokenHandlerService _tokenHandlerService;
+        private readonly IFavoritePointRepository _favoritePointRepository = favoritePointRepository;
+        private readonly ITokenHandlerService _tokenHandlerService = tokenHandlerService;
 
-        public FavoritePointController(
-            IFavoritePointRepository favoritePointRepository,
-            ITokenHandlerService tokenHandlerService)
-        {
-            _favoritePointRepository = favoritePointRepository;
-            _tokenHandlerService = tokenHandlerService;
-        }
         [HttpGet("{id}")]
-        public ActionResult<FavoritePointDto> GetFavoritePointById(int id)
+        public async Task<ActionResult<FavoritePointDto>> GetFavoritePointById(int id)
         {
-            return Ok(_favoritePointRepository.GetFavoritePointById(id));
+            return Ok(await _favoritePointRepository.GetFavoritePointById(id));
         }
         [HttpGet("favoritepoints")]
-        public ActionResult<IEnumerable<FavoritePointDto>> GetPassengerFavoritePoints()
+        public async Task<ActionResult<IEnumerable<FavoritePointDto>>> GetPassengerFavoritePoints()
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
                 return Unauthorized("Not authorized");
 
-            return Ok(_favoritePointRepository.GetFavoritePoints(Id));
+            return Ok(await _favoritePointRepository.GetFavoritePoints(Id));
         }
 
         [HttpDelete("{id}")]
-        public ActionResult DeleteFavoritePoint(int id)
+        public async Task<ActionResult> DeleteFavoritePoint(int id)
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
                 return Unauthorized("Not authorized");
 
-            if (_favoritePointRepository.DeleteFavoritePoint(id, Id))
-                if (_favoritePointRepository.SaveChanges())
+            if (await _favoritePointRepository.DeleteFavoritePoint(id, Id))
+                if (await _favoritePointRepository.SaveChanges())
                     return NoContent();
 
             return StatusCode(500, "Server Error");
         }
         [HttpPost("addfavoritepoint")]
-        public ActionResult CreateFavoritePoint(FavoritePointCreateDto favoritePointCreateDto)
+        public async Task<ActionResult> CreateFavoritePoint(FavoritePointCreateDto favoritePointCreateDto)
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
@@ -55,8 +50,8 @@ namespace API.Controllers.v1
 
             try
             {
-                if (_favoritePointRepository.InsertFavoritePoint(favoritePointCreateDto, Id))
-                    if (_favoritePointRepository.SaveChanges())
+                if (await _favoritePointRepository.InsertFavoritePoint(favoritePointCreateDto, Id))
+                    if (await _favoritePointRepository.SaveChanges())
                         return StatusCode(201);
             }
             catch (Exception)

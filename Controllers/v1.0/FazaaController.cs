@@ -28,20 +28,20 @@ namespace API.Controllers
         }
 
         [HttpPost("storeFazaas")]
-        public ActionResult CreateFazaas(FazaaCreateDto fazaaCreateDtos)
+        public async Task<ActionResult> CreateFazaas(FazaaCreateDto fazaaCreateDtos)
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
                 return Unauthorized("Not authorized");
             if (fazaaCreateDtos.InDebtId == Id)
                 return BadRequest("Really?! Seriously?!");
-            var friends = _friendsRepository.GetFriends(Id);
+            var friends = await _friendsRepository.GetFriends(Id);
             if (friends == null)
                 return BadRequest("You are not friends1");
             List<FriendDto> friendss = [];
             foreach (var fri in friends)
             {
-                if (fri.Passenger!.Id == Id)
+                if (fri!.Passenger!.Id == Id)
                     friendss.Add(fri.Friend!);
                 if (fri.Friend!.Id == Id)
                     friendss.Add(fri.Passenger!);
@@ -51,16 +51,16 @@ namespace API.Controllers
             else return BadRequest("You are not friends2");
             if (fazaaCreateDtos.Amount <= 0)
                 return BadRequest("Why? are you giving or taking?");
-            if (_passengerRepository.GetPassengerDtoById(fazaaCreateDtos.InDebtId) == null)
+            if (await _passengerRepository.GetPassengerDtoById(fazaaCreateDtos.InDebtId) == null)
                 return NotFound("Passenger Not Found");
-            if (_passengerRepository.GetPassengerDtoById(Id).Wallet < fazaaCreateDtos.Amount)
+            if ((await _passengerRepository.GetPassengerDtoById(Id))!.Wallet < fazaaCreateDtos.Amount)
                 return BadRequest("You are officially broke!");
-            if (_fazaaRepository.GetFazaas(fazaaCreateDtos.InDebtId).Count() > 0)
+            if ((await _fazaaRepository.GetFazaas(fazaaCreateDtos.InDebtId)).Any())
                 return BadRequest("You already have a Fazaa");
             try
             {
-                _fazaaRepository.StoreFazaas(fazaaCreateDtos, Id);
-                if (_fazaaRepository.SaveChanges())
+                await _fazaaRepository.StoreFazaas(fazaaCreateDtos, Id);
+                if (await _fazaaRepository.SaveChanges())
                     return StatusCode(201);
             }
             catch (Exception ex)
@@ -71,22 +71,22 @@ namespace API.Controllers
             return BadRequest("Duplicated Record");
         }
         [HttpGet("getFazaas")]
-        public ActionResult<IEnumerable<FazaaDto>> getFazaas()
+        public async Task<ActionResult<IEnumerable<FazaaDto>>> getFazaas()
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
                 return Unauthorized("Not authorized1");
 
-            var fazaas = _fazaaRepository.GetFazaas(Id);
+            var fazaas = await _fazaaRepository.GetFazaas(Id);
             if (fazaas == null)
                 return NotFound("No Fazaa Found");
 
             return Ok(fazaas);
         }
         [HttpGet("getFazaaById/{id}")]
-        public ActionResult<FazaaDto> getFazaaById(int id)
+        public async Task<ActionResult<FazaaDto>> getFazaaById(int id)
         {
-            var fazaa = _fazaaRepository.GetFazaaById(id);
+            var fazaa = await _fazaaRepository.GetFazaaById(id);
             if (fazaa == null)
                 return NotFound("Fazaa Not Found");
 

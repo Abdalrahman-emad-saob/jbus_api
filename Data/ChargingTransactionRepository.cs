@@ -3,22 +3,16 @@ using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Bogus.DataSets;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class ChargingTransactionRepository : IChargingTransactionRepository
+    public class ChargingTransactionRepository(DataContext context, IMapper mapper) : IChargingTransactionRepository
     {
-        private readonly DataContext _context;
-        private readonly IMapper _mapper;
+        private readonly DataContext _context = context;
+        private readonly IMapper _mapper = mapper;
 
-        public ChargingTransactionRepository(DataContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
-
-        public bool CreateChargingTransaction(ChargingTransactionCreateDto chargingTransactionCreateDto, int id)
+        public async Task<bool> CreateChargingTransaction(ChargingTransactionCreateDto chargingTransactionCreateDto, int id)
         {
             var chargeMethod = ChargingMethod.MASTERCARD;
             if(chargingTransactionCreateDto.paymentMethod?.ToUpper() == ChargingMethod.MASTERCARD.ToString())
@@ -37,31 +31,31 @@ namespace API.Data
                 PassengerId = id,
                 TimeStamp = DateTime.UtcNow
             };
-            _context.Passengers.Find(id)!.Wallet += chargingTransactionCreateDto.Amount;
-            _context.ChargingTransactions.Add(chargingTransaction);
+            (await _context.Passengers.FindAsync(id))!.Wallet += chargingTransactionCreateDto.Amount;
+            await _context.ChargingTransactions.AddAsync(chargingTransaction);
             return true;
         }
 
-        public ChargingTransactionDto GetChargingTransactionById(int id)
+        public async Task<ChargingTransactionDto?> GetChargingTransactionById(int id)
         {
-            return _context
+            return await _context
             .ChargingTransactions
             .Where(ct => ct.Id == id)
             .ProjectTo<ChargingTransactionDto>(_mapper.ConfigurationProvider)
-            .SingleOrDefault()!;
+            .SingleOrDefaultAsync()!;
         }
 
-        public IEnumerable<ChargingTransactionDto> GetChargingTransactions()
+        public async Task<IEnumerable<ChargingTransactionDto?>> GetChargingTransactions()
         {
-            return _context
+            return await _context
                 .ChargingTransactions
                 .ProjectTo<ChargingTransactionDto>(_mapper.ConfigurationProvider)
-                .ToList();
+                .ToListAsync();
         }
 
-        public bool SaveChanges()
+        public async Task<bool> SaveChanges()
         {
-            return _context.SaveChanges() > 0;
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

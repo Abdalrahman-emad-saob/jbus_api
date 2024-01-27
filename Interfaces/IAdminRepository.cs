@@ -5,12 +5,12 @@ namespace API.Interfaces
 {
     public interface IAdminRepository
     {
-        void Update(int id);
-        IEnumerable<AdminDto> GetAdmins();
-        AdminDto GetAdminDtoById(int id);
-        AdminDto CreateAdmin(RegisterAdminDto registerAdminDto);
-        Admin GetAdminById(int id);
-        Admin GetAdminByEmail(string Email);
-        bool SaveChanges();
+        Task<bool> Update(int id);
+        Task<IEnumerable<AdminDto?>> GetAdmins();
+        Task<AdminDto?> GetAdminDtoById(int id);
+        Task<AdminDto?> CreateAdmin(RegisterAdminDto registerAdminDto);
+        Task<Admin?> GetAdminById(int id);
+        Task<Admin?> GetAdminByEmail(string Email);
+        Task<bool> SaveChanges();
     }
 }

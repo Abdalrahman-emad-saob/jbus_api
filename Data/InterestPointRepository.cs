@@ -7,20 +7,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class InterestPointRepository : IInterestPointRepository
+    public class InterestPointRepository(DataContext context, IMapper mapper, IPointRepository pointRepository) : IInterestPointRepository
     {
-        private readonly DataContext _context;
-        private readonly IMapper _mapper;
-        private readonly IPointRepository _pointRepository;
+        private readonly DataContext _context = context;
+        private readonly IMapper _mapper = mapper;
+        private readonly IPointRepository _pointRepository = pointRepository;
 
-        public InterestPointRepository(DataContext context, IMapper mapper, IPointRepository pointRepository)
-        {
-            _context = context;
-            _mapper = mapper;
-            _pointRepository = pointRepository;
-        }
-
-        public InterestPoint CreateInterestPoint(InterestPointCreateDto interestPointDto)
+        public async Task<InterestPoint?> CreateInterestPoint(InterestPointCreateDto interestPointDto)
         {
             PointCreateDto pointCreateDto = new()
             {
@@ -29,41 +22,41 @@ namespace API.Data
                 Longitude = interestPointDto.Longitude,
                 CreatedAt = DateTime.UtcNow
             };
-            var point = _pointRepository.CreatePoint(pointCreateDto);
-            _context.Points.Add(point);
-            SaveChanges();
+            var point = await _pointRepository.CreatePoint(pointCreateDto);
+            await _context.Points.AddAsync(point!);
+            await SaveChanges();
             InterestPoint interestPoint = new()
             {
                 Name = interestPointDto.Name,
                 Logo = interestPointDto.Logo,
-                LocationId = point.Id,
+                LocationId = point!.Id,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
-            _context.InterestPoints.Add(interestPoint);
+            await _context.InterestPoints.AddAsync(interestPoint);
 
             return interestPoint;
         }
 
-        public InterestPointDto GetInterestPointById(int id)
+        public async Task<InterestPointDto?> GetInterestPointById(int id)
         {
-            return _context.InterestPoints
+            return await _context.InterestPoints
                 .Where(ip => ip.Id == id)
                 .ProjectTo<InterestPointDto>(_mapper.ConfigurationProvider)
-                .SingleOrDefault()!;
+                .SingleOrDefaultAsync()!;
         }
 
-        public IEnumerable<InterestPointDto> GetInterestPoints()
+        public async Task<IEnumerable<InterestPointDto?>> GetInterestPoints()
         {
-            return _context
+            return await _context
             .InterestPoints
             .ProjectTo<InterestPointDto>(_mapper.ConfigurationProvider)
-            .ToList();
+            .ToListAsync();
         }
 
-        public bool SaveChanges()
+        public async Task<bool> SaveChanges()
         {
-            return _context.SaveChanges() > 0;
+            return await _context.SaveChangesAsync() > 0;
         }
 
         public void Update(InterestPointDto interestPoint)

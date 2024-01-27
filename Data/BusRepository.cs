@@ -3,72 +3,103 @@ using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class BusRepository : IBusRepository
+    public class BusRepository(DataContext context,
+    IMapper mapper,
+    IDriverRepository driverRepository
+        ) : IBusRepository
     {
-        private readonly DataContext _context;
-        private readonly IMapper _mapper;
+        private readonly DataContext _context = context;
+        private readonly IMapper _mapper = mapper;
+        private readonly IDriverRepository _driverRepository = driverRepository;
 
-        public BusRepository(DataContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
-        public bool CreateBus(BusCreateDto busCreateDto)
+        public async Task<bool> CreateBus(BusCreateDto busCreateDto)
         {
             Bus bus = new()
             {
                 BusNumber = busCreateDto.BusNumber,
                 RouteId = busCreateDto.RouteId,
                 DriverId = busCreateDto.DriverId,
+                Capacity = busCreateDto.Capacity,
                 IsActive = false,
                 Going = BusStatus.Idle,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             };
-            _context.Buses.Add(bus);
-
+            await _context.Buses.AddAsync(bus);
+            await SaveChanges();
+            (await _driverRepository.GetDriverById(busCreateDto.DriverId))!.BusId = bus.Id;
             return true;
         }
 
-        public BusDto GetBusById(int id)
+        public async Task<BusDto?> GetBusById(int id)
         {
-            return _context
+            return await _context
            .Buses
+           .Include(b => b.Driver)
+              .Include(b => b.Route)
            .Where(d => d.Id == id)
            .ProjectTo<BusDto>(_mapper.ConfigurationProvider)
-           .SingleOrDefault()!;
+           .SingleOrDefaultAsync()!;
         }
 
-        public IEnumerable<BusDto> GetBuses()
+        public async Task<IEnumerable<BusDto>> GetBuses()
         {
-            return _context
+            return await _context
                 .Buses
+                .Include(b => b.Driver)
+                    .Include(b => b.Route)
                 .ProjectTo<BusDto>(_mapper.ConfigurationProvider)
-                .ToList();
+                .ToListAsync();
         }
-        public IEnumerable<BusDto> GetActiveBuses()
+        public async Task<IEnumerable<BusDto>> GetActiveBuses()
         {
-            return _context
+            return await _context
                 .Buses
+                .Include(b => b.Driver)
+                .Include(b => b.Route)
                 .ProjectTo<BusDto>(_mapper.ConfigurationProvider)
                 .Where(b => b.IsActive == true)
-                .ToList();
+                .ToListAsync();
         }
 
-        public bool SaveChanges()
+        public async Task<IEnumerable<BusDto>> GetActiveBusesByRoute(int id)
         {
-            return _context.SaveChanges() > 0;
+            return await _context
+                .Buses
+                .Include(b => b.Driver)
+                .Include(b => b.Route)
+                .ProjectTo<BusDto>(_mapper.ConfigurationProvider)
+                .Where(b => b.IsActive == true && b.RouteId == id)
+                .ToListAsync();
         }
 
-        public bool Update(BusUpdateDto busUpdateDto, int id)
+        public async Task<bool> SaveChanges()
         {
-            var bus = _context.Buses.Find(id);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> Update(BusUpdateDto busUpdateDto, int id)
+        {
+            var bus = await _context.Buses.FindAsync(id);
+            if (bus == null)
+                return false;
+
             _mapper.Map(busUpdateDto, bus);
-            // bus!.UpdatedAt = DateTime.UtcNow;
-            _context.Entry(busUpdateDto).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            bus.UpdatedAt = DateTime.UtcNow;
+
             return true;
+        }
+        public async Task<bool> IsBusActive(int? id)
+        {
+            var bus = await _context.Buses.FindAsync(id);
+            if (bus == null)
+                return false;
+
+            return bus.IsActive;
         }
     }
 }

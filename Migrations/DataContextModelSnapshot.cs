@@ -399,6 +399,9 @@ namespace API.Migrations
                     b.Property<string>("ProfileImage")
                         .HasColumnType("text");
 
+                    b.Property<int>("RewardPoints")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("UserId")
                         .HasColumnType("integer");
 

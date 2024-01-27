@@ -3,21 +3,16 @@ using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class PaymentTransactionRepository : IPaymentTransactionRepository
+    public class PaymentTransactionRepository(DataContext context, IMapper mapper) : IPaymentTransactionRepository
     {
-        private readonly DataContext _context;
-        private readonly IMapper _mapper;
+        private readonly DataContext _context = context;
+        private readonly IMapper _mapper = mapper;
 
-        public PaymentTransactionRepository(DataContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
-
-        public bool CreatePaymentTransaction(PaymentTransactionCreateDto paymentTransactionDto)
+        public async Task<bool> CreatePaymentTransaction(PaymentTransactionCreateDto paymentTransactionDto)
         {
             PaymentTransaction paymentTransaction = new()
             {
@@ -26,32 +21,32 @@ namespace API.Data
                 TripId = paymentTransactionDto.TripId,
                 TimeStamp = DateTime.UtcNow
             };
-            _context.PaymentTransactions.Add(paymentTransaction);
+            await _context.PaymentTransactions.AddAsync(paymentTransaction);
 
             return true;
         }
 
-        public PaymentTransactionDto GetPaymentTransactionById(int id)
+        public async Task<PaymentTransactionDto?> GetPaymentTransactionById(int id)
         {
-            return _context
+            return await _context
             .PaymentTransactions
             .Where(pt => pt.Id == id)
             .ProjectTo<PaymentTransactionDto>(_mapper.ConfigurationProvider)
-            .SingleOrDefault()!;
+            .SingleOrDefaultAsync()!;
         }
 
-        public IEnumerable<PaymentTransactionDto> GetPaymentTransactions(int id)
+        public async Task<IEnumerable<PaymentTransactionDto?>> GetPaymentTransactions(int id)
         {
-            return _context
+            return await _context
             .PaymentTransactions
             .Where(pt => pt.PassengerId == id)
             .ProjectTo<PaymentTransactionDto>(_mapper.ConfigurationProvider)
-            .ToList();
+            .ToListAsync();
         }
 
-        public bool SaveChanges()
+        public async Task<bool> SaveChanges()
         {
-            return _context.SaveChanges() > 0;
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }
