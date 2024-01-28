@@ -7,10 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class BusRepository(DataContext context,
-    IMapper mapper,
-    IDriverRepository driverRepository
-        ) : IBusRepository
+    public class BusRepository(
+        DataContext context,
+        IMapper mapper,
+        IDriverRepository driverRepository
+    ) : IBusRepository
     {
         private readonly DataContext _context = context;
         private readonly IMapper _mapper = mapper;
@@ -24,7 +25,7 @@ namespace API.Data
                 RouteId = busCreateDto.RouteId,
                 DriverId = busCreateDto.DriverId,
                 Capacity = busCreateDto.Capacity,
-                IsActive = false,
+                IsActive = true,
                 Going = BusStatus.Idle,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -99,6 +100,15 @@ namespace API.Data
             if (bus == null)
                 return false;
 
+            return bus.IsActive;
+        }
+
+        public async Task<bool> De_ActivateBus(int? id)
+        {
+            var bus = await _context.Buses.FindAsync(id);
+            if (bus == null)
+                return false;
+            bus.IsActive = false;
             return bus.IsActive;
         }
     }

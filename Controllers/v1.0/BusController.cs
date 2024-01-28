@@ -21,15 +21,31 @@ namespace api.Controllers.v1
         {
             var driver = await _driverRepository.GetDriverById(busCreateDto.DriverId);
 
-            if(driver == null)
+            if (driver == null)
                 return NotFound("Driver Not Found" + busCreateDto.DriverId);
 
-            if(driver.BusId != null)
+            if (driver.BusId != null)
                 return BadRequest("Driver Already Has a Bus");
 
             var bus = _busRepository.CreateBus(busCreateDto);
             if (await _busRepository.SaveChanges())
                 return Created("", bus);
+
+            return StatusCode(500, "Server Error");
+        }
+
+        [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
+        [HttpPut("De_ActivateBus/{id}")]
+        public async Task<ActionResult> De_ActivateBus(int id)
+        {
+            var bus = await _busRepository.GetBusById(id);
+            if (bus == null)
+                return NotFound("Bus Not Found");
+
+            await _busRepository.De_ActivateBus(id);
+            
+            if (await _busRepository.SaveChanges())
+                return NoContent();
 
             return StatusCode(500, "Server Error");
         }
@@ -72,16 +88,16 @@ namespace api.Controllers.v1
             if (bus == null)
                 return NotFound("Bus Not Found");
 
-            if(driver == null)
+            if (driver == null)
                 return NotFound("Driver Not Found" + busUpdateDto.DriverId);
 
-            if(driver.BusId != null)
+            if (driver.BusId != null)
                 return BadRequest("Driver Already Has a Bus");
 
 
-            if(!await _busRepository.Update(busUpdateDto, id)) 
+            if (!await _busRepository.Update(busUpdateDto, id))
                 return BadRequest("Failed to Update Bus");
-            
+
             if (await _busRepository.SaveChanges())
                 return NoContent();
 

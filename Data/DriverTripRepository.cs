@@ -56,20 +56,17 @@ namespace API.Data
 
         public async Task<(DriverTripDto, string)> updateDriverTrip(int id, DriverTripUpdateDto driverTripUpdateDto)
         {
-            var driverTrip = await _context.DriverTrips.FindAsync(id);
+            var driver = await _driverRepository.GetDriverById(id);
+            if (driver == null)
+                return (null, "Driver not found")!;
+
+            if (driver.DriverTrips == null)
+                return (null, "Driver has no trips")!;
+
+            var driverTrip = driver.DriverTrips.Find(dt => dt.status == Status.PENDING || dt.status == Status.ONGOING);
 
             if (driverTrip == null)
-                return (null, "Driver trip not found")!;
-
-            if (driverTripUpdateDto.status != null)
-            {
-                if (driverTrip.status == Status.COMPLETED)
-                    return (null, "Trip is Completed")!;
-                else if (driverTrip.status == Status.CANCELED)
-                    return (null, "Trip is Canceled")!;
-            }
-            else
-                return (null, "Invalid status1")!;
+                return (null, "Driver has no active trip")!;
 
             var driverTripDto = _mapper.Map<DriverTripDto>(driverTrip);
 
