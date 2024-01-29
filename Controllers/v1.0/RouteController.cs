@@ -40,6 +40,17 @@ namespace api.Controllers.v1
             return await _routeRepository.GetRouteById(id);
         }
 
+        [CustomAuthorize("DRIVER")]
+        [HttpGet("GetMyRoute")]
+        public async Task<ActionResult<RouteDto?>> GetMyRoute()
+        {
+            int DriverId = _tokenHandlerService.TokenHandler();
+            if (DriverId == -1)
+                return Unauthorized("Not authorized");
+
+            return await _routeRepository.GetDriverRoute(DriverId);
+        }
+
         [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
         [HttpPut("{id}")]
         public async Task<ActionResult> updateRoute(RouteUpdateDto routeUpdateDto, int id)

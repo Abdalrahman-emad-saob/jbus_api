@@ -51,12 +51,15 @@ public class DriverTripController(
         }
         else
         {
-            return BadRequest("Bus is idle");
+            return BadRequest("Bad Status");
         }
-        var driverTripDto = await _driverTripRepository.CreateDriverTrip(id);
+        var driverTripDto = await _driverTripRepository.CreateDriverTrip(id, IsGoing);
 
-        if (driverTripDto.Item2 == null)
-            return BadRequest("Driver Trip Not Created");
+        if (driverTripDto.Item2 == "Driver not found")
+            return BadRequest(driverTripDto.Item2);
+
+        if (driverTripDto.Item2 == "Driver has no bus")
+            return BadRequest(driverTripDto.Item2);
 
         if (!await IsBusActive(driverTripDto.Item1.BusId))
             return BadRequest("Bus is not active");
@@ -75,7 +78,9 @@ public class DriverTripController(
             Console.WriteLine($"Failed to update Firebase Realtime Database: {response.StatusCode}");
             return BadRequest("Failed to update Firebase Realtime Database");
         }
-
+        var pathR = $"/Route/{driverTripDto.Item1.RouteId}/{IsGoing}/Bus/{driverTripDto.Item1.BusId}";
+        driverTripDto.Item1.firebasePath = pathR;
+        driverTripDto.Item1.IsGoing = driverTripCreateDto.IsGoing.Equals(BusStatus.Going.ToString(), StringComparison.CurrentCultureIgnoreCase);
         return Ok(driverTripDto.Item1);
     }
 
@@ -86,14 +91,14 @@ public class DriverTripController(
         if (driverId == -1)
             return Unauthorized("Unauthorized");
 
-        if (Enum.TryParse(driverTripUpdateDto.status, out Status parsedStatus))
-        {
-            if (parsedStatus == Status.COMPLETED)
-            {
-                if (driverTripUpdateDto.Rating == 0)
-                    return BadRequest("Rating is required");
-            }
-        }
+        // if (Enum.TryParse(driverTripUpdateDto.status, out Status parsedStatus))
+        // {
+        //     if (parsedStatus == Status.COMPLETED)
+        //     {
+        //         if (driverTripUpdateDto.Rating == 0)
+        //             return BadRequest("Rating is required");
+        //     }
+        // }
         var driverTripDto = await _driverTripRepository.updateDriverTrip(driverId, driverTripUpdateDto);
 
         if (driverTripDto.Item2 == "Driver not found")
@@ -118,31 +123,28 @@ public class DriverTripController(
     }
 
     [HttpPut("finishHim")]
-    public async Task<ActionResult> finishDriverTrip(DriverTripUpdateDto driverTripUpdateDto)
+    public async Task<ActionResult> finishDriverTrip(int Rating)
     {
         int id = _tokenHandlerService.TokenHandler();
         if (id == -1)
             return Unauthorized("Unauthorized");
 
-        if (Enum.TryParse(driverTripUpdateDto.status!.ToUpper(), out Status parsedStatus))
+        var driverTripUpdateDto = new DriverTripUpdateDto
         {
-            if (parsedStatus != Status.COMPLETED)
-            {
-                return BadRequest("Invalid status0");
-            }
-            else
-            {
-                if (driverTripUpdateDto.Rating <= 0)
-                    return BadRequest("Rating is required");
-            }
-        }
-        else
-        {
-            return BadRequest("Invalid status1");
-        }
+            status = Status.COMPLETED.ToString(),
+        };
+
+            // if (driverTripUpdateDto.status.ToUpper() != Status.COMPLETED.ToString())
+            // {
+            //     if (driverTripUpdateDto.Rating <= 0)
+            //         return BadRequest("Rating is required");
+            // }
         var driverTripDto = await _driverTripRepository.updateDriverTrip(id, driverTripUpdateDto);
 
         if (driverTripDto.Item2 == "Driver trip not found")
+            return BadRequest($"{driverTripDto.Item2}");
+
+        if (driverTripDto.Item2 == "Driver has no active trip")
             return BadRequest($"{driverTripDto.Item2}");
 
         if (driverTripDto.Item2 == "Trip is Completed")

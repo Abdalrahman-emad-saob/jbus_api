@@ -18,14 +18,14 @@ namespace API.Controllers.v1
         private readonly IMapper _mapper = mapper;
 
         [HttpGet]
-        public ActionResult<IEnumerable<DriverDto>> GetDrivers()
+        public async Task<ActionResult<IEnumerable<DriverDto>>> GetDrivers()
         {
-            return Ok(_driverRepository.GetDrivers());
+            return Ok(await _driverRepository.GetDrivers());
         }
         [HttpGet("{id}")]
-        public ActionResult<Task<DriverDto?>> GetDriverById(int id)
+        public async Task<ActionResult<DriverDto?>> GetDriverById(int id)
         {
-            var driverDto = _driverRepository.GetDriverDtoById(id);
+            var driverDto = await _driverRepository.GetDriverDtoById(id);
             if (driverDto == null)
                 return NotFound("Driver Not Found");
             return driverDto;

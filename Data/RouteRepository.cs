@@ -96,5 +96,13 @@ namespace API.Data
             }
             return true;
         }
+
+        public async Task<RouteDto?> GetDriverRoute(int id)
+        {
+            return await _context.Routes
+                .Where(r => r.IsActive == ActiveStatus.Active && r.Buses!.Where(b => b.DriverId == id).SingleOrDefault() != null)
+                .ProjectTo<RouteDto>(_mapper.ConfigurationProvider)
+                .SingleOrDefaultAsync()!;
+        }
     }
 }

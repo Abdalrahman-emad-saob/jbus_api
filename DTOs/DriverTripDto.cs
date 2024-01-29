@@ -12,6 +12,8 @@ namespace API.DTOs
         [System.Text.Json.Serialization.JsonIgnore]
         public int? RouteId { get; set; }
         public RouteDto? Route { get; set; }
+        public string? firebasePath { get; set; }
+        public bool IsGoing { get; set; }
         // TODO
         // public List<TripDto>? Trips { get; set; }
     }

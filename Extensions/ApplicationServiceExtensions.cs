@@ -1,8 +1,9 @@
 using API.Data;
 using API.Interfaces;
 using API.Services;
-using AspNetCoreRateLimit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
 
 namespace API.Extensions
@@ -24,7 +25,22 @@ namespace API.Extensions
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
                 {
-                    c.SwaggerDoc("v1", new OpenApiInfo { Title = "JBus-api", Version = "v1" });
+                    c.SwaggerDoc("v1", new OpenApiInfo
+                    {
+                        Title = "jbus-api",
+                        Version = "v1",
+                        Description = "jbus API",
+                        Extensions = new Dictionary<string, IOpenApiExtension>()
+                        {
+                            {
+                                "x-logo", new OpenApiObject
+                                {
+                                    { "url", new OpenApiString("/images/logo.png") },
+                                    { "altText", new OpenApiString("JBus Logo") }
+                                }
+                            }
+                        }
+                    });
 
                     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                     {

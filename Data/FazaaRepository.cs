@@ -36,6 +36,15 @@ namespace API.Data
            .SingleOrDefaultAsync()!;
         }
 
+        public async Task<FazaaDto?> GetFazaaByPassengerId(int id)
+        {
+            return await _context
+           .Fazaas
+           .Where(dt => dt.InDebtId == id && dt.Paid == false)
+           .ProjectTo<FazaaDto>(_mapper.ConfigurationProvider)
+           .SingleOrDefaultAsync()!;
+        }
+
         public async Task<IEnumerable<FazaaDto?>> GetFazaas(int InDebtId)
         {
             return await _context

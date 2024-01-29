@@ -3,6 +3,7 @@ using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Bogus.DataSets;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
@@ -12,32 +13,33 @@ namespace API.Data
         private readonly DataContext _context = context;
         private readonly IMapper _mapper = mapper;
 
-        public async Task<TripDto?> CreateTrip(TripCreateDto tripDto, int PassengerId)
+        public async Task<TripDto?> CreateTrip(TripCreateDto tripDto, int PassengerId, int BusId)
         {
-            // int status = 0;
-            // if (tripDto.status?.ToLower() == "pending")
-            //     status = 0;
-            // else if (tripDto.status?.ToLower() == "ongoing")
-            //     status = 1;
-            // else if (tripDto.status?.ToLower() == "completed")
-            //     status = 2;
-            // else if (tripDto.status?.ToLower() == "canceled")
-            //     status = 3;
-            bool isStatusParsed = Enum.TryParse(tripDto.status, true, out TripStatus status);
+            // bool isStatusParsed = Enum.TryParse(tripDto.status, true, out TripStatus status);
 
-            if (!isStatusParsed)
-            {
-                throw new ArgumentException("Invalid status");
-            }
+            // if (!isStatusParsed)
+            // {
+            //     throw new ArgumentException("Invalid status");
+            // }
+            var bus = await _context.Buses.FindAsync(BusId);
+            int driverTripId = (await _context.DriverTrips.FindAsync(bus!.DriverTrips!.Find(dt => dt.status == Status.PENDING || dt.status == Status.ONGOING)!.Id))!.Id;
             Point pointPick = new()
             {
                 Latitude = tripDto.PickUpPoint!.Latitude,
                 Longitude = tripDto.PickUpPoint.Longitude
             };
+            // System.Console.WriteLine("||");
+            // System.Console.WriteLine("||");
+            // System.Console.WriteLine("||");
+            // System.Console.WriteLine("||");
+            // System.Console.WriteLine("||");
+            // System.Console.WriteLine("||");
+            // System.Console.WriteLine(tripDto.DropOffPoint);
+            Point pointDrop = new();
             if (tripDto.DropOffPoint != null)
-                if (tripDto.DropOffPoint.Longitude != 0 && tripDto.DropOffPoint.Longitude != 0)
+                if (tripDto.DropOffPoint.Longitude != 0 && tripDto.DropOffPoint.Latitude != 0)
                 {
-                    Point pointDrop = new()
+                    pointDrop = new()
                     {
                         Latitude = tripDto.DropOffPoint!.Latitude,
                         Longitude = tripDto.DropOffPoint.Longitude
@@ -48,11 +50,15 @@ namespace API.Data
             await SaveChanges();
             Trip trip = new()
             {
-                status = status,
+                status = TripStatus.PENDING,
                 PassengerId = PassengerId,
                 PickUpPointId = pointPick.Id,
-                StartedAt = tripDto.StartedAt
+                StartedAt = DateTime.UtcNow,
+                DriverTripId = driverTripId,
             };
+
+            if(tripDto.DropOffPoint != null)
+                trip.DropOffPointId = pointDrop.Id;
 
             await _context.Trips.AddAsync(trip);
 
@@ -91,10 +97,21 @@ namespace API.Data
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public void Update(TripUpdateDto tripUpdateDto, int id)
+        public async Task Update(TripUpdateDto tripUpdateDto, int id)
         {
-            var trip = _context.Trips.Find(id);
+            var trip = await _context.Trips.FindAsync(id);
+
             _mapper.Map(tripUpdateDto, trip);
+        }
+
+        public async Task<TripDto?> finishTrip(int id)
+        {
+            var trip = await _context.Trips.FindAsync(id);
+
+            trip!.status = TripStatus.COMPLETED;
+            trip.FinishedAt = DateTime.UtcNow;
+
+            return _mapper.Map<TripDto>(trip);
         }
     }
 }

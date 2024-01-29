@@ -73,8 +73,8 @@ namespace API.Data
                 .Buses
                 .Include(b => b.Driver)
                 .Include(b => b.Route)
+                .Where(b => (b.Going == BusStatus.Going || b.Going == BusStatus.Returning) && b.RouteId == id)
                 .ProjectTo<BusDto>(_mapper.ConfigurationProvider)
-                .Where(b => b.IsActive == true && b.RouteId == id)
                 .ToListAsync();
         }
 
@@ -103,12 +103,12 @@ namespace API.Data
             return bus.IsActive;
         }
 
-        public async Task<bool> De_ActivateBus(int? id)
+        public async Task<bool> De_ActivateBus(int? id, bool active)
         {
             var bus = await _context.Buses.FindAsync(id);
             if (bus == null)
                 return false;
-            bus.IsActive = false;
+            bus.IsActive = active;
             return bus.IsActive;
         }
     }

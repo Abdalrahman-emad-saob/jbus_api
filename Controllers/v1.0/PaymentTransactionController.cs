@@ -25,7 +25,7 @@ namespace API.Controllers.v1
 
         [CustomAuthorize("DRIVER")]
         [HttpPost("generateQrCode")]
-        public async Task<ActionResult<QrDto>> GenerateQrCode()
+        public async Task<ActionResult> GenerateQrCode()
         {
             int id = _tokenHandlerService.TokenHandler();
             var driver = await _driverRepository.GetDriverById(id);
@@ -37,9 +37,10 @@ namespace API.Controllers.v1
                 return BadRequest("Route");
             if (driver.DriverTrips == null)
                 return BadRequest("DriverTrip");
-            var driverTrip = driver.DriverTrips.Find(dt => dt.status == Status.ONGOING);
+            var driverTrip = driver.DriverTrips.Find(dt => dt.status == Status.ONGOING || dt.status == Status.PENDING);
             if (driverTrip == null)
                 return BadRequest("DriverTrip");
+            
             string data = $"{id},{driverTrip.Id},{driver.BusId},{driver.Bus.RouteId},{driver.Bus.Route.Fee},{DateTime.UtcNow}";
 
             string signature = GenerateSignature(data);
@@ -53,7 +54,7 @@ namespace API.Controllers.v1
             PngByteQRCode qrCode = new(qrCodeData);
             byte[] qrCodeAsPngByteArr = qrCode.GetGraphic(10);
             string base64String = Convert.ToBase64String(qrCodeAsPngByteArr);
-            return Ok(new QrDto { base64String = base64String });
+            return Ok(new { base64String });
         }
         [CustomAuthorize("PASSENGER")]
         [HttpGet("scanQrCode")]

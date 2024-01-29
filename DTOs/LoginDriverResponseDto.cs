@@ -7,6 +7,6 @@ namespace API.DTOs
         [Required]
         public DriverDto? driverDto { get; set; }
         [Required]
-        public string? Token { get; set; }        
+        public string? Token { get; set; }
     }
 }

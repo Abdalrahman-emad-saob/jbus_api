@@ -7,6 +7,7 @@ namespace API.Interfaces
         Task<bool> Update(RouteUpdateDto routeUpdateDto, int id);
         Task<IEnumerable<RouteDto?>> GetRoutes();
         Task<RouteDto?> GetRouteById(int id);
+        Task<RouteDto?> GetDriverRoute(int id);
         Task<bool> CreateRoute(RouteCreateDto routeDto);
         Task<bool> Delete(int id);
         Task<bool> SaveChanges();

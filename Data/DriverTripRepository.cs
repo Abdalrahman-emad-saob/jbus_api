@@ -17,7 +17,7 @@ namespace API.Data
         private readonly IMapper _mapper = mapper;
         private readonly IDriverRepository _driverRepository = driverRepository;
 
-        public async Task<(DriverTripDto, string)> CreateDriverTrip(int id)
+        public async Task<(DriverTripDto, string)> CreateDriverTrip(int id, string IsGoing)
         {
             var driver = await _driverRepository.GetDriverById(id);
             if (driver == null)
@@ -25,6 +25,10 @@ namespace API.Data
 
             if (driver.Bus == null)
                 return (null!, "Driver has no bus")!;
+
+           Enum.TryParse(IsGoing, true, out BusStatus busStatus);
+            driver.Bus.Going = busStatus;
+
             DriverTrip driverTrip = new()
             {
                 DriverId = id,
@@ -76,7 +80,6 @@ namespace API.Data
                 if (parsedStatus == Status.COMPLETED)
                 {
                     driverTrip.FinishedAt = DateTime.UtcNow;
-                    driverTrip.Rating = driverTripUpdateDto.Rating;
                 }
                 return (driverTripDto, "Driver trip is updated");
             }

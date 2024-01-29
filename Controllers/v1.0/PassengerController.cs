@@ -2,16 +2,20 @@ using API.DTOs;
 using API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using API.Validations;
+using FirebaseAdmin.Messaging;
 
 namespace API.Controllers.v1
 {
     public class PassengerController(
         IPassengerRepository passengerRepository,
         IUserRepository userRepository,
-        ITokenHandlerService tokenHandlerService) : BaseApiController
+        IFazaaRepository fazaaRepository,   
+        ITokenHandlerService tokenHandlerService
+        ) : BaseApiController
     {
         private readonly IPassengerRepository _passengerRepository = passengerRepository;
         private readonly IUserRepository _userRepository = userRepository;
+        private readonly IFazaaRepository _fazaaRepository = fazaaRepository;
         private readonly ITokenHandlerService _tokenHandlerService = tokenHandlerService;
 
         [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
@@ -99,13 +103,15 @@ namespace API.Controllers.v1
             }
 
             await _passengerRepository.CreatePassenger(registerDto);
+            if(await _passengerRepository.SaveChanges())
+                return Created("Created", null);
 
-            return StatusCode(201);
+            return StatusCode(500, "Server Error");
         }
 
         [CustomAuthorize("PASSENGER", "SUPER_ADMIN", "ADMIN")]
         [HttpPut("updateRewardPoints")]
-        public async Task<ActionResult> UpdateRewardPoints(int rp)
+        public async Task<ActionResult> UpdateRewardPoints(UpdateRPsDto rp)
         {
             int Id = _tokenHandlerService.TokenHandler();
 
@@ -113,7 +119,7 @@ namespace API.Controllers.v1
             if (passenger == null)
                 return NotFound("Passenger Does not Exist");
 
-            await _passengerRepository.UpdateRewardPoints(rp, Id);
+            await _passengerRepository.UpdateRewardPoints(rp.rp, Id);
 
             if (await _passengerRepository.SaveChanges())
                 return NoContent();
@@ -123,13 +129,13 @@ namespace API.Controllers.v1
 
         [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
         [HttpPut("updateRewardPoints/{Id}")]
-        public async Task<ActionResult> UpdateRewardPoints(int rp, int Id)
+        public async Task<ActionResult> UpdateRewardPoints(UpdateRPsDto rp, int Id)
         {
-            var passenger = _passengerRepository.GetPassengerDtoById(Id);
+            var passenger = await _passengerRepository.GetPassengerDtoById(Id);
             if (passenger == null)
                 return NotFound("Passenger Does not Exist");
 
-            await _passengerRepository.UpdateRewardPoints(rp, Id);
+            await _passengerRepository.UpdateRewardPoints(rp.rp, Id);
 
             if (await _passengerRepository.SaveChanges())
                 return NoContent();
@@ -139,14 +145,30 @@ namespace API.Controllers.v1
 
         [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
         [HttpPut("updateRewardPointsToAll")]
-        public async Task<ActionResult> UpdateRewardPointsToAll(int rp)
+        public async Task<ActionResult> UpdateRewardPointsToAll(UpdateRPsDto rp)
         {
-            await _passengerRepository.UpdateRewardPointsToAll(rp);
+            await _passengerRepository.UpdateRewardPointsToAll(rp.rp);
 
             if (await _passengerRepository.SaveChanges())
                 return NoContent();
 
             return BadRequest("Failed to Update Reward Points");
+        }
+
+        [CustomAuthorize("PASSENGER")]
+        [HttpGet("IsPassengerFazaa'able")]
+        public async Task<ActionResult> IsPassengerFazaaable()
+        {
+            int Id = _tokenHandlerService.TokenHandler();
+            if (Id == -1)
+                return Unauthorized("Not authorized");
+
+            var fazaa = await _fazaaRepository.GetFazaaByPassengerId(Id);
+
+            if (fazaa == null)
+                return Ok(new { Message  = true });
+
+            return Ok(new { Message  = false });
         }
 
         private async Task<bool> UserExists(string? Email)

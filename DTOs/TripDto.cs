@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace API.DTOs
 {
     public class TripDto
@@ -12,5 +14,7 @@ namespace API.DTOs
         public PointDto? PickUpPoint { get; set; }
         public int DropOffPointId { get; set; }
         public PointDto? DropOffPoint { get; set; }
+        [JsonIgnore]
+        public DriverTripDto? DriverTrip { get; set; }
     }
 }
