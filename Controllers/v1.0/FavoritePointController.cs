@@ -23,7 +23,7 @@ namespace API.Controllers.v1
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized("Not authorized");
+                return Unauthorized(new { Error = "Not authorized" });
 
             return Ok(await _favoritePointRepository.GetFavoritePoints(Id));
         }
@@ -33,20 +33,20 @@ namespace API.Controllers.v1
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized("Not authorized");
+                return Unauthorized(new { Error = "Not authorized" });
 
             if (await _favoritePointRepository.DeleteFavoritePoint(id, Id))
                 if (await _favoritePointRepository.SaveChanges())
                     return NoContent();
 
-            return StatusCode(500, "Server Error");
+            return StatusCode(500, new { Error = "Server Error" });
         }
         [HttpPost("addfavoritepoint")]
         public async Task<ActionResult> CreateFavoritePoint(FavoritePointCreateDto favoritePointCreateDto)
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized("Not authorized");
+                return Unauthorized(new { Error = "Not authorized" });
 
             try
             {
@@ -56,7 +56,7 @@ namespace API.Controllers.v1
             }
             catch (Exception)
             {
-                return StatusCode(500, "Server Error");
+                return StatusCode(500, new { Error = "Server Error" });
             }
 
             return BadRequest();

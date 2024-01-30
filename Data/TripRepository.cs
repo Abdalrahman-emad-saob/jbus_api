@@ -3,7 +3,6 @@ using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Bogus.DataSets;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data

@@ -48,26 +48,26 @@ namespace API.Controllers.v1
             {
                 var otp = await _oTPRepository.GetOTPByEmail(registerDto.Email!);
                 if (otp == null)
-                    return NotFound(new { Message = "OTP not found" });
+                    return NotFound(new { Error = "OTP not found" });
 
                 if (otp.Otp != OTP)
-                    return BadRequest("Invalid OTP");
+                    return BadRequest(new { Error = "Invalid OTP" });
 
                 await _oTPRepository.DeleteOTP(otp.Id);
             }
 
             var CreatePassenger = await _passengerRepository.CreatePassenger(registerDto);
             if (CreatePassenger == null)
-                return StatusCode(500, "Server Error0");
+                return StatusCode(500, new { Error = "Server Error0" });
 
             var user = CreatePassenger.user;
             var passengerDto = CreatePassenger.passengerDto;
 
             if (passengerDto == null || user == null)
-                return StatusCode(500, "Server Error1");
+                return StatusCode(500, new { Error = "Server Error1" });
 
             if (await _passengerRepository.SaveChanges() == false)
-                return StatusCode(500, "Server Error2");
+                return StatusCode(500, new { Error = "Server Error2" });
 
             var token = _tokenService.CreateToken(user, passengerDto.Id);
             return StatusCode(201, new LoginResponseDto
@@ -82,7 +82,7 @@ namespace API.Controllers.v1
             try
             {
                 if (loginDto.Email == null)
-                    return BadRequest("Email is Empty");
+                    return BadRequest(new { Error = "Email is Empty"});
 
                 var user = await _userRepository.GetUserByEmail(loginDto.Email);
 
@@ -131,46 +131,6 @@ namespace API.Controllers.v1
         [HttpPost("sendOTP")]
         public async Task<IActionResult> SendOtp(sendOTPDto sendOTPDto)
         {
-
-            // if (UserExists(sendOTPDto.Email))
-            // {
-            //     return BadRequest("Passenger exists");
-            // }
-            // string senderEmail = "aboodsaob1139@gmail.com";
-            // // string senderPassword = "dugm cixm ychg qjjc";
-            // int otp = _oTPRepository.CreateOTP(sendOTPDto.Email!);
-            // MailMessage mail = new()
-            // {
-            //     From = new MailAddress(senderEmail)
-            // };
-            // mail.To.Add(sendOTPDto.Email!);
-            // mail.Subject = "JBus OTP";
-            // mail.Body = otp.ToString();
-
-            // SmtpClient smtpClient = new("localhost")
-            // {
-            //     Port = 25,
-            //     // Credentials = new NetworkCredential(senderEmail, senderPassword),
-            //     // EnableSsl = true
-            // };
-
-            // try
-            // {
-            //     smtpClient.Send(mail);
-            //     Console.WriteLine("Email sent successfully!");
-
-            //     return Ok();
-            // }
-            // catch (Exception ex)
-            // {
-            //     Console.WriteLine($"Error sending email: {ex.Message}");
-            //     return StatusCode(500, "Server Error");
-            // }
-
-
-
-
-
             if (await UserExists(sendOTPDto.Email))
             {
                 return BadRequest("Passenger exists");
@@ -205,37 +165,6 @@ namespace API.Controllers.v1
                 Console.WriteLine($"Error sending email: {ex.Message}");
                 return StatusCode(500, "Server Error");
             }
-            // var appConfig = new Configuration
-            // {
-            //     BasePath = "https://onesignal.com/api/v1/notifications",
-            //     AccessToken = "MzQ3ZGIyNWUtODllNC00NGQxLWJkYTEtNDUzZTlhYTVhOTY5",
-            // };
-
-            // var apiInstance = new DefaultApi(appConfig);
-            // var notification = new Notification(
-            //     appId: "8109104c-6466-474a-b16f-8b6817e85c35",
-            //     includedSegments: new List<string> { "Subscribed Users" },
-            //     templateId: "8727c910-521c-40ba-b204-310e24531202"
-            // );
-
-            // try
-            // {
-            //     // Create notification
-            //     CreateNotificationSuccessResponse result = apiInstance.CreateNotification(notification);
-            //     System.Console.WriteLine("|");
-            //     System.Console.WriteLine("|");
-            //     System.Console.WriteLine("|");
-            //     System.Console.WriteLine("|");
-            //     var a = result.ExternalId;
-            //     System.Console.WriteLine(a);
-            //     Debug.WriteLine(result);
-            // }
-            // catch (ApiException e)
-            // {
-            //     Debug.Print("Exception when calling DefaultApi.CreateNotification: " + e.Message);
-            //     Debug.Print("Status Code: " + e.ErrorCode);
-            //     Debug.Print(e.StackTrace);
-            // }
         }
         [Authorize]
         [HttpPost("logout")]

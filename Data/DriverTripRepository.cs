@@ -12,7 +12,9 @@ namespace API.Data
         IMapper mapper,
         IDriverRepository driverRepository
     ) : IDriverTripRepository
-    {
+    {// TODO : check driver id when updating bus
+    // TODO : check rpoute id when updating bus too
+    // TODO : check payment transaction, the busid, driverid, and routeid are nulls
         private readonly DataContext _context = context;
         private readonly IMapper _mapper = mapper;
         private readonly IDriverRepository _driverRepository = driverRepository;

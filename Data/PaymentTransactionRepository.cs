@@ -12,18 +12,21 @@ namespace API.Data
         private readonly DataContext _context = context;
         private readonly IMapper _mapper = mapper;
 
-        public async Task<bool> CreatePaymentTransaction(PaymentTransactionCreateDto paymentTransactionDto)
+        public async Task<PaymentTransactionDto?> CreatePaymentTransaction(PaymentTransactionCreateDto paymentTransactionDto)
         {
             PaymentTransaction paymentTransaction = new()
             {
                 Amount = paymentTransactionDto.Amount,
                 PassengerId = paymentTransactionDto.PassengerId,
                 TripId = paymentTransactionDto.TripId,
+                BusId = paymentTransactionDto.BusId,
+                RouteId = paymentTransactionDto.RouteId,
+                DriverId = paymentTransactionDto.DriverId,
                 TimeStamp = DateTime.UtcNow
             };
             await _context.PaymentTransactions.AddAsync(paymentTransaction);
 
-            return true;
+            return _mapper.Map<PaymentTransactionDto>(paymentTransaction);
         }
 
         public async Task<PaymentTransactionDto?> GetPaymentTransactionById(int id)

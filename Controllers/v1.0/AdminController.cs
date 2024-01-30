@@ -30,7 +30,7 @@ namespace API.Controllers.v1
             var admin = await _adminRepository.GetAdminDtoById(Id);
 
             if (admin == null)
-                return NotFound("Admin Not Found");
+                return NotFound(new { Error = "Admin Not Found" });
 
             return admin;
         }
@@ -38,7 +38,7 @@ namespace API.Controllers.v1
         public ActionResult addAdmin(RegisterAdminDto registerAdminDto)
         {
             if (UserExists(registerAdminDto.Email))
-                return BadRequest("Admin Exists");
+                return BadRequest(new { Error = "Admin Exists" });
 
             _adminRepository.CreateAdmin(registerAdminDto);
 
@@ -51,18 +51,18 @@ namespace API.Controllers.v1
 
 
             if (admin == null || adminUpdateDto.User == null)
-                return NotFound("Admin Not Found");
+                return NotFound(new { Error = "Admin Not Found" });
 
             var user = await _userRepository.GetUserById(admin.UserId!);
             if (user == null)
-                return NotFound("User Not Found");
+                return NotFound(new { Error = "User Not Found" });
 
             if (adminUpdateDto.User.Sex != null)
                 adminUpdateDto.User.Sex = adminUpdateDto.User.Sex.ToUpper();
 
             if (user.Email != adminUpdateDto.User.Email)
                 if (UserExists(adminUpdateDto.User.Email))
-                    return BadRequest("Email Duplicated");
+                    return BadRequest(new { Error = "Email Duplicated" });
 
             _mapper.Map(adminUpdateDto, admin);
             _mapper.Map(adminUpdateDto.User, user);
@@ -71,7 +71,7 @@ namespace API.Controllers.v1
             if (await _adminRepository.SaveChanges())
                 return NoContent();
 
-            return BadRequest("Failed to Update Passenger");
+            return BadRequest(new { Error = "Failed to Update Passenger" });
         }
 
         private bool UserExists(string? Email)

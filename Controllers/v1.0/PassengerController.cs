@@ -9,7 +9,7 @@ namespace API.Controllers.v1
     public class PassengerController(
         IPassengerRepository passengerRepository,
         IUserRepository userRepository,
-        IFazaaRepository fazaaRepository,   
+        IFazaaRepository fazaaRepository,
         ITokenHandlerService tokenHandlerService
         ) : BaseApiController
     {
@@ -30,7 +30,7 @@ namespace API.Controllers.v1
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized("Not authorized");
+                return Unauthorized(new { Error = "Not authorized" });
 
             return await _passengerRepository.GetPassengerDtoById(Id);
         }
@@ -41,11 +41,11 @@ namespace API.Controllers.v1
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized("Not authorized");
+                return Unauthorized(new { Error = "Not authorized" });
 
             var passenger = await _passengerRepository.GetPassengerById(Id);
             if (passenger == null)
-                return NotFound("Passenger Does not Exist");
+                return NotFound(new { Error = "Passenger Does not Exist" });
             var user = await _userRepository.GetUserById((int)passenger.UserId!);
 
             if (passenger == null || user == null)
@@ -56,7 +56,7 @@ namespace API.Controllers.v1
             if (await _passengerRepository.SaveChanges())
                 return NoContent();
 
-            return BadRequest("Failed to Update Passenger");
+            return BadRequest(new { Error = "Failed to Update Passenger" });
         }
 
         [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
@@ -65,22 +65,22 @@ namespace API.Controllers.v1
         {
             var passenger = await _passengerRepository.GetPassengerById(Id);
             if (passenger == null)
-                return NotFound("Passenger Does not Exist");
+                return NotFound(new { Error = "Passenger Does not Exist" });
             var user = await _userRepository.GetUserById((int)passenger.UserId!);
             if (passenger == null || user == null || passengerUpdateDto.User == null)
-                return NotFound("User Does not Exist");
+                return NotFound(new { Error = "User Does not Exist" });
             if (passengerUpdateDto.User.Sex != null)
                 passengerUpdateDto.User.Sex = passengerUpdateDto.User.Sex.ToUpper();
             if (user.Email != passengerUpdateDto.User.Email)
                 if (await UserExists(passengerUpdateDto.User.Email))
-                    return BadRequest("Email Duplicated");
-                
+                    return BadRequest(new { Error = "Email Duplicated" });
+
             _passengerRepository.Update(passengerUpdateDto, passenger, user);
 
             if (await _passengerRepository.SaveChanges())
                 return NoContent();
 
-            return BadRequest("Failed to Update Passenger");
+            return BadRequest(new { Error = "Failed to Update Passenger" });
         }
         [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
         [HttpGet("{id}")]
@@ -88,7 +88,7 @@ namespace API.Controllers.v1
         {
             var passenger = await _passengerRepository.GetPassengerDtoById(id);
             if (passenger == null)
-                return NotFound("Passenger Does not Exist");
+                return NotFound(new { Error = "Passenger Does not Exist" });
 
             return Ok(passenger);
         }
@@ -99,14 +99,14 @@ namespace API.Controllers.v1
         {
             if (await UserExists(registerDto.Email))
             {
-                return BadRequest("Passenger Exists");
+                return BadRequest(new { Error = "Passenger Exists" });
             }
 
             await _passengerRepository.CreatePassenger(registerDto);
-            if(await _passengerRepository.SaveChanges())
+            if (await _passengerRepository.SaveChanges())
                 return Created("Created", null);
 
-            return StatusCode(500, "Server Error");
+            return StatusCode(500, new { Error = "Server Error" });
         }
 
         [CustomAuthorize("PASSENGER", "SUPER_ADMIN", "ADMIN")]
@@ -117,14 +117,14 @@ namespace API.Controllers.v1
 
             var passenger = _passengerRepository.GetPassengerDtoById(Id);
             if (passenger == null)
-                return NotFound("Passenger Does not Exist");
+                return NotFound(new { Error = "Passenger Does not Exist" });
 
             await _passengerRepository.UpdateRewardPoints(rp.rp, Id);
 
             if (await _passengerRepository.SaveChanges())
                 return NoContent();
 
-            return BadRequest("Failed to Update Reward Points");
+            return BadRequest(new { Error = "Failed to Update Reward Points" });
         }
 
         [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
@@ -133,14 +133,14 @@ namespace API.Controllers.v1
         {
             var passenger = await _passengerRepository.GetPassengerDtoById(Id);
             if (passenger == null)
-                return NotFound("Passenger Does not Exist");
+                return NotFound(new { Error = "Passenger Does not Exist" });
 
             await _passengerRepository.UpdateRewardPoints(rp.rp, Id);
 
             if (await _passengerRepository.SaveChanges())
                 return NoContent();
 
-            return BadRequest("Failed to Update Reward Points");
+            return BadRequest(new { Error = "Failed to Update Reward Points" });
         }
 
         [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
@@ -152,7 +152,7 @@ namespace API.Controllers.v1
             if (await _passengerRepository.SaveChanges())
                 return NoContent();
 
-            return BadRequest("Failed to Update Reward Points");
+            return BadRequest(new { Error = "Failed to Update Reward Points" });
         }
 
         [CustomAuthorize("PASSENGER")]
@@ -161,14 +161,14 @@ namespace API.Controllers.v1
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized("Not authorized");
+                return Unauthorized(new { Error = "Not authorized" });
 
             var fazaa = await _fazaaRepository.GetFazaaByPassengerId(Id);
 
             if (fazaa == null)
-                return Ok(new { Message  = true });
+                return Ok(new { Success = true });
 
-            return Ok(new { Message  = false });
+            return Ok(new { Success = false });
         }
 
         private async Task<bool> UserExists(string? Email)

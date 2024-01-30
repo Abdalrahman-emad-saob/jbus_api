@@ -27,7 +27,7 @@ namespace API.Controllers.v1
         {
             var driverDto = await _driverRepository.GetDriverDtoById(id);
             if (driverDto == null)
-                return NotFound("Driver Not Found");
+                return NotFound(new { Error = "Driver Not Found" });
             return driverDto;
         }
         [HttpPost("addDriver")]
@@ -35,7 +35,7 @@ namespace API.Controllers.v1
         {
             if (await UserExists(registerDriverDto.Email))
             {
-                return BadRequest("Driver Exists");
+                return BadRequest(new { Error = "Driver Exists" });
             }
             await _driverRepository.CreateDriver(registerDriverDto);
             return Ok();
@@ -46,19 +46,19 @@ namespace API.Controllers.v1
             var driver = await _driverRepository.GetDriverById(id);
 
             if (driver == null || driverUpdateDto.User == null)
-                return NotFound("Driver Not Found");
+                return NotFound(new { Error = "Driver Not Found" });
 
             var user = await _userRepository.GetUserById(driver.UserId);
 
             if (user == null)
-                return NotFound("Driver Not Found");
+                return NotFound(new { Error = "Driver Not Found" });
 
             if (driverUpdateDto.User.Sex != null)
                 driverUpdateDto.User.Sex = driverUpdateDto.User.Sex.ToUpper();
 
             if (user.Email != driverUpdateDto.User.Email)
                 if (await UserExists(driverUpdateDto.User.Email))
-                    return BadRequest("Email Duplicated");
+                    return BadRequest(new { Error = "Email Duplicated" });
 
             _mapper.Map(driverUpdateDto, driver);
             _mapper.Map(driverUpdateDto.User, user);
@@ -66,7 +66,7 @@ namespace API.Controllers.v1
             if (await _driverRepository.SaveChanges())
                 return NoContent();
 
-            return BadRequest("Failed to Update Driver");
+            return BadRequest(new { Error = "Failed to Update Driver" });
         }
         private async Task<bool> UserExists(string? Email)
         {

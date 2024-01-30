@@ -36,15 +36,15 @@ namespace API.Controllers.v1
                 var passwordVerificationResult = passwordHasher.VerifyHashedPassword(user, user.PasswordHash!, loginDto.Password!);
 
                 if (passwordVerificationResult != PasswordVerificationResult.Success)
-                    return Unauthorized("Not Authorized1");
+                    return Unauthorized(new { Error = "Not Authorized1" });
 
                 if (user.Email == null)
-                    return Unauthorized("Not Authorized2");
+                    return Unauthorized(new { Error = "Not Authorized2" });
 
                 var driverDto = _mapper.Map<DriverDto>(await _driverRepository.GetDriverByEmail(user.Email));
 
                 if (driverDto == null)
-                    return Unauthorized("Not Authorized3");
+                    return Unauthorized(new { Error = "Not Authorized3" });
 
                 var token = _tokenService.CreateToken(user, driverDto.Id);
 
@@ -56,7 +56,7 @@ namespace API.Controllers.v1
             }
             catch (Exception)
             {
-                return StatusCode(500, "Server Error");
+                return StatusCode(500, new { Error = "Server Error" });
             }
         }
         [Authorize]

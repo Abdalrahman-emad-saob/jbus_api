@@ -6,7 +6,7 @@ namespace API.Interfaces
     {
         Task<IEnumerable<PaymentTransactionDto?>> GetPaymentTransactions(int id);
         Task<PaymentTransactionDto?> GetPaymentTransactionById(int id);
-        Task<bool> CreatePaymentTransaction(PaymentTransactionCreateDto paymentTransactionDto);
+        Task<PaymentTransactionDto?> CreatePaymentTransaction(PaymentTransactionCreateDto paymentTransactionDto);
         Task<bool> SaveChanges();
     }
 }

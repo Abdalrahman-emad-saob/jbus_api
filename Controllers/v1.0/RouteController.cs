@@ -20,10 +20,10 @@ namespace api.Controllers.v1
         [HttpPost("addRoute")]
         public async Task<ActionResult> CreateRoute(RouteCreateDto routeCreateDto)
         {
-            if(await _routeRepository.CreateRoute(routeCreateDto))
-                if(await _routeRepository.SaveChanges())
+            if (await _routeRepository.CreateRoute(routeCreateDto))
+                if (await _routeRepository.SaveChanges())
                     return StatusCode(201);
-            return StatusCode(500, "Server Error");
+            return StatusCode(500, new { Error = "Server Error" });
         }
 
         [CustomAuthorize("PASSENGER", "SUPER_ADMIN", "ADMIN")]
@@ -46,7 +46,7 @@ namespace api.Controllers.v1
         {
             int DriverId = _tokenHandlerService.TokenHandler();
             if (DriverId == -1)
-                return Unauthorized("Not authorized");
+                return Unauthorized(new { Error = "Not authorized" });
 
             return await _routeRepository.GetDriverRoute(DriverId);
         }
@@ -57,15 +57,15 @@ namespace api.Controllers.v1
         {
             var route = await _routeRepository.GetRouteById(id);
 
-            if (route == null) 
-                return NotFound("Route Not Found");
+            if (route == null)
+                return NotFound(new { Error = "Route Not Found" });
 
-            
-            if(await _routeRepository.Update(routeUpdateDto, id))
-                if (await _routeRepository.SaveChanges()) 
+
+            if (await _routeRepository.Update(routeUpdateDto, id))
+                if (await _routeRepository.SaveChanges())
                     return NoContent();
 
-            return BadRequest("Failed to Update Route");
+            return BadRequest(new { Error = "Failed to Update Route" });
         }
 
         [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
@@ -74,15 +74,15 @@ namespace api.Controllers.v1
         {
             var route = await _routeRepository.GetRouteById(id);
 
-            if (route == null) 
-                return NotFound("Route Not Found");
+            if (route == null)
+                return NotFound(new { Error = "Route Not Found" });
 
-            
-            if(await _routeRepository.Delete(id))
-                if (await _routeRepository.SaveChanges()) 
+
+            if (await _routeRepository.Delete(id))
+                if (await _routeRepository.SaveChanges())
                     return NoContent();
 
-            return BadRequest("Failed to Delete Route");
+            return BadRequest(new { Error = "Failed to Delete Route" });
         }
         [CustomAuthorize("PASSENGER")]
         [HttpGet("{id}/favoritepoints")]
@@ -90,10 +90,10 @@ namespace api.Controllers.v1
         {
             int PassengerId = _tokenHandlerService.TokenHandler();
             if (PassengerId == -1)
-                return Unauthorized("Not authorized1");
+                return Unauthorized(new { Error = "Not authorized1" });
 
             IEnumerable<FavoritePointDto?> favoritePointDtos = await _favoritePointRepository.GetRouteFavoritePointDtos(PassengerId, id);
-                
+
             return Ok(favoritePointDtos);
         }
     }

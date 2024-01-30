@@ -12,6 +12,7 @@ namespace API.Interfaces
         Task<bool> De_ActivateBus(int? id, bool active);
         Task<bool> CreateBus(BusCreateDto busCreateDto);
         Task<bool> IsBusActive(int? id);
+        Task<bool> UpdateBusStatus(int? id, string? status);
         Task<bool> SaveChanges();
     }
 }

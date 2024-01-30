@@ -22,7 +22,7 @@ namespace api.Controllers.v1
             var driver = await _driverRepository.GetDriverById(busCreateDto.DriverId);
 
             if (driver == null)
-                return NotFound("Driver Not Found" + busCreateDto.DriverId);
+                return NotFound(new { Error = "Driver Not Found" + busCreateDto.DriverId });
 
             // if (driver.BusId != null)
             //     return BadRequest("Driver Already Has a Bus");
@@ -31,7 +31,7 @@ namespace api.Controllers.v1
             if (await _busRepository.SaveChanges())
                 return Created("", bus);
 
-            return StatusCode(500, "Server Error");
+            return StatusCode(500, new { Error = "Server Error" });
         }
 
         [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
@@ -40,14 +40,14 @@ namespace api.Controllers.v1
         {
             var bus = await _busRepository.GetBusById(id);
             if (bus == null)
-                return NotFound("Bus Not Found");
+                return NotFound(new { Error = "Bus Not Found" });
 
             await _busRepository.De_ActivateBus(id, active);
-            
+
             if (await _busRepository.SaveChanges())
                 return NoContent();
 
-            return StatusCode(500, "Server Error");
+            return StatusCode(500, new { Error = "Server Error" });
         }
 
         [CustomAuthorize("PASSENGER", "SUPER_ADMIN", "ADMIN", "DRIVER")]
@@ -86,22 +86,22 @@ namespace api.Controllers.v1
             var driver = await _driverRepository.GetDriverById(busUpdateDto.DriverId);
 
             if (bus == null)
-                return NotFound("Bus Not Found");
+                return NotFound(new { Error = "Bus Not Found" });
 
             if (driver == null)
-                return NotFound("Driver Not Found" + busUpdateDto.DriverId);
+                return NotFound(new { Error = "Driver Not Found" + busUpdateDto.DriverId });
 
             // if (driver.BusId != null)
             //     return BadRequest("Driver Already Has a Bus");
 
 
             if (!await _busRepository.Update(busUpdateDto, id))
-                return BadRequest("Failed to Update Bus");
+                return BadRequest(new { Error = "Failed to Update Bus" });
 
             if (await _busRepository.SaveChanges())
                 return NoContent();
 
-            return BadRequest("No Changes Made");
+            return BadRequest(new { Error = "No Changes Made" });
         }
     }
 }

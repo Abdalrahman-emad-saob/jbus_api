@@ -26,13 +26,13 @@ public class NotificationController(
             return Unauthorized("Not authorized1");
 
         if (string.IsNullOrEmpty(deviceToken))
-            return BadRequest(new { Message = "Device Token is Required" });
+            return BadRequest(new { Error = "Device Token is Required" });
 
         bool registred = await _notisTokenRepository.StoreDeviceToken(Id, deviceToken);
         if (registred)
-            return Ok(new { Message = "Device token registered successfully." });
+            return Ok(new { Success = "Device token registered successfully." });
 
-        return StatusCode(500, new { Message = "Serve Error" });
+        return StatusCode(500, new { Error = "Serve Error" });
     }
     [CustomAuthorize("Passenger")]
     [HttpPost("sendNoti")]
@@ -40,15 +40,15 @@ public class NotificationController(
     {
         int Id = _tokenHandlerService.TokenHandler();
         if (Id == -1)
-            return Unauthorized("Not authorized1");
+            return Unauthorized(new { Error = "Not authorized1"});
 
         string? deviceToken = await GetDeviceTokenFromUserId(Id)!;
         if (deviceToken == null)
-            return NotFound(new { Message = "FCM Token is not found" });
+            return NotFound(new { Error = "FCM Token is not found" });
 
         await _notificationService.SendNotificationAsync(deviceToken, notificationDto);
 
-        return Ok(new { Message = "Notification sent successfully." });
+        return Ok(new { Success = "Notification sent successfully." });
     }
 
     [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
@@ -57,7 +57,7 @@ public class NotificationController(
     {
         BackgroundJob.Enqueue(() => _notificationService.SendNotificationsToAllAsync(notificationDto).Wait());
 
-        return Ok(new { Message = "Notifications sent successfully." });
+        return Ok(new { Success = "Notifications sent successfully." });
     }
 
     private async Task<string?> GetDeviceTokenFromUserId(int? PassengerId)

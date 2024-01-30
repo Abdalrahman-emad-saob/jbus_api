@@ -21,8 +21,8 @@ namespace API.Controllers
             {
                 await _pointRepository.CreatePoint(pointCreateDto);
                if(!await _pointRepository.SaveChanges())
-                    return StatusCode(500, "Server Error1");
-                return StatusCode(201, "Point Created");
+                    return StatusCode(500, new { Error = "Server Error1"});
+                return StatusCode(201, new { Success = "Point Created"});
             }
             return Ok(point);
         }
@@ -33,9 +33,9 @@ namespace API.Controllers
             var pointDto = await _pointRepository.GetPointById(id);
 
             if (pointDto == null)
-                return NotFound("Point Not Found");
+                return NotFound(new { Error = "Point Not Found"});
 
-            return pointDto;
+            return Ok(pointDto);
         }
         private async Task<PointDto?> PointExists(double lat, double lon)
         {

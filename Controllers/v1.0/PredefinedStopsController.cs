@@ -22,8 +22,8 @@ namespace API.Controllers
         public async Task<ActionResult<PointDto>> CreatePredefinedStops(PredefinedStopsCreateDto predefinedStopsCreateDto)
         {
             var predefinedStops = _predefinedStopsRepository.CreatePredefinedStops(predefinedStopsCreateDto);
-            if(!await _predefinedStopsRepository.SaveChanges())
-                    return StatusCode(500, "Server Error1");
+            if (!await _predefinedStopsRepository.SaveChanges())
+                return StatusCode(500, new { Error = "Server Error1" });
             return Ok(predefinedStops);
         }
 
@@ -31,9 +31,9 @@ namespace API.Controllers
         public async Task<ActionResult<PredefinedStopsDto>> getPredefinedStopsById(int id)
         {
             PredefinedStopsDto? predefinedStops = await _predefinedStopsRepository.GetPredefinedStopById(id);
-            
-            if(predefinedStops == null)
-                return NotFound("No Predefined Stops Defined");
+
+            if (predefinedStops == null)
+                return NotFound(new { Error = "No Predefined Stops Defined" });
 
             return Ok(predefinedStops);
         }

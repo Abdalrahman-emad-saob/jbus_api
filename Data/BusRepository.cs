@@ -111,5 +111,14 @@ namespace API.Data
             bus.IsActive = active;
             return bus.IsActive;
         }
+
+        public async Task<bool> UpdateBusStatus(int? id, string? status)
+        {
+            var bus = await _context.Buses.FindAsync(id);
+            if (bus == null)
+                return false;
+            bus.Going = Enum.Parse<BusStatus>(status!);
+            return true;
+        }
     }
 }

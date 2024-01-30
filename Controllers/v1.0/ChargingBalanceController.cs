@@ -26,23 +26,23 @@ namespace api.Controllers.v1
 
             var creditCard = await _creditCardsRepository.GetCreditCardByCardNumber(chargingTransactionCreateDto.CardNumber);
             if (creditCard == null)
-                return NotFound("No Matching Card Found, Best Luck Next Time");
-            if(creditCard.CardType != chargingTransactionCreateDto.paymentMethod)
-                return BadRequest("Wrong Card Type");
+                return NotFound(new { Error = "No Matching Card Found, Best Luck Next Time" });
+            if (creditCard.CardType != chargingTransactionCreateDto.paymentMethod)
+                return BadRequest(new { Error = "Wrong Card Type" });
             if (creditCard.CVC != chargingTransactionCreateDto.CVC)
-                return BadRequest("CVC is not Correct, Stealing Credit Cards? eh?");
+                return BadRequest(new { Error = "CVC is not Correct, Stealing Credit Cards? eh?" });
             if (creditCard.ExpirationDate < DateOnly.FromDateTime(DateTime.UtcNow))
-                return BadRequest("Card Expired, go outside once and renew it");
+                return BadRequest(new { Error = "Card Expired, go outside once and renew it" });
             if (creditCard.ExpirationDate != chargingTransactionCreateDto.ExpirationDate)
-                return BadRequest("Bad Thief Catch him ... or her i don't know");
+                return BadRequest(new { Error = "Bad Thief Catch him ... or her i don't know" });
             if (creditCard.Balance < chargingTransactionCreateDto.Amount)
-                return BadRequest("Insuffucient Balance, so POOOOOOOOOR!");
+                return BadRequest(new { Error = "Insuffucient Balance, so POOOOOOOOOR!" });
             if (!await _chargingTransactionRepository.CreateChargingTransaction(chargingTransactionCreateDto, Id))
-                return StatusCode(500, "Server Error1");
+                return StatusCode(500, new { Error = "Server Error1" });
             if (!await _chargingTransactionRepository.SaveChanges())
-                return StatusCode(500, "Server Error2");
+                return StatusCode(500, new { Error = "Server Error2" });
 
-            return StatusCode(201, new { Message = "Charged Successfully, Lucky Booooy" });
+            return StatusCode(201, new { Success = "Charged Successfully, Lucky Booooy" });
         }
     }
 }

@@ -93,8 +93,8 @@ namespace API.Helpers
             CreateMap<Trip, TripDto>()
             .ForMember(td => td.Status, opt => opt.MapFrom(t => t.status.ToString()));
             CreateMap<TripUpdateDto, Trip>()
-            .ForMember(tud => tud.status, opt => opt.MapFrom(t => t.Status!.ToString()))
-            .ForMember(t => t.status, opt => opt.PreCondition(src => !string.IsNullOrEmpty(src.Status)))
+            // .ForMember(tud => tud.status, opt => opt.MapFrom(t => t.Status!.ToString()))
+            // .ForMember(t => t.status, opt => opt.PreCondition(src => !string.IsNullOrEmpty(src.Status)))
             .ForMember(t => t.PaymentTransactionId, opt => opt.PreCondition(src => src.PaymentTransactionId != default))
             .ForMember(t => t.PickUpPoint, opt => opt.PreCondition(src => src.PickUpPoint != null))
             .ForMember(t => t.DropOffPoint, opt => opt.PreCondition(src => src.DropOffPoint != null)); ;

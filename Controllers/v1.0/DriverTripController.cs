@@ -31,7 +31,7 @@ public class DriverTripController(
         var driverTripDto = await _driverTripRepository.GetDriverTripById(id);
 
         if (driverTripDto == null)
-            return NotFound("Driver Trip Not Found");
+            return NotFound(new { Error = "Driver Trip Not Found" });
 
         return driverTripDto;
     }
@@ -56,16 +56,16 @@ public class DriverTripController(
         var driverTripDto = await _driverTripRepository.CreateDriverTrip(id, IsGoing);
 
         if (driverTripDto.Item2 == "Driver not found")
-            return BadRequest(driverTripDto.Item2);
+            return BadRequest(new { Error = driverTripDto.Item2 });
 
         if (driverTripDto.Item2 == "Driver has no bus")
-            return BadRequest(driverTripDto.Item2);
+            return BadRequest(new { Error = driverTripDto.Item2 });
 
         if (!await IsBusActive(driverTripDto.Item1.BusId))
-            return BadRequest("Bus is not active");
+            return BadRequest(new { Error = "Bus is not active" });
 
         if (!await _driverTripRepository.SaveChanges())
-            return BadRequest("Failed to create DriverTrip");
+            return BadRequest(new { Error = "Failed to create DriverTrip" });
 
         using var client = new HttpClient();
 
@@ -76,7 +76,7 @@ public class DriverTripController(
         if (!response.IsSuccessStatusCode)
         {
             Console.WriteLine($"Failed to update Firebase Realtime Database: {response.StatusCode}");
-            return BadRequest("Failed to update Firebase Realtime Database");
+            return StatusCode(500, new { Error = "Failed to update Firebase Realtime Database" });
         }
         var pathR = $"/Route/{driverTripDto.Item1.RouteId}/{IsGoing}/Bus/{driverTripDto.Item1.BusId}";
         driverTripDto.Item1.firebasePath = pathR;
@@ -89,7 +89,7 @@ public class DriverTripController(
     {
         int driverId = _tokenHandlerService.TokenHandler();
         if (driverId == -1)
-            return Unauthorized("Unauthorized");
+            return Unauthorized(new { Error = "Unauthorized" });
 
         // if (Enum.TryParse(driverTripUpdateDto.status, out Status parsedStatus))
         // {
@@ -102,65 +102,65 @@ public class DriverTripController(
         var driverTripDto = await _driverTripRepository.updateDriverTrip(driverId, driverTripUpdateDto);
 
         if (driverTripDto.Item2 == "Driver not found")
-            return BadRequest($"{driverTripDto.Item2}");
+            return BadRequest(new { Error = $"{driverTripDto.Item2}" });
 
         if (driverTripDto.Item2 == "Driver has no trips")
-            return BadRequest($"{driverTripDto.Item2}");
+            return BadRequest(new { Error = $"{driverTripDto.Item2}" });
 
         if (driverTripDto.Item2 == "Driver has no active trip")
-            return BadRequest($"{driverTripDto.Item2}");
+            return BadRequest(new { Error = $"{driverTripDto.Item2}" });
 
         if (driverTripDto.Item2 == "Invalid status")
-            return BadRequest($"{driverTripDto.Item2} {driverTripUpdateDto.status}");
+            return BadRequest(new { Error = $"{driverTripDto.Item2} {driverTripUpdateDto.status}" });
 
         if (!await IsBusActive(driverTripDto.Item1.BusId))
-            return BadRequest("Bus is not active");
+            return BadRequest(new { Error = "Bus is not active" });
 
         if (!await _driverTripRepository.SaveChanges())
-            return BadRequest("Failed to update DriverTrip");
+            return BadRequest(new { Error = "Failed to update DriverTrip" });
 
-        return Ok("Trip Updated");
+        return Ok(new { Success = "Trip Updated" });
     }
 
     [HttpPut("finishHim")]
-    public async Task<ActionResult> finishDriverTrip(int Rating)
+    public async Task<ActionResult> finishDriverTrip()
     {
         int id = _tokenHandlerService.TokenHandler();
         if (id == -1)
-            return Unauthorized("Unauthorized");
+            return Unauthorized(new { Error = "Unauthorized"});
 
         var driverTripUpdateDto = new DriverTripUpdateDto
         {
             status = Status.COMPLETED.ToString(),
         };
 
-            // if (driverTripUpdateDto.status.ToUpper() != Status.COMPLETED.ToString())
-            // {
-            //     if (driverTripUpdateDto.Rating <= 0)
-            //         return BadRequest("Rating is required");
-            // }
+        // if (driverTripUpdateDto.status.ToUpper() != Status.COMPLETED.ToString())
+        // {
+        //     if (driverTripUpdateDto.Rating <= 0)
+        //         return BadRequest("Rating is required");
+        // }
         var driverTripDto = await _driverTripRepository.updateDriverTrip(id, driverTripUpdateDto);
 
         if (driverTripDto.Item2 == "Driver trip not found")
-            return BadRequest($"{driverTripDto.Item2}");
+            return BadRequest(new { Error = $"{driverTripDto.Item2}" });
 
         if (driverTripDto.Item2 == "Driver has no active trip")
-            return BadRequest($"{driverTripDto.Item2}");
+            return BadRequest(new { Error = $"{driverTripDto.Item2}" });
 
         if (driverTripDto.Item2 == "Trip is Completed")
-            return BadRequest($"Can not Update trip, {driverTripDto.Item2}");
+            return BadRequest(new { Error = $"Can not Update trip, {driverTripDto.Item2}" });
 
         if (driverTripDto.Item2 == "Trip is Canceled")
-            return BadRequest($"Can not Update trip, {driverTripDto.Item2}");
+            return BadRequest(new { Error = $"Can not Update trip, {driverTripDto.Item2}" });
 
         if (driverTripDto.Item2 == "Invalid status")
-            return BadRequest($"{driverTripDto.Item2} {driverTripUpdateDto.status}");
+            return BadRequest(new { Error = $"{driverTripDto.Item2} {driverTripUpdateDto.status}" });
 
         if (!await IsBusActive(driverTripDto.Item1.BusId))
-            return BadRequest("Bus is not active");
+            return BadRequest(new { Error = "Bus is not active" });
 
         if (!await _driverTripRepository.SaveChanges())
-            return BadRequest("Failed to finish DriverTrip");
+            return BadRequest(new { Error = "Failed to finish DriverTrip" });
 
         var bus = await _busRepository.GetBusById((int)driverTripDto.Item1.BusId!);
 
@@ -175,8 +175,9 @@ public class DriverTripController(
         }
         else
         {
-            return BadRequest("Bus is idle");
+            return BadRequest(new { Error = "Bus is idle" });
         }
+        await _busRepository.UpdateBusStatus((int)driverTripDto.Item1.BusId, BusStatus.Idle.ToString());
 
         using var client = new HttpClient();
 
@@ -186,11 +187,11 @@ public class DriverTripController(
         if (!response.IsSuccessStatusCode)
         {
             Console.WriteLine($"Failed to delete Firebase Realtime Database: {response.StatusCode}");
-            return BadRequest("Failed to delete Firebase Realtime Database");
+            return StatusCode(500, new { Error = "Failed to delete Firebase Realtime Database" });
         }
 
 
-        return Ok("Trip Finished");
+        return Ok(new { Success = "Trip Finished" });
     }
 
     private async Task<bool> IsBusActive(int? busId)

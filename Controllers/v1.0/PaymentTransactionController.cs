@@ -14,7 +14,8 @@ namespace API.Controllers.v1
         IDriverRepository driverRepository,
         IPassengerRepository passengerRepository,
         ICryptoService cryptoService,
-        ITokenHandlerService tokenHandlerService
+        ITokenHandlerService tokenHandlerService,
+        ITripRepository tripRepository
         ) : BaseApiController
     {
         private readonly IPaymentTransactionRepository _paymentTransactionRepository = _paymentTransactionRepository;
@@ -22,6 +23,7 @@ namespace API.Controllers.v1
         private readonly IPassengerRepository _passengerRepository = passengerRepository;
         private readonly ICryptoService _cryptoService = cryptoService;
         private readonly ITokenHandlerService _tokenHandlerService = tokenHandlerService;
+        private readonly ITripRepository _tripRepository = tripRepository;
 
         [CustomAuthorize("DRIVER")]
         [HttpPost("generateQrCode")]
@@ -30,17 +32,17 @@ namespace API.Controllers.v1
             int id = _tokenHandlerService.TokenHandler();
             var driver = await _driverRepository.GetDriverById(id);
             if (driver == null)
-                return BadRequest("Driver");
+                return BadRequest(new { Error = "Driver" });
             if (driver.Bus == null)
-                return BadRequest("Bus");
+                return BadRequest(new { Error = "Bus" });
             if (driver.Bus.Route == null)
-                return BadRequest("Route");
+                return BadRequest(new { Error = "Route" });
             if (driver.DriverTrips == null)
-                return BadRequest("DriverTrip");
+                return BadRequest(new { Error = "DriverTrip" });
             var driverTrip = driver.DriverTrips.Find(dt => dt.status == Status.ONGOING || dt.status == Status.PENDING);
             if (driverTrip == null)
-                return BadRequest("DriverTrip");
-            
+                return BadRequest(new { Error = "DriverTrip2" });
+
             string data = $"{id},{driverTrip.Id},{driver.BusId},{driver.Bus.RouteId},{driver.Bus.Route.Fee},{DateTime.UtcNow}";
 
             string signature = GenerateSignature(data);
@@ -57,7 +59,7 @@ namespace API.Controllers.v1
             return Ok(new { base64String });
         }
         [CustomAuthorize("PASSENGER")]
-        [HttpGet("scanQrCode")]
+        [HttpPost("scanQrCode")]
         public async Task<ActionResult<string>> ScanQrCode(EncryptedDataDto encryptedData)
         {
             string decryptedData = DecryptQrCode(encryptedData.EncryptedData!);
@@ -70,9 +72,11 @@ namespace API.Controllers.v1
 
                 int id = _tokenHandlerService.TokenHandler();
                 var passenger = await _passengerRepository.GetPassengerById(id);
-                var trip = passenger!.Trips.Find(t => t.status == TripStatus.ONGOING);
+                var trip = passenger!.Trips.Find(t => t.status == TripStatus.ONGOING || t.status == TripStatus.PENDING);
+
                 if (trip == null)
-                    return BadRequest("Trip");
+                    return BadRequest(new { Error = "Trip" });
+
                 var PaymentTransactionCreateDto = new PaymentTransactionCreateDto
                 {
                     PassengerId = id,
@@ -83,11 +87,22 @@ namespace API.Controllers.v1
                     Amount = double.Parse(data[4]),
                     TimeStamp = DateTime.UtcNow
                 };
-                await _paymentTransactionRepository.CreatePaymentTransaction(PaymentTransactionCreateDto);
-                if (await _paymentTransactionRepository.SaveChanges())
-                    return Ok("Valid");
+                var pt = await _paymentTransactionRepository.CreatePaymentTransaction(PaymentTransactionCreateDto);
+                if (pt == null)
+                    return StatusCode(500, new { Error = "Error in Creating PaymentTransaction" });
+                await _tripRepository.Update(new TripUpdateDto() { Status = TripStatus.ONGOING.ToString(), PaymentTransactionId = pt.Id }, trip.Id);
+                try
+                {
+                    if (await _paymentTransactionRepository.SaveChanges())
+                        return Ok(new { Success = "Valid and Trip Status Updated}"});
+                }
+                catch (Exception)
+                {
+                    return BadRequest(new { Error = "Duplciated Payment for the trip" });
+                }
+
             }
-            return BadRequest("Invalid");
+            return BadRequest(new { Error = "Invalid" });
         }
 
         private string DecryptQrCode(string encryptedData)

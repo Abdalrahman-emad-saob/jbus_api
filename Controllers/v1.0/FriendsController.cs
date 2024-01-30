@@ -22,27 +22,27 @@ namespace API.Controllers
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized("Not authorized1");
+                return Unauthorized(new { Error = "Not authorized1" });
 
             var passenger = await _passengerRepository.GetPassengerDtoById(friendsCreateDto.FriendId);
             if (passenger == null)
-                return NotFound("Friend Not Found");
+                return NotFound(new { Error = "Friend Not Found" });
 
             if (passenger.Id == Id)
-                return BadRequest("WHY??? why sending friend reqeust to yourself? Are you this lonely?");
+                return BadRequest(new { Error = "WHY??? why sending friend reqeust to yourself? Are you this lonely?" });
 
             bool friendReqeustExists = await _friendsRepository.FriendRequestExists(friendsCreateDto.FriendId, Id);
             if (friendReqeustExists)
-                return BadRequest("Friend Request Exists");
+                return BadRequest(new { Error = "Friend Request Exists" });
 
             if (await _friendsRepository.SendFriendRequest(friendsCreateDto, Id))
             {
                 if (!await _friendsRepository.SaveChanges())
-                    return StatusCode(500, "Server Error1");
+                    return StatusCode(500, new { Error = "Server Error1" });
                 return StatusCode(201);
             }
 
-            return StatusCode(500, "Server Error2");
+            return StatusCode(500, new { Error = "Server Error2" });
         }
 
         [HttpPut("confirmFriendRequest/{id}")]
@@ -50,14 +50,14 @@ namespace API.Controllers
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized("Not authorized");
+                return Unauthorized(new { Error = "Not authorized" });
 
             if (await _friendsRepository.ConfirmFriendRequest(id, Id))
             {
                 await _friendsRepository.SaveChanges();
                 return NoContent();
             }
-            return StatusCode(500, "Server Error");
+            return StatusCode(500, new { Error = "Server Error" });
         }
 
         [HttpGet("getFriendById/{id}")]
@@ -65,11 +65,11 @@ namespace API.Controllers
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized("Not authorized1");
+                return Unauthorized(new { Error = "Not authorized1" });
 
             var friend = await _friendsRepository.GetFriendById(id, Id);
             if (friend == null || friend.Friend == null)
-                return NotFound("Friend Not Found");
+                return NotFound(new { Error = "Friend Not Found" });
             FriendDto trueFriend;
 
             if (friend.Passenger!.Id == Id)
@@ -85,7 +85,7 @@ namespace API.Controllers
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized("Not authorized1");
+                return Unauthorized(new { Error = "Not authorized1" });
 
             var friends = await _friendsRepository.GetFriends(Id);
             List<FriendDto> friendss = [];
@@ -104,7 +104,7 @@ namespace API.Controllers
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized("Not authorized1");
+                return Unauthorized(new { Error = "Not authorized1" });
 
             var friendsRequests = await _friendsRepository.GetFriendRequests(Id);
 
@@ -116,13 +116,13 @@ namespace API.Controllers
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
-                return Unauthorized("Not authorized1");
+                return Unauthorized(new { Error = "Not authorized1" });
 
             bool result = await _friendsRepository.DeleteFriend(id, Id);
             if (!result)
-                return NotFound("Friend Not Found");
+                return NotFound(new { Error = "Friend Not Found" });
             if (!await _friendsRepository.SaveChanges())
-                return StatusCode(500, "Server Error");
+                return StatusCode(500, new { Error = "Server Error" });
             return NoContent();
         }
     }

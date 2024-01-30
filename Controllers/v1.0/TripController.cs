@@ -24,7 +24,7 @@ public class TripController(
     {
         int Id = _tokenHandlerService.TokenHandler();
         if (Id == -1)
-            return Unauthorized("Not authorized");
+            return Unauthorized(new { Error = "Not authorized" });
 
         return Ok(await _tripRepository.GetTrips(Id));
     }
@@ -34,7 +34,7 @@ public class TripController(
     {
         int Id = _tokenHandlerService.TokenHandler();
         if (Id == -1)
-            return Unauthorized("Not authorized");
+            return Unauthorized(new { Error = "Not authorized" });
 
         string role = _tokenHandlerService.ExtractUserRole();
         if (
@@ -62,17 +62,17 @@ public class TripController(
          t!.Status.Equals(TripStatus.PENDING.ToString(), StringComparison.CurrentCultureIgnoreCase));
 
         if (tripDto == null)
-            return NotFound("Trip Not Found");
+            return NotFound(new { Error = "Trip Not Found" });
 
         if (tripDto.DriverTrip == null)
-            return BadRequest("DriverTrip");
+            return BadRequest(new { Error = "DriverTrip" });
         if (tripDto.DriverTrip.BusId == null)
-            return BadRequest("BusId");
+            return BadRequest(new { Error = "BusId" });
         var bus = await _busRepository.GetBusById((int)tripDto.DriverTrip.BusId);
         if (bus == null)
-            return BadRequest("Bus");
+            return BadRequest(new { Error = "Bus" });
         if (bus.Going == null)
-            return BadRequest("Going");
+            return BadRequest(new { Error = "Going" });
         using var client = new HttpClient();
         var firebaseUrl = "https://jbus-8f9bf-default-rtdb.europe-west1.firebasedatabase.app/";
         var DropOffPoint = tripUpdateDto.DropOffPoint;
@@ -88,7 +88,7 @@ public class TripController(
             if (!responseD.IsSuccessStatusCode)
             {
                 Console.WriteLine($"Failed to update Dropoff Point Firebase Realtime Database: {responseD.StatusCode}");
-                return BadRequest("Failed to update Dropoff Point Firebase Realtime Database");
+                return StatusCode(500, new { Error = "Failed to update Dropoff Point Firebase Realtime Database" });
             }
         }
 
@@ -100,7 +100,7 @@ public class TripController(
         if (!response.IsSuccessStatusCode)
         {
             Console.WriteLine($"Failed to update Pickup Point Firebase Realtime Database: {response.StatusCode}");
-            return BadRequest("Failed to update Pickup Point Firebase Realtime Database");
+            return StatusCode(500, new { Error = "Failed to update Pickup Point Firebase Realtime Database" });
         }
 
         await _tripRepository.Update(tripUpdateDto, tripDto.Id);
@@ -108,18 +108,18 @@ public class TripController(
         if (await _tripRepository.SaveChanges())
             return NoContent();
 
-        return BadRequest("No Changes Made");
+        return BadRequest(new { Error = "No Changes Made" });
     }
     [HttpPost("{id}")]
     public async Task<ActionResult> CreateTrip(int id, TripCreateDto tripCreateDto)
     {
         int Id = _tokenHandlerService.TokenHandler();
         if (Id == -1)
-            return Unauthorized("Not authorized");
+            return Unauthorized(new { Error = "Not authorized" });
 
         var tripDto = await _tripRepository.CreateTrip(tripCreateDto, Id, id);
         if (tripDto == null)
-            return BadRequest("Bad Request");
+            return BadRequest(new { Error = "Bad Request" });
         var tripDtos = (await _tripRepository.GetTrips(Id)).ToList();
         var tripDtot = tripDtos.Find(t => t!.Status!.Equals(TripStatus.ONGOING.ToString(), StringComparison.CurrentCultureIgnoreCase) ||
         t!.Status.Equals(TripStatus.PENDING.ToString(), StringComparison.CurrentCultureIgnoreCase));
@@ -137,10 +137,10 @@ public class TripController(
         var bus = await _busRepository.GetBusById(id);
 
         if (bus == null)
-            return BadRequest("Bus");
+            return BadRequest(new { Error = "Bus" });
 
         if (bus.Going == null)
-            return BadRequest("Going");
+            return BadRequest(new { Error = "Going" });
 
 
         using var client = new HttpClient();
@@ -156,7 +156,7 @@ public class TripController(
             if (!responseD.IsSuccessStatusCode)
             {
                 Console.WriteLine($"Failed to update Dropoff Point Firebase Realtime Database: {responseD.StatusCode}");
-                return BadRequest("Failed to update Dropoff Point Firebase Realtime Database");
+                return StatusCode(500, new { Error = "Failed to update Dropoff Point Firebase Realtime Database" });
             }
         }
 
@@ -168,10 +168,10 @@ public class TripController(
         if (!response.IsSuccessStatusCode)
         {
             Console.WriteLine($"Failed to update Pickup Point Firebase Realtime Database: {response.StatusCode}");
-            return BadRequest("Failed to update Pickup Point Firebase Realtime Database");
+            return StatusCode(500, new { Error = "Failed to update Pickup Point Firebase Realtime Database" });
         }
         if (!await _tripRepository.SaveChanges())
-            return StatusCode(500, "Server Error1");
+            return StatusCode(500, new { Error = "Server Error1" });
 
         return Created("", tripDto);
     }
@@ -180,7 +180,7 @@ public class TripController(
     {
         int Id = _tokenHandlerService.TokenHandler();
         if (Id == -1)
-            return Unauthorized("Not authorized");
+            return Unauthorized(new { Error = "Not authorized" });
 
         var tripDtos = (await _tripRepository.GetTrips(Id)).ToList();
 
@@ -191,45 +191,37 @@ public class TripController(
          t!.Status.Equals(TripStatus.PENDING.ToString(), StringComparison.CurrentCultureIgnoreCase));
 
         if (tripDto == null)
-            return NotFound("Trip Not Found");
+            return NotFound(new { Error = "Trip Not Found" });
 
         if (tripDto.DriverTrip == null)
-            return BadRequest("DriverTrip");
+            return BadRequest(new { Error = "DriverTrip" });
         if (tripDto.DriverTrip.BusId == null)
-            return BadRequest("BusId");
+            return BadRequest(new { Error = "BusId" });
         var bus = await _busRepository.GetBusById((int)tripDto.DriverTrip.BusId);
         if (bus == null)
-            return BadRequest("Bus");
+            return BadRequest(new { Error = "Bus" });
         if (bus.Going == null)
-            return BadRequest("Going");
+            return BadRequest(new { Error = "Going" });
         using var client = new HttpClient();
         var firebaseUrl = "https://jbus-8f9bf-default-rtdb.europe-west1.firebasedatabase.app/";
-        // var DropOffPoint = tripUpdateDto.DropOffPoint;
-        // var PickUpPoint = tripUpdateDto.PickUpPoint;
 
-        // if (DropOffPoint != null)
-        // {
         using var clientD = new HttpClient();
         var path = $"Route/{bus.RouteId}/{bus.Going.ToString().ToLower()}/Bus/{bus.Id}/dropoffs/{Id}.json";
-        // var jsonData = JsonConvert.SerializeObject(new Dictionary<string, double>() { { "latitude", DropOffPoint.Latitude }, { "longitude", DropOffPoint.Longitude } });
-        // var contentD = new StringContent(jsonData, Encoding.UTF8, "application/json");
         var responseD = await client.DeleteAsync(firebaseUrl + path);
         if (!responseD.IsSuccessStatusCode)
         {
             Console.WriteLine($"Failed to delete Dropoff Point Firebase Realtime Database: {responseD.StatusCode}");
-            return BadRequest("Failed to delete Dropoff Point Firebase Realtime Database");
+            return StatusCode(500, new { Error = "Failed to delete Dropoff Point Firebase Realtime Database" });
         }
-        // }
 
         var pathP = $"Route/{bus.RouteId}/{bus.Going.ToString().ToLower()}/Bus/{bus.Id}/pickups/{Id}.json";
 
-        // var jsonDataP = JsonConvert.SerializeObject(new Dictionary<string, double>() { { "latitude", PickUpPoint!.Latitude }, { "longitude", PickUpPoint.Longitude } });
-        // var content = new StringContent(jsonDataP, Encoding.UTF8, "application/json");
+
         var response = await client.DeleteAsync(firebaseUrl + pathP);
         if (!response.IsSuccessStatusCode)
         {
             Console.WriteLine($"Failed to delete Pickup Point Firebase Realtime Database: {response.StatusCode}");
-            return BadRequest("Failed to delete Pickup Point Firebase Realtime Database");
+            return StatusCode(500, new { Error = "Failed to delete Pickup Point Firebase Realtime Database" });
         }
 
         await _tripRepository.finishTrip(tripDto.Id);
@@ -237,7 +229,7 @@ public class TripController(
         if (await _tripRepository.SaveChanges())
             return NoContent();
 
-        return BadRequest("No Changes Made");
+        return BadRequest(new { Error = "No Changes Made" });
     }
 }
 
