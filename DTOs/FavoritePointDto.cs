@@ -4,8 +4,7 @@ namespace API.DTOs
     {
         public int Id { get; set; }
         public DateTime CreatedAt { get; set; }
-        public int PointId { get; set; }
-        public PointDto? Point { get; set; }       
-        public int RouteId { get; set; }
+        public PointDto? Point { get; set; }
+        public RouteDto? Route { get; set; }  
     }
 }

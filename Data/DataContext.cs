@@ -17,6 +17,7 @@ namespace API.Data
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         public DbSet<Point> Points { get; set; }
         public DbSet<Entities.Route> Routes { get; set; }
+        public DbSet<ScratchCard> ScratchCards { get; set; }
         public DbSet<Trip> Trips { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<DriverTrip> DriverTrips { get; set; }

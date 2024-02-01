@@ -61,6 +61,7 @@ namespace API.Controllers.v1
                 return StatusCode(500, new { Error = $"Server Error {ex}" });
             }
         }
+        
         [Authorize]
         [HttpPost("logout")]
         public ActionResult logout()

@@ -88,6 +88,7 @@ namespace API.Extensions
             services.AddScoped<INotisTokenRepository, NotisTokenRepository>();
             services.AddScoped<IBlacklistedTokenRepository, BlacklistedTokenRepository>();
             services.AddScoped<ICreditCardsRepository, CreditCardsRepository>();
+            services.AddScoped<IScratchCardRepository, ScratchCardRepository>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<ITokenService, TokenService>();
@@ -96,6 +97,7 @@ namespace API.Extensions
             string iv = configuration["Crypto:Iv"] ?? string.Empty;
             services.AddScoped<ICryptoService>(provider => new CryptoService(key, iv));
             services.AddScoped<NotificationService>();
+            services.AddScoped<UpdateExpiredCardsService>();
             // services.AddMemoryCache();
             // services.AddSingleton<IProcessingStrategy, FixedWindowProcessingStrategy>();
             // services.Configure<IpRateLimitOptions>(configuration.GetSection("IpRateLimiting"));

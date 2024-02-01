@@ -11,34 +11,24 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers.v1
 {
-    public class PassengerAccountController : BaseApiController
+    public class PassengerAccountController(
+        IPassengerRepository passengerRepository,
+        IUserRepository userRepository,
+        IOTPRepository oTPRepository,
+        ITokenService tokenService,
+        ITokenHandlerService tokenHandlerService,
+        IBlacklistedTokenRepository blacklistedTokenRepository,
+        IConfiguration configuration
+            ) : BaseApiController
     {
-        private readonly IPassengerRepository _passengerRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly IOTPRepository _oTPRepository;
-        private readonly ITokenService _tokenService;
-        private readonly ITokenHandlerService _tokenHandlerService;
-        private readonly IBlacklistedTokenRepository _blacklistedTokenRepository;
-        private readonly IConfiguration _configuration;
+        private readonly IPassengerRepository _passengerRepository = passengerRepository;
+        private readonly IUserRepository _userRepository = userRepository;
+        private readonly IOTPRepository _oTPRepository = oTPRepository;
+        private readonly ITokenService _tokenService = tokenService;
+        private readonly ITokenHandlerService _tokenHandlerService = tokenHandlerService;
+        private readonly IBlacklistedTokenRepository _blacklistedTokenRepository = blacklistedTokenRepository;
+        private readonly IConfiguration _configuration = configuration;
 
-        public PassengerAccountController(
-            IPassengerRepository passengerRepository,
-            IUserRepository userRepository,
-            IOTPRepository oTPRepository,
-            ITokenService tokenService,
-            ITokenHandlerService tokenHandlerService,
-            IBlacklistedTokenRepository blacklistedTokenRepository,
-            IConfiguration configuration
-            )
-        {
-            _passengerRepository = passengerRepository;
-            _userRepository = userRepository;
-            _oTPRepository = oTPRepository;
-            _tokenService = tokenService;
-            _tokenHandlerService = tokenHandlerService;
-            _blacklistedTokenRepository = blacklistedTokenRepository;
-            _configuration = configuration;
-        }
         [HttpPost("register/{OTP}")]
         public async Task<ActionResult<LoginResponseDto>> Register(RegisterDto registerDto, int OTP)
         {
@@ -58,16 +48,16 @@ namespace API.Controllers.v1
 
             var CreatePassenger = await _passengerRepository.CreatePassenger(registerDto);
             if (CreatePassenger == null)
-                return StatusCode(500, new { Error = "Server Error0" });
+                return StatusCode(500, new { Error = "Error in creating passenger" });
 
             var user = CreatePassenger.user;
             var passengerDto = CreatePassenger.passengerDto;
 
             if (passengerDto == null || user == null)
-                return StatusCode(500, new { Error = "Server Error1" });
+                return StatusCode(500, new { Error = "Error in creating passenger" });
 
             if (await _passengerRepository.SaveChanges() == false)
-                return StatusCode(500, new { Error = "Server Error2" });
+                return StatusCode(500, new { Error = "Error in saving passenger" });
 
             var token = _tokenService.CreateToken(user, passengerDto.Id);
             return StatusCode(201, new LoginResponseDto
@@ -93,19 +83,19 @@ namespace API.Controllers.v1
                 var passwordVerificationResult = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginDto.Password);
 
                 if (passwordVerificationResult != PasswordVerificationResult.Success)
-                    return Unauthorized("Not Authorized1");
+                    return Unauthorized("Password is incorrect");
 
                 var passengerDto = await _passengerRepository.GetPassengerDtoByEmail(loginDto.Email);
 
                 if (passengerDto == null)
-                    return Unauthorized("Not Authorized2");
+                    return Unauthorized("Passenger does not exist");
 
                 var passenger = await _passengerRepository.GetPassengerById(passengerDto.Id);
                 if (loginDto.FCMToken != null)
                 {
-                    passenger!.FcmToken = loginDto.FCMToken;
-                    if (!await _passengerRepository.SaveChanges())
-                        return StatusCode(500, "Server Error3");
+                    // passenger!.FcmToken = loginDto.FCMToken;
+                    await _passengerRepository.SaveChanges();
+                        // return StatusCode(500, "FCM Token Error");
                 }
 
                 var token = _tokenService.CreateToken(user, passengerDto.Id);
@@ -163,7 +153,7 @@ namespace API.Controllers.v1
             catch (Exception ex)
             {
                 Console.WriteLine($"Error sending email: {ex.Message}");
-                return StatusCode(500, "Server Error");
+                return StatusCode(500, "Error sending email");
             }
         }
         [Authorize]
@@ -194,40 +184,3 @@ namespace API.Controllers.v1
         }
     }
 }
-
-
-
-// if (UserExists(sendOTPDto.Email))
-//             {
-//                 return BadRequest("Passenger exists");
-//             }
-//             string senderEmail = "aboodsaob1139@gmail.com";
-//             string senderPassword = "dugm cixm ychg qjjc";
-//             int otp = _oTPRepository.CreateOTP(sendOTPDto.Email!);
-//             MailMessage mail = new()
-//             {
-//                 From = new MailAddress(senderEmail)
-//             };
-//             mail.To.Add(sendOTPDto.Email!);
-//             mail.Subject = "JBus OTP";
-//             mail.Body = otp.ToString();
-
-//             SmtpClient smtpClient = new("localhost")
-//             {
-//                 Port = 25,
-//                 // Credentials = new NetworkCredential(senderEmail, senderPassword),
-//                 // EnableSsl = true
-//             };
-
-//             try
-//             {
-//                 smtpClient.Send(mail);
-//                 Console.WriteLine("Email sent successfully!");
-
-//                 return Ok();
-//             }
-//             catch (Exception ex)
-//             {
-//                 Console.WriteLine($"Error sending email: {ex.Message}");
-//                 return StatusCode(500, "Server Error");
-//             }
