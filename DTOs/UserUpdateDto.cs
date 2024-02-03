@@ -6,7 +6,6 @@ namespace API.DTOs;
 public class UserUpdateDto
 {
     public string? Name { get; set; }
-    [Phone]
     public string? PhoneNumber { get; set; }
     // TODO TO REMEMBER [RegularExpression(@"^[A-Za-z0-9_-]*$")]
     [EmailAddress(ErrorMessage = "Invalid email address")]
