@@ -23,6 +23,8 @@ namespace API.Data
                     CreditorId = CreditorId,
                     InDebtId = fazaaCreateDto.InDebtId
                 };
+                (await _context.Passengers.FindAsync(CreditorId))!.Wallet -= fazaaCreateDto.Amount;
+                (await _context.Passengers.FindAsync(fazaaCreateDto.InDebtId))!.Wallet += fazaaCreateDto.Amount;
                 await _context.Fazaas.AddAsync(newFazaa);
             return true;
         }

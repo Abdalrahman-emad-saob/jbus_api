@@ -18,7 +18,8 @@ namespace API.Controllers.v1
         ITokenService tokenService,
         ITokenHandlerService tokenHandlerService,
         IBlacklistedTokenRepository blacklistedTokenRepository,
-        IConfiguration configuration
+        IConfiguration configuration,
+        ITripRepository tripRepository
             ) : BaseApiController
     {
         private readonly IPassengerRepository _passengerRepository = passengerRepository;
@@ -28,6 +29,7 @@ namespace API.Controllers.v1
         private readonly ITokenHandlerService _tokenHandlerService = tokenHandlerService;
         private readonly IBlacklistedTokenRepository _blacklistedTokenRepository = blacklistedTokenRepository;
         private readonly IConfiguration _configuration = configuration;
+        private readonly ITripRepository _tripRepository = tripRepository;
 
         [HttpPost("register/{OTP}")]
         public async Task<ActionResult<LoginResponseDto>> Register(RegisterDto registerDto, int OTP)
@@ -72,7 +74,7 @@ namespace API.Controllers.v1
             try
             {
                 if (loginDto.Email == null)
-                    return BadRequest(new { Error = "Email is Empty"});
+                    return BadRequest(new { Error = "Email is Empty" });
 
                 var user = await _userRepository.GetUserByEmail(loginDto.Email);
 
@@ -93,9 +95,8 @@ namespace API.Controllers.v1
                 var passenger = await _passengerRepository.GetPassengerById(passengerDto.Id);
                 if (loginDto.FCMToken != null)
                 {
-                    // passenger!.FcmToken = loginDto.FCMToken;
+                    passenger!.FcmToken = loginDto.FCMToken;
                     await _passengerRepository.SaveChanges();
-                        // return StatusCode(500, "FCM Token Error");
                 }
 
                 var token = _tokenService.CreateToken(user, passengerDto.Id);
@@ -108,7 +109,7 @@ namespace API.Controllers.v1
             }
             catch (Exception)
             {
-                return StatusCode(500, "Internal Server Error");
+                return StatusCode(500, "Server Error");
             }
         }
 
@@ -168,7 +169,7 @@ namespace API.Controllers.v1
         }
         [CustomAuthorize("PASSENGER")]
         [HttpGet("status")]
-        public ActionResult<statusDto> loggedIn()
+        public async Task<ActionResult<statusDto>> loggedIn()
         {
             int Id = _tokenHandlerService.TokenHandler();
             if (Id == -1)
@@ -176,6 +177,20 @@ namespace API.Controllers.v1
                 {
                     status = ZingyStatus.NOTLOGGEDIN
                 });
+
+            var trips = await _tripRepository.GetTripsById(Id);
+            if (trips != null)
+            {
+                var trip = trips.FirstOrDefault(t => t!.Status!.Equals(TripStatus.ONGOING.ToString(), StringComparison.CurrentCultureIgnoreCase) || t!.Status!.Equals(TripStatus.PENDING.ToString(), StringComparison.CurrentCultureIgnoreCase));
+                if (trip != null)
+                    return Ok(new statusDto
+                    {
+                        status = ZingyStatus.INTRIP,
+                        trip = trip,
+                        BusId = trip.DriverTrip!.BusId,
+                        route = trip.DriverTrip!.Route
+                    });
+            }
 
             return Ok(new statusDto
             {

@@ -2,7 +2,6 @@ using API.DTOs;
 using API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using API.Validations;
-using FirebaseAdmin.Messaging;
 
 namespace API.Controllers.v1
 {
@@ -46,6 +45,7 @@ namespace API.Controllers.v1
             var passenger = await _passengerRepository.GetPassengerById(Id);
             if (passenger == null)
                 return NotFound(new { Error = "Passenger Does not Exist" });
+
             var user = await _userRepository.GetUserById((int)passenger.UserId!);
 
             if (passenger == null || user == null)
@@ -66,11 +66,14 @@ namespace API.Controllers.v1
             var passenger = await _passengerRepository.GetPassengerById(Id);
             if (passenger == null)
                 return NotFound(new { Error = "Passenger Does not Exist" });
+
             var user = await _userRepository.GetUserById((int)passenger.UserId!);
             if (passenger == null || user == null || passengerUpdateDto.User == null)
                 return NotFound(new { Error = "User Does not Exist" });
+
             if (passengerUpdateDto.User.Sex != null)
                 passengerUpdateDto.User.Sex = passengerUpdateDto.User.Sex.ToUpper();
+                
             if (user.Email != passengerUpdateDto.User.Email)
                 if (await UserExists(passengerUpdateDto.User.Email))
                     return BadRequest(new { Error = "Email Duplicated" });
@@ -156,7 +159,7 @@ namespace API.Controllers.v1
         }
 
         [CustomAuthorize("PASSENGER")]
-        [HttpGet("IsPassengerFazaa'able")]
+        [HttpGet("IsPassengerFaza'aable")]
         public async Task<ActionResult> IsPassengerFazaaable()
         {
             int Id = _tokenHandlerService.TokenHandler();
@@ -168,7 +171,7 @@ namespace API.Controllers.v1
             if (fazaa == null)
                 return Ok(new { Success = true });
 
-            return Ok(new { Success = false });
+            return BadRequest(new { Success = false });
         }
 
         private async Task<bool> UserExists(string? Email)

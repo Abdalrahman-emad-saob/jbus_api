@@ -237,7 +237,7 @@ namespace API.Data
             {
                 CardType = "VISA",
                 CardNumber = 1234123412341234,
-                CVC = 123,
+                CVC = "123",
                 ExpirationDate = new DateOnly(2025, 1, 16),
                 Balance = 999999999999999
             };
@@ -245,7 +245,7 @@ namespace API.Data
             {
                 CardType = "MASTER_CARD",
                 CardNumber = 4321432143214321,
-                CVC = 321,
+                CVC = "321",
                 ExpirationDate = new DateOnly(2025, 1, 16),
                 Balance = 999999999999999
             };
@@ -253,7 +253,7 @@ namespace API.Data
             {
                 CardType = "VISA",
                 CardNumber = 1234567812345678,
-                CVC = 123,
+                CVC = "123",
                 ExpirationDate = new DateOnly(2025, 1, 16),
                 Balance = 0
             };
@@ -261,7 +261,7 @@ namespace API.Data
             {
                 CardType = "VISA",
                 CardNumber = 1234561234561234,
-                CVC = 123,
+                CVC = "123",
                 ExpirationDate = new DateOnly(2023, 1, 16),
                 Balance = 999999999999999
             };

@@ -2,6 +2,7 @@ using System.Text;
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
+using API.Services;
 using API.Validations;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -12,12 +13,14 @@ namespace API.Controllers.v1;
 public class TripController(
     ITokenHandlerService tokenHandlerService,
     ITripRepository tripRepository,
-    IBusRepository busRepository
+    IBusRepository busRepository,
+    FirebaseService firebaseService
         ) : BaseApiController
 {
     private readonly ITokenHandlerService _tokenHandlerService = tokenHandlerService;
     private readonly ITripRepository _tripRepository = tripRepository;
     private readonly IBusRepository _busRepository = busRepository;
+    private readonly FirebaseService _firebaseService = firebaseService;
 
     [HttpGet("getTrips")]
     public async Task<ActionResult<IEnumerable<TripDto>>> GetTrips()
@@ -52,8 +55,16 @@ public class TripController(
         int Id = _tokenHandlerService.TokenHandler();
         if (Id == -1)
             return Unauthorized(new { Error = "Not authorized" });
-
-        var tripDto = await _tripRepository.CreateTrip(tripCreateDto, Id, id);
+            TripDto? tripDto = null;
+        try
+        {
+        tripDto = await _tripRepository.CreateTrip(tripCreateDto, Id, id);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return BadRequest(new { Error = "Driver Trip Not found" });
+        }
         if (tripDto == null)
             return BadRequest(new { Error = "Error in creating trip" });
         var tripDtos = (await _tripRepository.GetTrips(Id)).ToList();
@@ -73,20 +84,18 @@ public class TripController(
         if (bus.Going == null)
             return BadRequest(new { Error = $"Error in the field 'Going' bus id {bus.Id}" });
 
+        if (!await _tripRepository.SaveChanges())
+            return StatusCode(500, new { Error = "Error in saving trip" });
 
-        using var client = new HttpClient();
-        var firebaseUrl = "https://jbus-8f9bf-default-rtdb.europe-west1.firebasedatabase.app/";
 
         if (DropOffPoint != null)
         {
-            using var clientD = new HttpClient();
             var path = $"Route/{bus.RouteId}/{bus.Going.ToString().ToLower()}/Bus/{bus.Id}/dropoffs/{Id}.json";
             var jsonData = JsonConvert.SerializeObject(new Dictionary<string, double>() { { "latitude", DropOffPoint.Latitude }, { "longitude", DropOffPoint.Longitude } });
-            var contentD = new StringContent(jsonData, Encoding.UTF8, "application/json");
-            var responseD = await client.PutAsync(firebaseUrl + path, contentD);
-            if (!responseD.IsSuccessStatusCode)
+            var responseD = await _firebaseService.PutAsync(path, jsonData);
+            if (!responseD)
             {
-                Console.WriteLine($"Failed to update Dropoff Point Firebase Realtime Database: {responseD.StatusCode}");
+                Console.WriteLine($"Failed to update Dropoff Point Firebase Realtime Database");
                 return StatusCode(500, new { Error = "Failed to update Dropoff Point Firebase Realtime Database" });
             }
         }
@@ -94,16 +103,29 @@ public class TripController(
         var pathP = $"Route/{bus.RouteId}/{bus.Going.ToString().ToLower()}/Bus/{bus.Id}/pickups/{Id}.json";
 
         var jsonDataP = JsonConvert.SerializeObject(new Dictionary<string, double>() { { "latitude", PickUpPoint!.Latitude }, { "longitude", PickUpPoint.Longitude } });
-        var content = new StringContent(jsonDataP, Encoding.UTF8, "application/json");
-        var response = await client.PutAsync(firebaseUrl + pathP, content);
-        if (!response.IsSuccessStatusCode)
+        var response = await _firebaseService.PutAsync(pathP, jsonDataP);
+        if (!response)
         {
-            Console.WriteLine($"Failed to update Pickup Point Firebase Realtime Database: {response.StatusCode}");
+            Console.WriteLine($"Failed to update Pickup Point Firebase Realtime Database");
             return StatusCode(500, new { Error = "Failed to update Pickup Point Firebase Realtime Database" });
         }
-        if (!await _tripRepository.SaveChanges())
-            return StatusCode(500, new { Error = "Server Error1" });
 
+        var pathC = $"Route/{bus.RouteId}/{bus.Going.ToString().ToLower()}/Bus/{bus.Id}/currentPassNum.json";
+        var responseC = await _firebaseService.GetAsync(pathC);
+        if (responseC == "")
+        {
+            Console.WriteLine($"Failed to get currentPassNum Firebase Realtime Database");
+            return StatusCode(500, new { Error = "Failed to get currentPassNum Firebase Realtime Database" });
+        }
+        if (responseC == "null")
+        {
+            await _firebaseService.PutAsync(pathC, "1");
+        }
+        else
+        {
+        var currentPassNum = JsonConvert.DeserializeObject<int>(responseC);
+        await _firebaseService.PutAsync(pathC, (currentPassNum + 1).ToString());
+        }
         return Created("", tripDto);
     }
     [HttpPut]
@@ -133,33 +155,28 @@ public class TripController(
             return BadRequest(new { Error = "Error in the field 'Bus'" });
         if (bus.Going == null)
             return BadRequest(new { Error = $"Error in the field 'Going' bus id {bus.Id}" });
-        using var client = new HttpClient();
-        var firebaseUrl = "https://jbus-8f9bf-default-rtdb.europe-west1.firebasedatabase.app/";
+
         var DropOffPoint = tripUpdateDto.DropOffPoint;
         var PickUpPoint = tripUpdateDto.PickUpPoint;
 
         if (DropOffPoint != null)
         {
-            using var clientD = new HttpClient();
             var path = $"Route/{bus.RouteId}/{bus.Going.ToString().ToLower()}/Bus/{bus.Id}/dropoffs/{Id}.json";
             var jsonData = JsonConvert.SerializeObject(new Dictionary<string, double>() { { "latitude", DropOffPoint.Latitude }, { "longitude", DropOffPoint.Longitude } });
-            var contentD = new StringContent(jsonData, Encoding.UTF8, "application/json");
-            var responseD = await client.PutAsync(firebaseUrl + path, contentD);
-            if (!responseD.IsSuccessStatusCode)
+            var responseD = await _firebaseService.PutAsync(path, jsonData);
+            if (!responseD)
             {
-                Console.WriteLine($"Failed to update Dropoff Point Firebase Realtime Database: {responseD.StatusCode}");
+                Console.WriteLine($"Failed to update Dropoff Point Firebase Realtime Database");
                 return StatusCode(500, new { Error = "Failed to update Dropoff Point Firebase Realtime Database" });
             }
         }
 
         var pathP = $"Route/{bus.RouteId}/{bus.Going.ToString().ToLower()}/Bus/{bus.Id}/pickups/{Id}.json";
-
         var jsonDataP = JsonConvert.SerializeObject(new Dictionary<string, double>() { { "latitude", PickUpPoint!.Latitude }, { "longitude", PickUpPoint.Longitude } });
-        var content = new StringContent(jsonDataP, Encoding.UTF8, "application/json");
-        var response = await client.PutAsync(firebaseUrl + pathP, content);
-        if (!response.IsSuccessStatusCode)
+        var response = await _firebaseService.PutAsync(pathP, jsonDataP);
+        if (!response)
         {
-            Console.WriteLine($"Failed to update Pickup Point Firebase Realtime Database: {response.StatusCode}");
+            Console.WriteLine($"Failed to update Pickup Point Firebase Realtime Database");
             return StatusCode(500, new { Error = "Failed to update Pickup Point Firebase Realtime Database" });
         }
 
@@ -198,27 +215,32 @@ public class TripController(
             return BadRequest(new { Error = "Error in the field 'Bus'" });
         if (bus.Going == null)
             return BadRequest(new { Error = $"Error in the field 'Going' bus id {bus.Id}" });
-        using var client = new HttpClient();
-        var firebaseUrl = "https://jbus-8f9bf-default-rtdb.europe-west1.firebasedatabase.app/";
 
-        using var clientD = new HttpClient();
         var path = $"Route/{bus.RouteId}/{bus.Going.ToString().ToLower()}/Bus/{bus.Id}/dropoffs/{Id}.json";
-        var responseD = await client.DeleteAsync(firebaseUrl + path);
-        if (!responseD.IsSuccessStatusCode)
+        var responseD = await _firebaseService.DeleteAsync(path);
+        if (!responseD)
         {
-            Console.WriteLine($"Failed to delete Dropoff Point Firebase Realtime Database: {responseD.StatusCode}");
+            Console.WriteLine($"Failed to delete Dropoff Point Firebase Realtime Database");
             return StatusCode(500, new { Error = "Failed to delete Dropoff Point Firebase Realtime Database" });
         }
 
         var pathP = $"Route/{bus.RouteId}/{bus.Going.ToString().ToLower()}/Bus/{bus.Id}/pickups/{Id}.json";
-
-
-        var response = await client.DeleteAsync(firebaseUrl + pathP);
-        if (!response.IsSuccessStatusCode)
+        var response = await _firebaseService.DeleteAsync(pathP);
+        if (!response)
         {
-            Console.WriteLine($"Failed to delete Pickup Point Firebase Realtime Database: {response.StatusCode}");
+            Console.WriteLine($"Failed to delete Pickup Point Firebase Realtime Database");
             return StatusCode(500, new { Error = "Failed to delete Pickup Point Firebase Realtime Database" });
         }
+
+        var pathC = $"Route/{bus.RouteId}/{bus.Going.ToString().ToLower()}/Bus/{bus.Id}/currentPassNum.json";
+        var responseC = await _firebaseService.GetAsync(pathC);
+        if (responseC == "")
+        {
+            Console.WriteLine($"Failed to get currentPassNum Firebase Realtime Database");
+            return StatusCode(500, new { Error = "Failed to get currentPassNum Firebase Realtime Database" });
+        }
+        var currentPassNum = JsonConvert.DeserializeObject<int>(responseC);
+        await _firebaseService.PutAsync(pathC, (currentPassNum - 1).ToString());
 
         await _tripRepository.finishTrip(tripDto.Id);
 

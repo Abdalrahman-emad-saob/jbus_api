@@ -14,12 +14,6 @@ namespace API.Data
 
         public async Task<TripDto?> CreateTrip(TripCreateDto tripDto, int PassengerId, int BusId)
         {
-            // bool isStatusParsed = Enum.TryParse(tripDto.status, true, out TripStatus status);
-
-            // if (!isStatusParsed)
-            // {
-            //     throw new ArgumentException("Invalid status");
-            // }
             var bus = await _context.Buses.FindAsync(BusId);
             int driverTripId = (await _context.DriverTrips.FindAsync(bus!.DriverTrips!.Find(dt => dt.status == Status.PENDING || dt.status == Status.ONGOING)!.Id))!.Id;
             Point pointPick = new()
@@ -27,13 +21,7 @@ namespace API.Data
                 Latitude = tripDto.PickUpPoint!.Latitude,
                 Longitude = tripDto.PickUpPoint.Longitude
             };
-            // System.Console.WriteLine("||");
-            // System.Console.WriteLine("||");
-            // System.Console.WriteLine("||");
-            // System.Console.WriteLine("||");
-            // System.Console.WriteLine("||");
-            // System.Console.WriteLine("||");
-            // System.Console.WriteLine(tripDto.DropOffPoint);
+
             Point pointDrop = new();
             if (tripDto.DropOffPoint != null)
                 if (tripDto.DropOffPoint.Longitude != 0 && tripDto.DropOffPoint.Latitude != 0)

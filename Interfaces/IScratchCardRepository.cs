@@ -1,13 +1,16 @@
 using API.DTOs;
+using API.Entities;
 
 namespace API.Interfaces
 {
     public interface IScratchCardRepository
     {
         Task<IEnumerable<ScratchCardDto?>> GetScratchCards();
-        Task<ScratchCardDto?> CreateCard(ScratchCardCreateDto scratchCardCreateDto);
+        string[] GetScratchCardsStatuses();
+        Task<bool> CreateCard(ScratchCardCreateDto scratchCardCreateDto, int number);
         Task<ScratchCardDto?> GetScratchCardById(int id);
-        Task<ScratchCardDto?> ChargeCard(int id, int passengerId);
+        Task<ScratchCardDto?> GetScratchCardByCN(int CardNumber);
+        Task<ScratchCardDto?> ChargeCard(int CN, int passengerId);
         Task UpdateExpiredCards();
         Task<bool> SaveChanges();
     }

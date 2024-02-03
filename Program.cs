@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using AspNetCoreRateLimit;
+using Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,7 @@ app.UseMiddleware<TokenBlacklistMiddleware>();
 // app.UseIpRateLimiting();
 // if (app.Environment.IsDevelopment())
 // {
+app.UseHangfireDashboard();
 app.UseStaticFiles();
 app.UseSwagger();
 app.UseSwaggerUI(options =>

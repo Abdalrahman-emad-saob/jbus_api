@@ -1,5 +1,6 @@
 using API.Controllers.v1;
 using API.DTOs;
+using API.Entities;
 using API.Interfaces;
 using API.Validations;
 using Microsoft.AspNetCore.Mvc;
@@ -18,27 +19,43 @@ public class ScratchCardsController(IScratchCardRepository scratchCardRepository
         return Ok(scratchCards);
     }
     [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
-    [HttpPost]
-    public async Task<ActionResult<ScratchCardDto?>> CreateCard(ScratchCardCreateDto scratchCardCreateDto)
+    [HttpGet("statuses")]
+    public ActionResult<string[]> GetScratchCardsStatuses()
     {
-        var scratchCard = await _scratchCardRepository.CreateCard(scratchCardCreateDto);
-        if (scratchCard == null) return BadRequest(new { Error = "Failed to create card" });
-        return Ok(scratchCard);
+        var scratchCardsStatuses = _scratchCardRepository.GetScratchCardsStatuses();
+        return Ok(scratchCardsStatuses);
+    }
+    [CustomAuthorize("SUPER_ADMIN", "ADMIN")]
+    [HttpPost("{number}")]
+    public async Task<ActionResult<ScratchCardDto?>> CreateCard(int number, ScratchCardCreateDto scratchCardCreateDto)
+    {
+        try
+        {
+            var scratchCard = await _scratchCardRepository.CreateCard(scratchCardCreateDto, number);
+            if (scratchCard == false) return BadRequest(new { Error = "Failed to create cards" });
+            if (!await _scratchCardRepository.SaveChanges())
+                return BadRequest(new { Error = "Failed to create cards" });
+            return Created("", new { Success = "Cards created successfully" });
+        }
+        catch (Exception)
+        {
+            return BadRequest(new { Error = "Error while creating cards" });
+        }
     }
     [CustomAuthorize("PASSENGER")]
-    [HttpPut("{id}")]
-    public async Task<ActionResult<ScratchCardDto?>> ChargeCard(int id)
+    [HttpPut("chargeUsingSC/{CN}")]
+    public async Task<ActionResult<ScratchCardDto?>> ChargeCard(int CN)
     {
         int Id = _tokenHandlerService.TokenHandler();
-        var sc = await _scratchCardRepository.GetScratchCardById(id);
+        var sc = await _scratchCardRepository.GetScratchCardByCN(CN);
 
-        if (sc == null) return BadRequest(new { Error = $"Card does not exist {id}" });
+        if (sc == null) return BadRequest(new { Error = $"Card does not exist {CN}" });
 
-        if (sc.Status == "USED") return BadRequest(new { Error = $"Card has been used {id}" });
+        if (sc.Status == ScratchCardStatus.USED.ToString()) return BadRequest(new { Error = $"Card has been used {CN}" });
 
         if (sc.ExpiryDate < DateTime.UtcNow) return BadRequest(new { Error = $"Card has expired" });
 
-        var scratchCard = await _scratchCardRepository.ChargeCard(id, Id);
+        var scratchCard = await _scratchCardRepository.ChargeCard(CN, Id);
         if (scratchCard == null) return BadRequest(new { Error = "Failed to charge passenger" });
 
         if (!await _scratchCardRepository.SaveChanges())

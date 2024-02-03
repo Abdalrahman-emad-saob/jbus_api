@@ -33,7 +33,7 @@ namespace API.Data
         {
             var friend = await _context
                         .Friends
-                        .Where(f => f.Id == Id && f.FriendId == PassengerId)
+                        .Where(f => f.PassengerId == Id && f.FriendId == PassengerId)
                         .SingleOrDefaultAsync();
             friend!.Confirmed = true;
 

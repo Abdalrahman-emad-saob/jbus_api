@@ -38,7 +38,7 @@ namespace API.Data
             await SaveChanges();
             Entities.Route route = new()
             {
-                Name = routeDto.Name,
+                Name = routeDto.StartingPoint!.Name + " - " + routeDto.EndingPoint!.Name,
                 WaypointsGoing = routeDto.WaypointsGoing,
                 WaypointsReturning = routeDto.WaypointsReturning,
                 Fee = routeDto.Fee,
@@ -48,7 +48,7 @@ namespace API.Data
                 UpdatedAt = DateTime.UtcNow
             };
             await _context.Routes.AddAsync(route);
-            
+
             return true;
         }
 

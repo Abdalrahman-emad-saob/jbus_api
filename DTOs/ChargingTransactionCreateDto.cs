@@ -12,7 +12,7 @@ namespace API.DTOs
         [Required]
         public long CardNumber { get; set; }
         [Required]
-        public short CVC { get; set; }
+        public string? CVC { get; set; }
         [Required]
         public DateOnly ExpirationDate { get; set; }
         [JsonIgnore]

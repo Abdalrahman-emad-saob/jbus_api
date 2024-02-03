@@ -2,6 +2,7 @@ using API.Controllers.v1;
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
+using API.Services;
 using API.Validations;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
@@ -12,12 +13,14 @@ namespace API.Controllers;
 public class DriverTripController(
     IDriverTripRepository driverTripRepository,
     IBusRepository busRepository,
-    ITokenHandlerService tokenHandlerService
+    ITokenHandlerService tokenHandlerService,
+    FirebaseService firebaseService
     ) : BaseApiController
 {
     private readonly IDriverTripRepository _driverTripRepository = driverTripRepository;
     private readonly IBusRepository _busRepository = busRepository;
     private readonly ITokenHandlerService _tokenHandlerService = tokenHandlerService;
+    private readonly FirebaseService _firebaseService = firebaseService;
 
     [HttpGet]
     public ActionResult<IEnumerable<DriverTripDto>> GetDriverTrips()
@@ -51,7 +54,7 @@ public class DriverTripController(
         }
         else
         {
-            return BadRequest("Bad Status");
+            return BadRequest(new { Error = "Bad Status" });
         }
         var driverTripDto = await _driverTripRepository.CreateDriverTrip(id, IsGoing);
 
@@ -67,15 +70,11 @@ public class DriverTripController(
         if (!await _driverTripRepository.SaveChanges())
             return BadRequest(new { Error = "Failed to create DriverTrip" });
 
-        using var client = new HttpClient();
-
-        var firebaseUrl = "https://jbus-8f9bf-default-rtdb.europe-west1.firebasedatabase.app/";
         var path = $"Route/{driverTripDto.Item1.RouteId}/{IsGoing}/Bus/{driverTripDto.Item1.BusId}/currentLocation.json";
-        var content = new StringContent("\"\"", Encoding.UTF8, "application/json");
-        var response = await client.PutAsync(firebaseUrl + path, content);
-        if (!response.IsSuccessStatusCode)
+        var response = await _firebaseService.PutAsync(path, "\"\"");
+        if (!response)
         {
-            Console.WriteLine($"Failed to update Firebase Realtime Database: {response.StatusCode}");
+            Console.WriteLine($"Failed to update Firebase Realtime Database");
             return StatusCode(500, new { Error = "Failed to update Firebase Realtime Database" });
         }
         var pathR = $"/Route/{driverTripDto.Item1.RouteId}/{IsGoing}/Bus/{driverTripDto.Item1.BusId}";
@@ -91,14 +90,6 @@ public class DriverTripController(
         if (driverId == -1)
             return Unauthorized(new { Error = "Unauthorized" });
 
-        // if (Enum.TryParse(driverTripUpdateDto.status, out Status parsedStatus))
-        // {
-        //     if (parsedStatus == Status.COMPLETED)
-        //     {
-        //         if (driverTripUpdateDto.Rating == 0)
-        //             return BadRequest("Rating is required");
-        //     }
-        // }
         var driverTripDto = await _driverTripRepository.updateDriverTrip(driverId, driverTripUpdateDto);
 
         if (driverTripDto.Item2 == "Driver not found")
@@ -127,18 +118,13 @@ public class DriverTripController(
     {
         int id = _tokenHandlerService.TokenHandler();
         if (id == -1)
-            return Unauthorized(new { Error = "Unauthorized"});
+            return Unauthorized(new { Error = "Unauthorized" });
 
         var driverTripUpdateDto = new DriverTripUpdateDto
         {
             status = Status.COMPLETED.ToString(),
         };
 
-        // if (driverTripUpdateDto.status.ToUpper() != Status.COMPLETED.ToString())
-        // {
-        //     if (driverTripUpdateDto.Rating <= 0)
-        //         return BadRequest("Rating is required");
-        // }
         var driverTripDto = await _driverTripRepository.updateDriverTrip(id, driverTripUpdateDto);
 
         if (driverTripDto.Item2 == "Driver trip not found")
@@ -178,18 +164,15 @@ public class DriverTripController(
             return BadRequest(new { Error = "Bus is idle" });
         }
         await _busRepository.UpdateBusStatus((int)driverTripDto.Item1.BusId, BusStatus.Idle.ToString());
+        await _busRepository.SaveChanges();
 
-        using var client = new HttpClient();
-
-        var firebaseUrl = "https://jbus-8f9bf-default-rtdb.europe-west1.firebasedatabase.app/";
         var path = $"Route/{driverTripDto.Item1.RouteId}/{IsGoing}/Bus/{driverTripDto.Item1.BusId}.json";
-        var response = await client.DeleteAsync(firebaseUrl + path);
-        if (!response.IsSuccessStatusCode)
+        var response = await _firebaseService.DeleteAsync(path);
+        if (!response)
         {
-            Console.WriteLine($"Failed to delete Firebase Realtime Database: {response.StatusCode}");
+            Console.WriteLine($"Failed to delete Firebase Realtime Database");
             return StatusCode(500, new { Error = "Failed to delete Firebase Realtime Database" });
         }
-
 
         return Ok(new { Success = "Trip Finished" });
     }

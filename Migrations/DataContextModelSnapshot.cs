@@ -140,8 +140,8 @@ namespace API.Migrations
                     b.Property<long>("Balance")
                         .HasColumnType("bigint");
 
-                    b.Property<short>("CVC")
-                        .HasColumnType("smallint");
+                    b.Property<string>("CVC")
+                        .HasColumnType("text");
 
                     b.Property<long>("CardNumber")
                         .HasColumnType("bigint");

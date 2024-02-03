@@ -36,7 +36,7 @@ namespace API.Data
         {
             return await _context.Passengers
             .Include(p => p.Trips)
-                .Where(p => p.UserId == id)
+                .Where(p => p.Id == id)
                 .SingleOrDefaultAsync()!;
         }
 

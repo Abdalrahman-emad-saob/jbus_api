@@ -35,12 +35,12 @@ namespace API.Controllers.v1
             return admin;
         }
         [HttpPost("addAdmin")]
-        public ActionResult addAdmin(RegisterAdminDto registerAdminDto)
+        public async Task<ActionResult> addAdmin(RegisterAdminDto registerAdminDto)
         {
-            if (UserExists(registerAdminDto.Email))
+            if (await UserExists(registerAdminDto.Email))
                 return BadRequest(new { Error = "Admin Exists" });
 
-            _adminRepository.CreateAdmin(registerAdminDto);
+            await _adminRepository.CreateAdmin(registerAdminDto);
 
             return StatusCode(201);
         }
@@ -61,7 +61,7 @@ namespace API.Controllers.v1
                 adminUpdateDto.User.Sex = adminUpdateDto.User.Sex.ToUpper();
 
             if (user.Email != adminUpdateDto.User.Email)
-                if (UserExists(adminUpdateDto.User.Email))
+                if (await UserExists(adminUpdateDto.User.Email))
                     return BadRequest(new { Error = "Email Duplicated" });
 
             _mapper.Map(adminUpdateDto, admin);
@@ -74,9 +74,9 @@ namespace API.Controllers.v1
             return BadRequest(new { Error = "Failed to Update Passenger" });
         }
 
-        private bool UserExists(string? Email)
+        private async Task<bool> UserExists(string? Email)
         {
-            return _userRepository.GetUserByEmail(Email!) != null;
+            return await _userRepository.GetUserByEmail(Email!) != null;
         }
     }
 }

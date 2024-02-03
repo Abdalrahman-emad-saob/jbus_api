@@ -4,6 +4,7 @@ using API.Interfaces;
 using API.Services;
 using API.Validations;
 using Hangfire;
+using Hangfire.Server;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -11,12 +12,14 @@ namespace API.Controllers;
 public class NotificationController(
     NotificationService notificationService,
     ITokenHandlerService tokenHandlerService,
-    INotisTokenRepository notisTokenRepository
+    INotisTokenRepository notisTokenRepository,
+    IBackgroundJobClient backgroundJobClient
         ) : BaseApiController
 {
     private readonly NotificationService _notificationService = notificationService;
     private readonly ITokenHandlerService _tokenHandlerService = tokenHandlerService;
     private readonly INotisTokenRepository _notisTokenRepository = notisTokenRepository;
+    private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
 
     [HttpPost("register")]
     public async Task<IActionResult> RegisterDeviceToken(string? deviceToken)
@@ -40,7 +43,7 @@ public class NotificationController(
     {
         int Id = _tokenHandlerService.TokenHandler();
         if (Id == -1)
-            return Unauthorized(new { Error = "Not authorized1"});
+            return Unauthorized(new { Error = "Not authorized1" });
 
         string? deviceToken = await GetDeviceTokenFromUserId(Id)!;
         if (deviceToken == null)
@@ -55,7 +58,7 @@ public class NotificationController(
     [HttpPost("sendNotisToAll")]
     public IActionResult sendNotisToAll(NotificationDto notificationDto)
     {
-        BackgroundJob.Enqueue(() => _notificationService.SendNotificationsToAllAsync(notificationDto).Wait());
+        _backgroundJobClient.Enqueue(() => _notificationService.SendNotificationsToAllAsync(notificationDto));
 
         return Ok(new { Success = "Notifications sent successfully." });
     }
@@ -64,6 +67,5 @@ public class NotificationController(
     {
         return await _notisTokenRepository.GetDeviceToken(PassengerId);
     }
-
 
 }

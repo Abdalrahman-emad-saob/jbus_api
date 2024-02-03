@@ -34,8 +34,9 @@ namespace API.Data
 
         public async Task<User?> GetUserByEmail(string Email)
         {
-            return await _context.Users
-                    .FirstOrDefaultAsync(x => x.Email != null && EF.Functions.Like(x.Email, Email));
+            return await _context
+                        .Users
+                        .FirstOrDefaultAsync(x => x.Email != null && EF.Functions.Like(x.Email, Email));
         }
     }
 }

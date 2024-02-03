@@ -1,6 +1,9 @@
 using API.Data;
 using API.Interfaces;
 using API.Services;
+using Hangfire;
+using Hangfire.MemoryStorage;
+using Hangfire.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Interfaces;
@@ -97,7 +100,12 @@ namespace API.Extensions
             string iv = configuration["Crypto:Iv"] ?? string.Empty;
             services.AddScoped<ICryptoService>(provider => new CryptoService(key, iv));
             services.AddScoped<NotificationService>();
+            services.AddScoped<FirebaseService>();
             services.AddScoped<UpdateExpiredCardsService>();
+            services.AddHangfire(c => c.UseMemoryStorage());
+
+            services.AddHangfireServer();
+
             // services.AddMemoryCache();
             // services.AddSingleton<IProcessingStrategy, FixedWindowProcessingStrategy>();
             // services.Configure<IpRateLimitOptions>(configuration.GetSection("IpRateLimiting"));

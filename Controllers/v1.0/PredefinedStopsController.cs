@@ -21,7 +21,7 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult<PointDto>> CreatePredefinedStops(PredefinedStopsCreateDto predefinedStopsCreateDto)
         {
-            var predefinedStops = _predefinedStopsRepository.CreatePredefinedStops(predefinedStopsCreateDto);
+            var predefinedStops = await _predefinedStopsRepository.CreatePredefinedStops(predefinedStopsCreateDto);
             if (!await _predefinedStopsRepository.SaveChanges())
                 return StatusCode(500, new { Error = "Server Error1" });
             return Ok(predefinedStops);

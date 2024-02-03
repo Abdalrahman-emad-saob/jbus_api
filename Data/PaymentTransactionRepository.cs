@@ -7,10 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class PaymentTransactionRepository(DataContext context, IMapper mapper) : IPaymentTransactionRepository
+    public class PaymentTransactionRepository(DataContext context, IMapper mapper, IPassengerRepository passengerRepository) : IPaymentTransactionRepository
     {
         private readonly DataContext _context = context;
         private readonly IMapper _mapper = mapper;
+        private readonly IPassengerRepository _passengerRepository = passengerRepository;
 
         public async Task<PaymentTransactionDto?> CreatePaymentTransaction(PaymentTransactionCreateDto paymentTransactionDto)
         {
@@ -25,6 +26,7 @@ namespace API.Data
                 TimeStamp = DateTime.UtcNow
             };
             await _context.PaymentTransactions.AddAsync(paymentTransaction);
+            (await _context.Passengers.FindAsync(paymentTransactionDto.PassengerId))!.Wallet -= paymentTransactionDto.Amount;
 
             return _mapper.Map<PaymentTransactionDto>(paymentTransaction);
         }
