@@ -49,8 +49,8 @@ public class FazaaController(
         //     return BadRequest(new { Error = "Why? are you giving or taking?" });
         if ((await _fazaaRepository.GetFazaas(Id)).Any())
             return BadRequest(new { Error = "You already have a Fazaa" });
-        // try
-        // {
+        try
+        {
         foreach (var friend in friendss)
         {
             var FcmToken = await _notisTokenRepository.GetDeviceToken(friend.Id);
@@ -75,11 +75,11 @@ public class FazaaController(
             }
         }
         return Ok(new { Success = "Request Sent" });
-        // }
-        // catch (Exception)
-        // {
-        //     return StatusCode(500, "Server Error");
-        // }
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "Server Error");
+        }
     }
     [HttpPost("storeFazaas")]
     public async Task<ActionResult> CreateFazaa(FazaaCreateDto fazaaCreateDto)
@@ -156,7 +156,7 @@ public class FazaaController(
         return Ok(fazaas);
     }
     [HttpGet("getFazaaById/{id}")]
-    public async Task<ActionResult<FazaaDto>> getFazaaById(int id)
+    public async Task<ActionResult<IEnumerable<FazaaDto>>> getFazaaById(int id)
     {
         var fazaa = await _fazaaRepository.GetFazaaById(id);
         if (fazaa == null)

@@ -166,7 +166,7 @@ namespace API.Controllers.v1
             if (Id == -1)
                 return Unauthorized(new { Error = "Not authorized" });
 
-            var fazaa = await _fazaaRepository.GetFazaaByPassengerId(Id);
+            var fazaa = await _fazaaRepository.GetFazaasByPassengerId(Id);
 
             if (fazaa == null)
                 return Ok(new { Success = true });

@@ -37,6 +37,7 @@ namespace api.Controllers.v1
                 return BadRequest(new { Error = "Bad Thief Catch him ... or her i don't know" });
             if (creditCard.Balance < chargingTransactionCreateDto.Amount)
                 return BadRequest(new { Error = "Insuffucient Balance, so POOOOOOOOOR!" });
+            // if((await _fazaaRepository.GetFazaaByPassengerId(Id)) != null)
             if (!await _chargingTransactionRepository.CreateChargingTransaction(chargingTransactionCreateDto, Id))
                 return StatusCode(500, new { Error = "Server Error1" });
             if (!await _chargingTransactionRepository.SaveChanges())

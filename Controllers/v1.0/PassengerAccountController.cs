@@ -19,7 +19,8 @@ namespace API.Controllers.v1
         ITokenHandlerService tokenHandlerService,
         IBlacklistedTokenRepository blacklistedTokenRepository,
         IConfiguration configuration,
-        ITripRepository tripRepository
+        ITripRepository tripRepository,
+        IBusRepository busRepository
             ) : BaseApiController
     {
         private readonly IPassengerRepository _passengerRepository = passengerRepository;
@@ -30,6 +31,7 @@ namespace API.Controllers.v1
         private readonly IBlacklistedTokenRepository _blacklistedTokenRepository = blacklistedTokenRepository;
         private readonly IConfiguration _configuration = configuration;
         private readonly ITripRepository _tripRepository = tripRepository;
+        private readonly IBusRepository _busRepository = busRepository;
 
         [HttpPost("register/{OTP}")]
         public async Task<ActionResult<LoginResponseDto>> Register(RegisterDto registerDto, int OTP)
@@ -178,18 +180,24 @@ namespace API.Controllers.v1
                     status = ZingyStatus.NOTLOGGEDIN
                 });
 
-            var trips = await _tripRepository.GetTripsById(Id);
+            var trips = (await _tripRepository.GetTripsById(Id));
+
+            // System.Console.WriteLine(trips[0].Status);
             if (trips != null)
             {
-                var trip = trips.FirstOrDefault(t => t!.Status!.Equals(TripStatus.ONGOING.ToString(), StringComparison.CurrentCultureIgnoreCase) || t!.Status!.Equals(TripStatus.PENDING.ToString(), StringComparison.CurrentCultureIgnoreCase));
+                
+                var trip = trips.SingleOrDefault(t => t!.Status!.Equals(Status.ONGOING.ToString(), StringComparison.CurrentCultureIgnoreCase) || t!.Status!.Equals(Status.PENDING.ToString(), StringComparison.CurrentCultureIgnoreCase))!;
+
                 if (trip != null)
+                {
                     return Ok(new statusDto
                     {
                         status = ZingyStatus.INTRIP,
                         trip = trip,
-                        BusId = trip.DriverTrip!.BusId,
+                        Bus = await _busRepository.GetBusById((int)trip.DriverTrip!.BusId!),
                         route = trip.DriverTrip!.Route
                     });
+                }
             }
 
             return Ok(new statusDto

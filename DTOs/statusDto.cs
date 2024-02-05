@@ -7,6 +7,6 @@ namespace API.DTOs
         public ZingyStatus status { get; set; }
         public TripDto? trip { get; set; }
         public RouteDto? route { get; set; }
-        public int? BusId { get; set; }
+        public BusDto? Bus { get; set; }
     }
 }
